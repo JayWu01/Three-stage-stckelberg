@@ -3,8 +3,9 @@ import csv
 import os
 
 # # 常量
-n_number = 1
+n_number = 10
 v_number = 10
+bg=[]
 Alpha_e = 2
 Alpha_c = 1
 phi_e = 1
@@ -58,6 +59,10 @@ l_th = 5
 vp_min=0.1
 v_p = (Q_j-vp_min) * np.exp(-0.1 * l_th) + vp_min
 
+
+#Userdevice 配置
+bi_size_range = [6, 10]
+bi_range = [bi_size_range[1], bi_size_range[1] * 1.5]
 
 class Lamd:
     def __init__(self, index, lamda_1, lamda_2, lamda_3, lamda_4, lamda_5, lamda_6, lamda_7, lamda_8, lamda_9):
@@ -304,13 +309,64 @@ class Vechicle:
             return ans
 
 
+class UserDevice:
+    def __init__(self, index, bi, Q_total_v, f_v):
+        self.index = index
+        self.bi = bi
+        # self.Q_total_v = Q_total_v
+        # self.f_v = f_v
+
+    @staticmethod
+    def build(file_name='userDevice.csv', cnt=n_number):
+        """
+        生成csv数据集文件
+        随机生成csv数据集文件
+        :param name: 文件名称
+        :param cnt: 循环次数
+        """
+        file_name = os.path.join(file_path, file_name)
+        with open(file_name, 'w', newline="") as f:
+            writer = csv.writer(f)
+            for i in range(cnt):
+                ls = []
+                ls.append(i)
+                bi = np.round(np.random.uniform(bi_range[0], bi_range[1]), 1)
+                ls.append(bi)
+                writer.writerow(ls)
+            f.close()
+
+    @staticmethod
+    def read(count, file_name='userDevice.csv'):
+        """
+        从文件中读取服务
+        :param name: 文件名
+        :return: 返回读取完成的服务
+        """
+        ans = []
+        c = 0
+        bg.clear()
+        file_name = os.path.join(file_path, file_name)
+        with open(file_name) as f:
+            reader = csv.reader(f)
+            for i, rows in enumerate(reader):
+                if c < count:
+                    ls = rows
+                    bg.append(float(ls[1]))
+                    c += 1
+                else:
+                    return ans
+            return ans
+
+
 if __name__ == '__main__':
-    Task.build()
-    Task.read(n_number)
-    Task.buildPrice()
-    Task.readPrice(n_number)
-    Lamd.build()
-    Task.read(n_number)
-    Lamd.read(n_number)
-    Vechicle.build()
-    Vechicle.read(v_number)
+    # Task.build()
+    # Task.read(n_number)
+    # Task.buildPrice()
+    # Task.readPrice(n_number)
+    # Lamd.build()
+    # Task.read(n_number)
+    # Lamd.read(n_number)
+    # Vechicle.build()
+    # Vechicle.read(v_number)
+    UserDevice.build()
+    UserDevice.read(v_number)
