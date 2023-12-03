@@ -22,7 +22,7 @@ def optimal_Stage3strategy_KKT(P_0, P_1, P_2, alpha, beta, zeta,bi):
     f_i2 = alpha[2] / (P[2] * zeta[2]) - beta[2] ** -1
     if f_i0 > 0 and f_i1 > 0 and f_i2 > 0 and (bi - (f_i0 * P[0]+ f_i1 * P[1] + f_i2 * P[2])) >= 0:
         print("Case 2-1")
-       # #  return bi,f_i0, f_i1, f_i2
+        return bi,f_i0, f_i1, f_i2
 
     ################################################################### Case 2-2
     P = np.array([P_0, P_1, P_2])
@@ -35,7 +35,7 @@ def optimal_Stage3strategy_KKT(P_0, P_1, P_2, alpha, beta, zeta,bi):
     b= bi - (f_i0 * P[0]+ f_i1 * P[1] + f_i2 * P[2])
     if lamda and f_i0 > 0 and f_i1 > 0 and f_i2 > 0:
         print("Case 2-2")
-       #  return bi,f_i0, f_i1, f_i2
+        return bi,f_i0, f_i1, f_i2
 
     ################################################################### Case 3-1
     P = np.array([P_0, P_1, P_2])
@@ -44,7 +44,7 @@ def optimal_Stage3strategy_KKT(P_0, P_1, P_2, alpha, beta, zeta,bi):
     f_i2= alpha[2]/(zeta[2]*P[2])-beta[2]**-1
     if P[0] == alpha[0]*beta[0]/zeta[0] and f_i1 > 0 and f_i2 > 0 and (bi - (f_i0 * P[0]+ f_i1 * P[1] + f_i2 * P[2])) >= 0:
         print("Case 3-1")
-       #  return bi,f_i0, f_i1, f_i2
+        return bi,f_i0, f_i1, f_i2
 
     ################################################################### Case 3-2
     P = np.array([P_0, P_1, P_2])
@@ -64,7 +64,7 @@ def optimal_Stage3strategy_KKT(P_0, P_1, P_2, alpha, beta, zeta,bi):
     b = bi - (f_i0 * P[0] + f_i1 * P[1] + f_i2 * P[2])
     if lamda > 0 and mu_i0 >= 0 and f_i1 > 0 and f_i2 > 0:
         print("Case 3-2")
-       #  return bi,f_i0, f_i1, f_i2
+        return bi,f_i0, f_i1, f_i2
 
     ################################################################### Case 4-1
     P = np.array([P_0, P_1, P_2])
@@ -74,7 +74,7 @@ def optimal_Stage3strategy_KKT(P_0, P_1, P_2, alpha, beta, zeta,bi):
     if P[1] == alpha[1] * beta[1] / zeta[1] and f_i0 > 0 and f_i2 > 0 and (bi -sum([f_i0 * P[0] + f_i1 * P[1] + f_i2 * P[2] for i in
                   range(nuser)])) >= 0:
         print("Case 4-1")
-       #  return bi,f_i0, f_i1, f_i2
+        return bi,f_i0, f_i1, f_i2
 
     ################################################################## Case 4-2
     P = np.array([P_0, P_1, P_2])
@@ -95,7 +95,7 @@ def optimal_Stage3strategy_KKT(P_0, P_1, P_2, alpha, beta, zeta,bi):
     b = bi - (f_i0 * P[0] + f_i1 * P[1] + f_i2 * P[2])
     if lamda > 0 and mu_i1 >= 0 and f_i0 > 0 and f_i2 > 0:
         print("Case 4-2")
-       #  return bi,f_i0, f_i1, f_i2
+        return bi,f_i0, f_i1, f_i2
 
     ################################################################### Case 5-1
     P = np.array([P_0, P_1, P_2])
@@ -106,7 +106,7 @@ def optimal_Stage3strategy_KKT(P_0, P_1, P_2, alpha, beta, zeta,bi):
             bi - sum([f_i0 * P[0] + f_i1 * P[1] + f_i2 * P[2] for i in
                   range(nuser)])) >= 0:
         print("Case 5-1")
-       #  return bi,f_i0, f_i1, f_i2
+        return bi,f_i0, f_i1, f_i2
 
     ################################################################### Case 5-2
     P = np.array([P_0, P_1, P_2])
@@ -126,7 +126,7 @@ def optimal_Stage3strategy_KKT(P_0, P_1, P_2, alpha, beta, zeta,bi):
     b = bi - (f_i0 * P[0] + f_i1 * P[1] + f_i2 * P[2])
     if lamda > 0 and mu_i0 >= 0 and f_i0 > 0 and f_i1 > 0:
         print("Case 5-2")
-       #  return bi,f_i0, f_i1, f_i2
+        return bi,f_i0, f_i1, f_i2
 
 
     ################################################################### Case 6-1
@@ -135,7 +135,7 @@ def optimal_Stage3strategy_KKT(P_0, P_1, P_2, alpha, beta, zeta,bi):
     f_i2= alpha[2]/(zeta[2]*P[2])-beta[2]**-1
     if P[0] == alpha[0]*beta[0]/zeta[0] and P[1] == alpha[1]*beta[1]/zeta[1] and f_i2 > 0 and (bi - (f_i0 * P[0]+ f_i1 * P[1] + f_i2 * P[2])) >= 0:
         print("Case 6-1")
-       #  return bi,f_i0, f_i1, f_i2
+        return bi,f_i0, f_i1, f_i2
 
     ################################################################### Case 6-2
     P = np.array([P_0, P_1, P_2])
@@ -148,7 +148,7 @@ def optimal_Stage3strategy_KKT(P_0, P_1, P_2, alpha, beta, zeta,bi):
     b = bi - (f_i0 * P[0] + f_i1 * P[1] + f_i2 * P[2])
     if lamda > 0 and mu_i0 >= 0 and mu_i1 >= 0:
         print("Case 6-2")
-       #  return bi,f_i0, f_i1, f_i2
+        return bi,f_i0, f_i1, f_i2
 
     ################################################################### Case 7-1
     P = np.array([P_0, P_1, P_2])
@@ -156,7 +156,7 @@ def optimal_Stage3strategy_KKT(P_0, P_1, P_2, alpha, beta, zeta,bi):
     f_i1 = alpha[1] / (zeta[1] * P[1]) - beta[1] ** -1
     if P[0] == alpha[0] * beta[0] / zeta[0] and P[2] == alpha[2] * beta[2] / zeta[2] and f_i1 > 0 and (bi - (f_i0 * P[0]+ f_i1 * P[1] + f_i2 * P[2])) >= 0:
         print("Case 7-1")
-       #  return bi,f_i0, f_i1, f_i2
+        return bi,f_i0, f_i1, f_i2
 
     ################################################################### Case 7-2
     P = np.array([P_0, P_1, P_2])
@@ -169,7 +169,7 @@ def optimal_Stage3strategy_KKT(P_0, P_1, P_2, alpha, beta, zeta,bi):
     b = bi - (f_i0 * P[0] + f_i1 * P[1] + f_i2 * P[2])
     if lamda > 0 and mu_i0 >= 0 and mu_i2 >= 0:
         print("Case 7-2")
-       #  return bi,f_i0, f_i1, f_i2
+        return bi,f_i0, f_i1, f_i2
 
     ################################################################### Case 8-1
     P = np.array([P_0, P_1, P_2])
@@ -177,7 +177,7 @@ def optimal_Stage3strategy_KKT(P_0, P_1, P_2, alpha, beta, zeta,bi):
     f_i0 = alpha[0] / (zeta[0] * P[0]) - beta[0] ** -1
     if P[1] == alpha[1] * beta[1] / zeta[1] and P[2] == alpha[2] * beta[2] / zeta[2] and f_i0 > 0 and (bi - (f_i0 * P[0]+ f_i1 * P[1] + f_i2 * P[2])) >= 0:
         print("Case 8-1")
-       #  return bi,f_i0, f_i1, f_i2
+        return bi,f_i0, f_i1, f_i2
 
     ################################################################### Case 8-2
     P = np.array([P_0, P_1, P_2])
@@ -190,7 +190,7 @@ def optimal_Stage3strategy_KKT(P_0, P_1, P_2, alpha, beta, zeta,bi):
     b = bi - (f_i0 * P[0] + f_i1 * P[1] + f_i2 * P[2])
     if lamda > 0 and mu_i2 >= 0 and mu_i1 >= 0:
         print("Case 8-2")
-       #  return bi,f_i0, f_i1, f_i2
+        return bi,f_i0, f_i1, f_i2
 
 
     return bi,0,0,0
@@ -206,12 +206,32 @@ def caculateUilityofCloudAndMec(p, c, f, a, p_Rsu, f_Rsu, e, K,phi):
     return U_c
 
 # 计算梯度
-def caculate_gradient():
+def caculate_gradient(f_c):
+    phi_2_grad=f_c
     return 0
+
+
+# 计算Cloud效益函数值
+def caculateUilityofCloud(p, c, f, a, p_Rsu, e, K,phi,f_ic):
+    # 定义变量
+    # 计算 能耗成本E
+    E = e * K * f ** 2
+    # 计算整体表达式
+    U_c = phi * np.log(1 + p - c) * f - a * E - p_Rsu * (np.sum(f_ic)-f)
+    return U_c
+
+# 计算梯度
+def caculate_gradient(f_c,f_ic,a,beta,zeta,p_c):
+    phi_1_grad=np.sum(f_ic)-f_c
+    phi_2_grad=f_c
+    phi_4_grad=a*beta-zeta*p_c
+    return phi_1_grad,phi_2_grad,phi_4_grad
+
 
 # 核心代码：拉格朗日交替更新拉格朗日乘子
 def LagrangeDual(fi_0,fi_1,fi_2):
-
+    f_c, f_ic, a, beta, zeta, p_c=0
+    phi_1_grad,phi_2_grad,phi_4_grad=caculate_gradient(f_c, f_ic, a, beta, zeta, p_c)
     return 0
 
 
@@ -235,6 +255,9 @@ alpha, beta, zeta=np.array([0.7,1.4,1.4]),np.array([0.5,0.5,0.5]),np.array([1,1.
 # alpha, beta, zeta=np.array([7,14,12]),np.array([7.2,8.2,545.2]),np.array([71,81,5])
 if __name__ == '__main__':
     cst.UserDevice.read(nuser)
+    ls=[]
     for i in range(nuser):
         result = optimal_Stage3strategy_KKT(P_0, P_1, P_2, alpha, beta, zeta, bg[i])
+        ls.append(result)
         print(result)
+    print(ls)
