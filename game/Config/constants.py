@@ -58,12 +58,15 @@ l_th = 5
 # v_p = 0.5 ** (1 / l_th) * Q_j
 vp_min=0.1
 v_p = (Q_j-vp_min) * np.exp(-0.1 * l_th) + vp_min
-
-
+############################################################################################################################################
 #Userdevice 配置
 bi_size_range = [6, 10]
 bi_range = [bi_size_range[1], bi_size_range[1] * 1.5]
 
+
+############################################################################################################################################
+# 拉格朗日乘子配置
+phi_1, phi_2, phi_4=0,0,0
 class Lamd:
     def __init__(self, index, lamda_1, lamda_2, lamda_3, lamda_4, lamda_5, lamda_6, lamda_7, lamda_8, lamda_9):
         self.index = index
@@ -358,6 +361,67 @@ class UserDevice:
             return ans
 
 
+class Phi:
+    def __init__(self, index, phi_1, phi_2, phi_4):
+        self.index = index
+        self.phi_1 = phi_1
+        self.phi_2 = phi_2
+        self.phi_4 = phi_4
+
+    @staticmethod
+    def build(file_name='phi.csv', cnt=n_number):
+        """
+        生成csv数据集文件
+        随机生成csv数据集文件
+        :param name: 文件名称
+        :param cnt: 循环次数
+        """
+        file_name = os.path.join(file_path, file_name)
+        with open(file_name, 'w', newline="") as f:
+            writer = csv.writer(f)
+            for i in range(cnt):
+                ls = []
+                ls.append(i)
+                phi_1 = np.round(np.random.uniform(canshu[0], canshu[1]), 1)
+                phi_2 = np.round(np.random.uniform(canshu[0], canshu[1]), 1)
+                phi_4 = np.round(np.random.uniform(canshu[0], canshu[1]), 1)
+
+                ls.append(phi_1)
+                ls.append(phi_2)
+                ls.append(phi_4)
+
+                writer.writerow(ls)
+            f.close()
+
+    @staticmethod
+    def read(count, file_name='phi.csv'):
+        """
+        从文件中读取服务
+        :param name: 文件名
+        :return: 返回读取完成的服务
+        """
+        ans = []
+        c = 0
+        phi_1.clear()
+        phi_2.clear()
+        phi_4.clear()
+
+        file_name = os.path.join(file_path, file_name)
+        with open(file_name) as f:
+            reader = csv.reader(f)
+            for i, rows in enumerate(reader):
+                if c < count:
+                    ls = rows
+                    phi_1.append(float(ls[1]))
+                    phi_2.append(float(ls[2]))
+                    phi_4.append(float(ls[3]))
+
+                    c += 1
+                else:
+                    return ans
+            return ans
+
+
 if __name__ == '__main__':
     # Task.build()
     # Task.read(n_number)
@@ -370,3 +434,5 @@ if __name__ == '__main__':
     # Vechicle.read(v_number)
     UserDevice.build()
     UserDevice.read(v_number)
+    Phi.build()
+    Phi.read(n_number)
