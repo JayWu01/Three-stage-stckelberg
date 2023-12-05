@@ -6,13 +6,13 @@ nuser = cst.n_number
 bg = cst.bg
 
 # 拉格朗日乘子
-phi_0, phi_1, phi_2, phi_3, phi_4 = 8.2,2.0,9.8,4.9,1.9
-Mu_0, Mu_1, Mu_2, Mu_3, Mu_4 = 5.4,1.4,1.5,4.6,6.2
-theta_0, theta_1, theta_2, theta_3, theta_4 = 4.9,9.2,5.0, 7.3,9.5
+phi_0, phi_1, phi_2, phi_3, phi_4 = 8.2, 2.0, 9.8, 4.9, 1.9
+Mu_0, Mu_1, Mu_2, Mu_3, Mu_4 = 5.4, 1.4, 1.5, 4.6, 6.2
+theta_0, theta_1, theta_2, theta_3, theta_4 = 4.9, 9.2, 5.0, 7.3, 9.5
 # 权重参数
-alpha, beta, zeta = np.array([0.7, 1.4, 1.4]), np.array([0.5, 0.5, 0.5]), np.array([1, 1.2, 1.3])
-varphi, e, a = 8.2,2.0,9.8
-C = [0.2, 0.1, 0.1]  # 三台服务器成本
+alpha, beta, zeta = np.array([2.0, 1.0, 1.0]), np.array([1.0, 1.0, 1.0]), np.array([1.65, 1.65, 1.65])
+varphi, e, a = 8.2, 2.0, 9.8
+C = [0.4, 0.2, 0.2]  # 三台服务器成本
 K = [2, 1, 1]  # 服务器功率
 f_1_max, f_2_max = 5, 7  # M1、M2最大能提供的计算资源
 
@@ -55,7 +55,7 @@ def optimal_Stage3strategy_KKT(bi, P_0, P_1, P_2):
     f_i1 = alpha[1] * (B + bi) / (A * P[1]) - beta[1] ** -1
     f_i2 = alpha[2] * (B + bi) / (A * P[2]) - beta[2] ** -1
     b = bi - (f_i0 * P[0] + f_i1 * P[1] + f_i2 * P[2])
-    if lamda and f_i0 > 0 and f_i1 > 0 and f_i2 > 0:
+    if lamda  > 0 and f_i0 > 0 and f_i1 > 0 and f_i2 > 0:
         print("Case 2-2")
         return bi, f_i0, f_i1, f_i2
 
@@ -261,8 +261,8 @@ def LagrangeDual(F_i0, F_i1, F_i2, f_0, f_1, f_2, P_0, P_1, P_2):
             # P_0_new=alpha[0]*beta[0]/zeta[0]
             P_0_new = C[0]
         else:
-            P_0_new = np.maximum(C[0],varphi * f_0 / (phi_4 * zeta[0] - phi_0) + C[0] - 1)
-        f_0_new = np.maximum(0,(varphi * np.log(1 + P_0 - C[0]) + P_rsu - phi_1 + phi_2) / (2 * a * e * K[0]))
+            P_0_new = np.maximum(C[0], varphi * f_0 / (phi_4 * zeta[0] - phi_0) + C[0] - 1)
+        f_0_new = np.maximum(0, (varphi * np.log(1 + P_0 - C[0]) + P_rsu - phi_1 + phi_2) / (2 * a * e * K[0]))
         f_0, P_0 = f_0_new, P_0_new
         phi_0_grad, phi_1_grad, phi_2_grad, phi_4_grad = caculate_CloudGradient(F_i0, f_0, P_0)
         phi_0_new = np.maximum(0, phi_0 + cst.s_k * phi_0_grad)
@@ -316,8 +316,8 @@ def LagrangeDual(F_i0, F_i1, F_i2, f_0, f_1, f_2, P_0, P_1, P_2):
     global theta_0, theta_1, theta_2, theta_3, theta_4
     for n in range(cst.max_iteration):
         if theta_4 * zeta[1] - theta_0 == 0:
-            # P_12_new=alpha[2]*beta[2]/zeta[2]
-            P_2_new = C[2]
+            P_2_new = alpha[2] * beta[2] / zeta[2]
+            # P_2_new = C[2]
         else:
             P_2_new = varphi * f_2 / (theta_4 * zeta[2] - theta_0) + C[2] - 1
         f_2_new = (varphi * np.log(1 + P_2 - C[2]) + P_rsu - theta_1 + theta_2 - theta_3) / (2 * a * e * K[1])
