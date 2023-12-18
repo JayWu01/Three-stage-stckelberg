@@ -10,14 +10,15 @@ phi_0, phi_1, phi_2, phi_3, phi_4 = 8.2, 2.0, 9.8, 4.9, 1.9
 Mu_0, Mu_1, Mu_2, Mu_3, Mu_4 = 5.4, 1.4, 1.5, 4.6, 6.2
 theta_0, theta_1, theta_2, theta_3, theta_4 = 4.9, 9.2, 5.0, 7.3, 9.5
 # 权重参数
-alpha, beta, zeta = np.array([2.0, 1.0, 1.0]), np.array([1.0, 1.0, 1.0]), np.array([1.65, 1.65, 1.65])
-varphi, e, a = 8.2, 2.0, 9.8
-C = [0.4, 0.2, 0.2]  # 三台服务器成本
-K = [2, 1, 1]  # 服务器功率
-f_1_max, f_2_max = 5, 7  # M1、M2最大能提供的计算资源
+alpha, beta, zeta = np.array([2.0, 1.0, 1.0]), np.array([1.5, 1.2, 1.2]), np.array([2, 1.5, 1.5])
+varphi, e, a = 1.0, 1.0, 1.0
+C = [0.5, 0.2, 0.2]  # 三台服务器成本
+# C = [0.0, 0.0, 0.0]  # 三台服务器成本
+K = [0.2, 0.1, 0.1]  # 服务器功率
+f_1_max, f_2_max = 3, 2  # M1、M2最大能提供的计算资源
 
 # stage 3决策变量
-P_rsu = 0.2
+P_rsu = 0.1
 
 
 # stage 2决策变量
@@ -27,6 +28,18 @@ P_rsu = 0.2
 # stage 1决策变量
 # F_i0, F_i1, F_i2 = np.array(np.zeros((1, nuser))), np.array(np.zeros((1, nuser))), np.array(np.zeros((1, nuser)))
 # F_i0, F_i1, F_i2 = [], [], []
+
+
+def find_Optial_mulitUser(P_0, P_1, P_2):
+    cst.UserDevice.read(nuser)
+    F_i0, F_i1, F_i2 = [], [], []
+    for i in range(nuser):
+        result = optimal_Stage3strategy_KKT(bg[i], P_0, P_1, P_2)
+        F_i0 = np.append(F_i0, result[1])
+        F_i1 = np.append(F_i1, result[2])
+        F_i2 = np.append(F_i2, result[3])
+
+    return F_i0, F_i1, F_i2
 
 
 def optimal_Stage3strategy_KKT(bi, P_0, P_1, P_2):
@@ -55,7 +68,7 @@ def optimal_Stage3strategy_KKT(bi, P_0, P_1, P_2):
     f_i1 = alpha[1] * (B + bi) / (A * P[1]) - beta[1] ** -1
     f_i2 = alpha[2] * (B + bi) / (A * P[2]) - beta[2] ** -1
     b = bi - (f_i0 * P[0] + f_i1 * P[1] + f_i2 * P[2])
-    if lamda  > 0 and f_i0 > 0 and f_i1 > 0 and f_i2 > 0:
+    if lamda > 0 and f_i0 > 0 and f_i1 > 0 and f_i2 > 0:
         print("Case 2-2")
         return bi, f_i0, f_i1, f_i2
 
@@ -221,6 +234,20 @@ def caculateUilityofCloudAndMec():
     return U
 
 
+# 计算云服务器的效益函数值
+def caculateUilityofCloud(f, P, C, F):
+    # f = [f_0, f_1, f_2]
+    # P = [P_0, P_1, P_2]
+    # F = [np.sum(F_i0), np.sum(F_i1), np.sum(F_i2)]
+    # 计算 能耗成本E
+    E = e * K[0] * (f ** 2)
+    R = (P - C) * F
+    # 计算整体表达式
+    U = varphi * np.log(1 + R) - a * E - P_rsu * (F - f)
+    # U = varphi * np.log(1 + (P - C) * f)  - P_rsu * (F - f)
+    return U
+
+
 # 计算cloud梯度
 def caculate_CloudGradient(F_i0, f_0, P_0):
     phi_0_grad = P_0 - C[0]
@@ -254,43 +281,70 @@ def caculate_MEC2Gradient(F_i2, f_2, P_2):
 def LagrangeDual(F_i0, F_i1, F_i2, f_0, f_1, f_2, P_0, P_1, P_2):
     # cloud 迭代
     # global f_0, P_0  # f_0 可提供的计算资源、P_0出售的价格
+    f_0_new, P_0_new = f_0, P_0  # f_0 可提供的计算资源、P_0出售的价格
     # global varphi, c, e, k, a, beta, zeta
     global phi_0, phi_1, phi_2, phi_3, phi_4
     for n in range(cst.max_iteration):
+
         if phi_4 * zeta[0] - phi_0 == 0:
-            # P_0_new=alpha[0]*beta[0]/zeta[0]
+            # P_0_new = alpha[0] * beta[0] / zeta[0]
             P_0_new = C[0]
         else:
-            P_0_new = np.maximum(C[0], varphi * f_0 / (phi_4 * zeta[0] - phi_0) + C[0] - 1)
-        f_0_new = np.maximum(0, (varphi * np.log(1 + P_0 - C[0]) + P_rsu - phi_1 + phi_2) / (2 * a * e * K[0]))
-        f_0, P_0 = f_0_new, P_0_new
+            P_0_new = np.maximum(alpha[0] * beta[0] / zeta[0],
+                                 varphi / (phi_4 * zeta[0] - phi_0) + C[0] - np.sum(F_i0) ** -1)
+            # P_0_new = np.maximum(C[0],
+            #                      varphi / (phi_4 * zeta[0] - phi_0) + C[0] - np.sum(F_i0) ** -1)
+            # P_0_new = varphi / (phi_4 * zeta[0] - phi_0) + C[0] - np.sum(F_i0) ** -1
+            f_0_new = (P_rsu - phi_1 + phi_2) / (2 * a * e * K[0])
+
         phi_0_grad, phi_1_grad, phi_2_grad, phi_4_grad = caculate_CloudGradient(F_i0, f_0, P_0)
-        phi_0_new = np.maximum(0, phi_0 + cst.s_k * phi_0_grad)
-        phi_1_new = np.maximum(0, phi_1 + cst.s_k * phi_1_grad)
-        phi_2_new = np.maximum(0, phi_2 + cst.s_k * phi_2_grad)
-        phi_4_new = np.maximum(0, phi_4 + cst.s_k * phi_4_grad)
-        if (np.abs(phi_0_new - phi_0) <= cst.Error_value).all() and (
-                np.abs(phi_1_new - phi_1) <= cst.Error_value).all() and (
-                np.abs(phi_2_new - phi_2) <= cst.Error_value).all() and (
-                np.abs(phi_4_new - phi_4) <= cst.Error_value).all():
+        phi_0_new = np.maximum(0, phi_0 - cst.s_k * phi_0_grad)
+        phi_1_new = np.maximum(0, phi_1 - cst.s_k * phi_1_grad)
+        phi_2_new = np.maximum(0, phi_2 - cst.s_k * phi_2_grad)
+        phi_4_new = np.maximum(0, phi_4 - cst.s_k * phi_4_grad)
+        print("第{}次迭代更新的乘子为：".format(n), phi_0, phi_1, phi_2, phi_4)
+        print("第{}次迭代云服务器效益值为：".format(n), caculateUilityofCloud(f_0_new, P_0_new, C[0], np.sum(F_i0)))
+        LagValue = caculateUilityofCloud(f_0_new, P_0_new, C[0], np.sum(
+            F_i0)) + phi_0_grad * phi_0_new + phi_1_grad * phi_1_new + phi_2_grad * phi_2_new + phi_4_grad * phi_1_new
+        # if (np.abs(phi_0_new - phi_0) <= cst.Error_value).all() and (
+        #         np.abs(phi_1_new - phi_1) <= cst.Error_value).all() and (
+        #         np.abs(phi_2_new - phi_2) <= cst.Error_value).all() and (
+        #         np.abs(phi_4_new - phi_4) <= cst.Error_value).all():
+        if (np.abs(LagValue - caculateUilityofCloud(f_0_new, P_0_new, C[0], np.sum(F_i0))) <= cst.Error_value).all():
+            phi_0 = phi_0_new
+            phi_1 = phi_1_new
+            phi_2 = phi_2_new
+            phi_4 = phi_4_new
+            if phi_4 * zeta[0] - phi_0 == 0:
+                # P_0_new = alpha[0] * beta[0] / zeta[0]
+                P_0_new = C[0]
+            else:
+                P_0_new = np.maximum(alpha[0] * beta[0] / zeta[0],
+                                     varphi / (phi_4 * zeta[0] - phi_0) + C[0] - np.sum(F_i0) ** -1)
+                # P_0_new = np.maximum(C[0],
+                #                      varphi / (phi_4 * zeta[0] - phi_0) + C[0] - np.sum(F_i0) ** -1)
+                # P_0_new = varphi / (phi_4 * zeta[0] - phi_0) + C[0] - np.sum(F_i0) ** -1
+                f_0_new = (P_rsu - phi_1 + phi_2) / (2 * a * e * K[0])
             break
-            # return P_0_new, f_0_new
+
         phi_0 = phi_0_new
         phi_1 = phi_1_new
         phi_2 = phi_2_new
         phi_4 = phi_4_new
 
+    # f_1, P_1=f_2, P_2 = f_0_new, P_0_new
     # M1 迭代
     # global f_1, P_1  # f_0 可提供的计算资源、P_0出售的价格
     global Mu_0, Mu_1, Mu_2, Mu_3, Mu_4
     for n in range(cst.max_iteration):
+        print("第{}次迭代更新的乘子为：".format(n), Mu_0, Mu_1, Mu_2, Mu_3, Mu_4)
         if Mu_4 * zeta[1] - Mu_0 == 0:
             # P_1_new=alpha[1]*beta[1]/zeta[1]
             P_1_new = C[1]
         else:
-            P_1_new = varphi * f_1 / (phi_4 * zeta[1] - Mu_0) + C[1] - 1
+            P_1_new = np.maximum(C[1], varphi * f_1 / (phi_4 * zeta[1] - Mu_0) + C[1] - 1)
 
-        f_1_new = (varphi * np.log(1 + P_1 - C[1]) + P_rsu - Mu_1 + Mu_2 - Mu_3) / (2 * a * e * K[1])
+        f_1_new = np.maximum(0, (varphi * np.log(1 + P_1_new - C[1]) + P_rsu - Mu_1 + Mu_2 - Mu_3) / (2 * a * e * K[1]))
         f_1, P_1 = f_1_new, P_1_new
         Mu_0_grad, Mu_1_grad, Mu_2_grad, Mu_3_grad, Mu_4_grad = caculate_MEC1Gradient(F_i1, f_1, P_1)
         Mu_0_new = np.maximum(0, Mu_0 + cst.s_k * Mu_0_grad)
@@ -319,8 +373,9 @@ def LagrangeDual(F_i0, F_i1, F_i2, f_0, f_1, f_2, P_0, P_1, P_2):
             P_2_new = alpha[2] * beta[2] / zeta[2]
             # P_2_new = C[2]
         else:
-            P_2_new = varphi * f_2 / (theta_4 * zeta[2] - theta_0) + C[2] - 1
-        f_2_new = (varphi * np.log(1 + P_2 - C[2]) + P_rsu - theta_1 + theta_2 - theta_3) / (2 * a * e * K[1])
+            P_2_new = np.maximum(C[2], varphi * f_2 / (theta_4 * zeta[2] - theta_0) + C[2] - 1)
+        f_2_new = np.maximum(0, (varphi * np.log(1 + P_2 - C[2]) + P_rsu - theta_1 + theta_2 - theta_3) / (
+                2 * a * e * K[1]))
         f_2, P_2 = f_2_new, P_2_new
         theta_0_grad, theta_1_grad, theta_2_grad, theta_3_grad, theta_4_grad = caculate_MEC2Gradient(F_i2, f_2, P_2)
         theta_0_new = np.maximum(0, theta_0 + cst.s_k * theta_0_grad)
@@ -343,18 +398,136 @@ def LagrangeDual(F_i0, F_i1, F_i2, f_0, f_1, f_2, P_0, P_1, P_2):
     return P_0, P_1, P_2, f_0, f_1, f_2
 
 
-if __name__ == '__main__':
+def find_nash_equilibrium():
+    # Initialization
+    p_0_min, p_1_min, p_2_min = C[0], C[1], C[2]
+    p_0_max, p_1_max, p_2_max = alpha[0] * beta[0] / zeta[0], alpha[1] * beta[1] / zeta[1], alpha[2] * beta[2] / zeta[2]
+    p_0_init, p_1_init, p_2_init = 0.5 * (p_0_min + p_0_max), 0.5 * (p_1_min + p_1_max), 0.5 * (p_2_min + p_2_max),
 
-    P_0, P_1, P_2 = 0.6, 0.3, 0.3
-    f_0, f_1, f_2 = 0.6, 0.3, 0.3  # 服务器能够提供的计算资源
-    while 1 == 1:
-        cst.UserDevice.read(nuser)
-        # cst.Phi.read(nuser)
-        F_i0, F_i1, F_i2 = [], [], []
-        for i in range(nuser):
-            result = optimal_Stage3strategy_KKT(bg[i], P_0, P_1, P_2)
-            F_i0 = np.append(F_i0, result[1])
-            F_i1 = np.append(F_i1, result[2])
-            F_i2 = np.append(F_i2, result[3])
-        print(F_i0 + F_i1 + F_i2)
-        P_0, P_1, P_2, f_0, f_1, f_2 = LagrangeDual(F_i0, F_i1, F_i2, f_0, f_1, f_2, P_0, P_1, P_2)
+    # Parameter Setup
+    Delta, Dt = 0.1, 0.1
+    dslow, dfast = 0.5, 2.0
+
+    while True:
+        # Adjust strategy for the hash-server
+        p_0_t, p_1_t, p_2_t = p_0_init, p_1_init, p_2_init
+
+        # Calculate utility for the cloud
+        Uc = calculate_utility_for_Cloud_server(p_0_t, p_1_t, p_2_t)
+        Uc_add_Delta = calculate_utility_for_Cloud_server(p_0_t + Delta, p_1_t, p_2_t)
+        Uc_minus_Delta = calculate_utility_for_Cloud_server(p_0_t - Delta, p_1_t, p_2_t)
+
+        if Uc_add_Delta >= Uc and Uc_add_Delta >= Uc_minus_Delta:
+            p_0_init = min(p_0_t + Delta, p_0_max)
+        elif Uc_minus_Delta >= Uc and Uc_minus_Delta >= Uc_add_Delta:
+            p_0_init = max(p_0_t - Delta, p_0_min)
+        else:
+            p_0_init=p_0_t
+
+        # if (np.abs(p_0_init-p_0_t) <= cst.Error_value).all():
+        #     return p_0_init
+        # # Reduce the step for the hash-server
+        # Dh = dfast * Dh if p0h != ph else dslow * Dh
+        #
+        # # Adjust strategy for the task-server
+        # p0h, p0t = ph, pt
+
+        # Calculate utility for the M1-server
+        U_m1 = calculate_utility_for_M1_server(p_1_t, p_0_t, p_2_t)
+        U_m1_add_Delta = calculate_utility_for_M1_server(p_1_t + Delta, p_0_t, p_2_t)
+        U_m1_minus_Delta = calculate_utility_for_M1_server(p_1_t - Delta, p_0_t, p_2_t)
+
+        if U_m1_add_Delta >= U_m1 and U_m1_add_Delta >= U_m1_minus_Delta:
+            p_1_init = min(p_1_t + Delta, p_1_max)
+        elif U_m1_minus_Delta >= U_m1 and U_m1_minus_Delta >= U_m1_add_Delta:
+            p_1_init = max(p_1_t - Delta, p_1_min)
+        else:
+            p_1_init=p_1_t
+
+        # if (np.abs(p_1_init-p_1_t) <= cst.Error_value).all():
+        #     return p_1_init
+
+        # Calculate utility for the M2-server
+        U_m2 = calculate_utility_for_M2_server(p_2_t, p_0_t, p_1_t)
+        U_m2_add_Delta = calculate_utility_for_M2_server(p_2_t + Delta, p_0_t, p_1_t)
+        U_m2_minus_Delta = calculate_utility_for_M2_server(p_2_t - Delta, p_0_t, p_1_t)
+
+        if U_m2_add_Delta >= U_m2 and U_m2_add_Delta >= U_m2_minus_Delta:
+            p_2_init = min(p_2_t + Delta, p_2_max)
+        elif U_m2_minus_Delta >= U_m2 and U_m2_minus_Delta >= U_m2_add_Delta:
+            p_2_init = max(p_2_t - Delta, p_2_min)
+        else:
+            p_2_init=p_2_t
+        #
+        # if (np.abs(p_2_init-p_2_t) <= cst.Error_value).all():
+        #     return p_2_init
+
+        if (np.abs(p_2_init-p_2_t) <= cst.Error_value).all() and (np.abs(p_2_init-p_2_t) <= cst.Error_value).all() and (np.abs(p_2_init-p_2_t) <= cst.Error_value).all():
+            return p_0_init, p_1_init, p_2_init
+
+    # The loop continues indefinitely until a stopping criterion is met
+    # Return the final pricing strategies (ph, pt)
+    return p_0_init, p_1_init, p_2_init
+
+
+# 计算云服务器的效益函数值
+def calculate_utility_for_Cloud_server(p_0_t, p_1_t, p_2_t):
+    #fix(f_vop_0,P_vop)
+    f_vop_0=P_vop=0.5
+    F_i0,F_i1,F_i2= find_Optial_mulitUser(p_0_t, p_1_t, p_2_t)
+
+    #奖励回报
+    Reward=p_0_t*np.log(1 + sum(F_i0))
+    # 计算 能耗、成本
+    E = a *e * K[0] * ((sum(F_i0)-f_vop_0) ** 2)
+    payment = P_vop*np.log(1 + f_vop_0)
+    # 计算整体表达式
+    U = Reward - E - payment
+    return U
+
+def calculate_utility_for_M1_server(p_1_t, p_0_t, p_2_t):
+    #fix(f_vop_0,P_vop)
+    f_vop_1=P_vop=0.5
+    F_i0,F_i1,F_i2= find_Optial_mulitUser(p_0_t, p_1_t, p_2_t)
+
+    #奖励回报
+    Reward=p_1_t*np.log(1 + sum(F_i0))
+    # 计算 能耗、成本
+    E = a *e * K[1] * ((sum(F_i1)-f_vop_1) ** 2)
+    payment = P_vop*np.log(1 + f_vop_1)
+    # 计算整体表达式
+    U = Reward - E - payment
+    return U
+
+def calculate_utility_for_M2_server(p_2_t, p_0_t, p_1_t):
+    #fix(f_vop_0,P_vop)
+    f_vop_2=P_vop=0.5
+    F_i0,F_i1,F_i2= find_Optial_mulitUser(p_0_t, p_1_t, p_2_t)
+
+    #奖励回报
+    Reward=p_2_t*np.log(1 + sum(F_i0))
+    # 计算 能耗、成本
+    E = a *e * K[2] * ((sum(F_i2)-f_vop_2) ** 2)
+    payment = P_vop*np.log(1 + f_vop_2)
+    # 计算整体表达式
+    U = Reward - E - payment
+    return U
+
+
+if __name__ == '__main__':
+    p_0_init, p_1_init, p_2_init=find_nash_equilibrium()
+    print(p_0_init, p_1_init, p_2_init)
+
+    # P_0, P_1, P_2 = 1.0, 0.3, 0.25
+    # f_0, f_1, f_2 = 0.6, 0.3, 0.3  # 服务器能够提供的计算资源
+    # while 1 == 1:
+    #     cst.UserDevice.read(nuser)
+    #     # cst.Phi.read(nuser)
+    #     F_i0, F_i1, F_i2 = [], [], []
+    #     for i in range(nuser):
+    #         result = optimal_Stage3strategy_KKT(bg[i], P_0, P_1, P_2)
+    #         F_i0 = np.append(F_i0, result[1])
+    #         F_i1 = np.append(F_i1, result[2])
+    #         F_i2 = np.append(F_i2, result[3])
+    #     print(F_i0, F_i1, F_i2)
+    #     P_0, P_1, P_2, f_0, f_1, f_2 = LagrangeDual(F_i0, F_i1, F_i2, f_0, f_1, f_2, P_0, P_1, P_2)
