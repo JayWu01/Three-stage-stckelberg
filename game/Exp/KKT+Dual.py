@@ -28,7 +28,7 @@ Q_total_m = cst.Q_total_m  # 车辆m的计算资源负载
 # stageI
 Omega_m = cst.Omega_m  # 约束C1
 Phi_m = cst.Phi_m  # 约束C1
-Pi = [1.0]  # 约束C2
+Pi = 1.0  # 约束C2
 Upsilon_j = [1.0, 1.0, 1.0]  # #约束C3
 Lambda_j = [1.0, 1.0, 1.0]  # #约束C3
 f_m, p_m = [], []  # 合同（f_m,p_m）
@@ -105,16 +105,15 @@ def calculate_utility_for_M2_server(p_2_t, p_0_t, p_1_t):
 # stage I 计算Vop的效益
 def calculate_utility_for_Vop():
     # global Theta_m, lamda_m
-    Theta = sorted(Theta_m, key=lambda x: x[-1] if isinstance(x[-1], (int, float)) else x)
     # fix(f_vop_0,P_vop)
     F = [F_i0, F_i1, F_i2]
     # 奖励回报
     # Reward = sum([sum(F[i]) - p_j_vop[i] / (2 * a * e * K[i]) for i in range(len(K))])
     Reward = sum([p_j_vop[i] * (sum(F[i]) - p_j_vop[i] / (2 * a * e * K[i])) for i in range(len(K))])
     # 付给车辆的成本
-    payment_cost = v_number * sum([lamda_m[i] * (f_m[i] * Theta[i] ** -1 + sum(
-        [(Theta[j - 1] ** -1 - Theta[j] ** -1) * f_m[j - 1] ** -1 for j in range(1, lamda_m)])) for i in
-                                   range(lamda_m)])
+    payment_cost = v_number * sum([lamda_m[i] * (f_m[i] * Theta_m[i] ** -1 + sum(
+        [(Theta_m[j - 1] ** -1 - Theta_m[j] ** -1) * f_m[j - 1] ** 2 for j in range(1, v_number)])) for i in
+                                   range(v_number)])
     # 计算整体表达式
     U_vop = Reward - payment_cost
     return U_vop
@@ -124,50 +123,59 @@ def calculate_utility_for_Vop():
 def caculate_VopGradient(f_m):
     # global  Omega_m, Pi, Upsilon_j, Lambda_j
     # global p_j_vop
+    F_i0, F_i1, F_i2 = 12, 11, 24
     F = [F_i0, F_i1, F_i2]
     Phi_m_grad = f_m
-    Omega_m_grad = Q_total_m - f_m
-    Pi_grad = v_number * sum(lamda_m[i] * f_m[i] for i in range(v_number)) - sum(
-        [sum(F[j]) - p_j_vop[j] / (2 * a * e * K[j]) for j in range(len(K))])
+    Omega_m_grad = [Q_total_m[i] - f_m[i] for i in range(v_number)]
+    # Pi_grad = v_number * sum([lamda_m[i] * f_m[i] for i in range(v_number)]) - sum(
+    #     [F[j] - p_j_vop[j] / (2 * a * e * K[j]) for j in range(len(K))])
+    f_vop_j = [0.04, 0.06, 0.02]
+    Pi_grad = v_number * sum([lamda_m[i] * f_m[i] for i in range(v_number)]) - sum(
+        [f_vop_j[j] for j in range(len(K))])
 
     Upsilon_j_grad = p_j_vop
-    Lambda_j_grad = 2 * a * e * K * F - p_j_vop
+    Lambda_j_grad = [2 * a * e * K[j] * F[j] - p_j_vop[j] for j in range(len(K))]
     return Phi_m_grad, Omega_m_grad, Pi_grad, Upsilon_j_grad, Lambda_j_grad
 
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # 核心代码：拉格朗日交替更新拉格朗日乘子 stageI
-def LagrangeDualStage1Vop():
+def LagrangeDualStageIforVop():
     global Phi_m, Omega_m, Pi, Upsilon_j, Lambda_j
     global f_m, p_j_vop
+    F_i0, F_i1, F_i2 = 12, 11, 24
     for n in range(cst.max_iteration):
+        Pi = 0
         F = [F_i0, F_i1, F_i2]
         rho_m = [2 * v_number * ((lamda_m[i] / Theta_m[i]) + (Theta_m[i] ** -1 + Theta_m[i + 1] ** -1) * sum(
             lamda_m[j] for j in range(i + 1, v_number))) for i in range(v_number - 1)]
         con = [Phi_m[i] - Omega_m[i] + Pi * lamda_m[i] * v_number for i in range(v_number)]
-        f_m = [con[m] / rho_m[m] if m != v_number else Theta_m[m] * con[m] / (2 * v_number * lamda_m[m]) for m in
+        f_m = [con[m] / rho_m[m] if m != v_number - 1 else Theta_m[m] * con[m] / (2 * v_number * lamda_m[m]) for m in
                range(v_number)]
-        p_j_vop = 2 * a * e * K * (F + Upsilon_j - Lambda_j)
+        p_j_vop = [2 * a * e * K[j] * (F[j] + Upsilon_j[j] - Lambda_j[j]) for j in range(len(K))]
+
         Phi_m_grad, Omega_m_grad, Pi_grad, Upsilon_j_grad, Lambda_j_grad = caculate_VopGradient(f_m)
-        Phi_m_new = np.maximum(0, Phi_m - cst.s_k * Phi_m_grad)
-        Omega_m_new = np.maximum(0, Omega_m - cst.s_k * Omega_m_grad)
-        Pi_new = np.maximum(0, Pi - cst.s_k * Pi_grad)
-        Upsilon_j_new = np.maximum(0, Upsilon_j - cst.s_k * Upsilon_j_grad)
-        Lambda_j_new = np.maximum(0, Lambda_j - cst.s_k * Lambda_j_grad)
-        print("第{}次迭代更新的乘子为：".format(n), Phi_m_new, Omega_m_new, Pi_new, Upsilon_j_new, Lambda_j_new)
+
+        Phi_m_new = [np.maximum(0, Phi_m[i] - cst.s_k * Phi_m_grad[i]) for i in range(v_number)]
+        Omega_m_new = [np.maximum(0, Omega_m[i] - cst.s_k * Omega_m_grad[i]) for i in range(v_number)]
+        # Pi_new = np.maximum(0, Pi - cst.s_k * Pi_grad)
+        Pi_new = 0
+        Upsilon_j_new = [np.maximum(0, Upsilon_j[j] - cst.s_k * Upsilon_j_grad[j]) for j in range(len(K))]
+        Lambda_j_new = [np.maximum(0, Lambda_j[j] - cst.s_k * Lambda_j_grad[j]) for j in range(len(K))]
+
+        print("第{}次迭代更新的乘子为：".format(n + 1), Phi_m_new, Omega_m_new, Pi_new, Upsilon_j_new, Lambda_j_new)
         utility_for_Vop = calculate_utility_for_Vop()
-        print("第{}次迭代Vop效益值为：".format(n), utility_for_Vop)
+        print("第{}次迭代Vop效益值为：".format(n + 1), utility_for_Vop)
         LagValue = utility_for_Vop + sum([Phi_m_grad[i] * Phi_m_new[i] for i in range(len(Phi_m_grad))]) + sum(
             [Omega_m_grad[i] * Omega_m_new[i] for i in range(len(Omega_m_grad))]) + Pi_grad * Pi_new + sum(
-            [Upsilon_j_grad[j] * Upsilon_j_new[j] for j in range(len(
-                len(K)))]) + sum([Lambda_j_grad[j] * Lambda_j_new[j] for j in range(len(
-            len(K)))])
+            [Upsilon_j_grad[j] * Upsilon_j_new[j] for j in range(len(K))]) + sum(
+            [Lambda_j_grad[j] * Lambda_j_new[j] for j in range(len(K))])
         # if (np.abs(phi_0_new - phi_0) <= cst.Error_value).all() and (
         #         np.abs(phi_1_new - phi_1) <= cst.Error_value).all() and (
         #         np.abs(phi_2_new - phi_2) <= cst.Error_value).all() and (
         #         np.abs(phi_4_new - phi_4) <= cst.Error_value).all():
-        if (np.abs(LagValue - utility_for_Vop()) <= cst.Error_value).all():
+        if (np.abs(LagValue - utility_for_Vop) <= cst.Error_value).all():
             Phi_m = Phi_m_new
             Omega_m = Omega_m_new
             Pi = Pi_new
@@ -441,5 +449,6 @@ if __name__ == '__main__':
     cst.LM.read(v_number)
     cst.Vechicle.read(v_number)
     cst.UserDevice.read(nuser)
-    p_0_init, p_1_init, p_2_init = find_nash_equilibrium()
-    print(p_0_init, p_1_init, p_2_init)
+    # p_0_init, p_1_init, p_2_init = find_nash_equilibrium()
+    # print(p_0_init, p_1_init, p_2_init)
+    LagrangeDualStageIforVop()

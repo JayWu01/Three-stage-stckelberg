@@ -1,12 +1,12 @@
 import numpy as np
 import csv
 import os
-
+import random
 # # 常量
 n_number = 10
 v_number = 10
 bg = []
-s_k = 0.1  # (0.8-1.4)
+s_k = 1.1  # (0.8-1.4)
 
 Error_value = 0.000001
 max_iteration = 2000
@@ -23,9 +23,9 @@ file_path = 'D:/江西理工大学/边缘计算/Three-stage-stckelberg/game/Data
 # 初始化限制车辆参数
 Price_v, Q_total_m, f_m, k_m, e_m, Theta_m = [], [], [], [], [], []
 Q_total_m_range = [10, 20]
-k_m_range = [1, 2]
-e_m_range = [1, 2]
-f_m_range = [3, 5]
+k_m_range = [1, 5]
+e_m_range = [1, 5]
+f_m_range = [3, 6]
 
 ############################################################################################################################################
 # Userdevice 配置
@@ -35,7 +35,7 @@ bi_range = [bi_size_range[1], bi_size_range[1] * 1.5]
 
 ############################################################################################################################################
 class Vechicle:
-    def __init__(self, index, Q_total_m, Theta_m, f_m, k_m, e_m):
+    def __init__(self, index, Q_total_m, k_m, e_m, Theta_m, f_m):
         self.index = index
         self.Q_total_m = Q_total_m
         self.Theta_m = Theta_m
@@ -52,23 +52,34 @@ class Vechicle:
         :param cnt: 循环次数
         """
         file_name = os.path.join(file_path, file_name)
+        column_ranges = [(Q_total_m_range[0], Q_total_m_range[1]), (k_m_range[0], k_m_range[1]), (e_m_range[0], e_m_range[1])]
+        random_matrix = [[round(random.uniform(low, high),2) for (low, high) in column_ranges] for i in range(v_number)]
+        for row in random_matrix:
+            row.append(round(row[1] * row[2],4))
+        # 对每行按照最后一列的值进行升序排序(按照Theta升序)
+        sorted_matrix = sorted(random_matrix, key=lambda x: x[-1])
+        # 添加序号到每行的第一个位置
+        sorted_matrix = [[i] + row for i, row in enumerate(sorted_matrix)]
         with open(file_name, 'w', newline="") as f:
-            writer = csv.writer(f)
-            for i in range(cnt):
-                ls = []
-                ls.append(i)
-                # Theta_m = np.round(np.random.uniform(Q_total_m_range[0], Q_total_m_range[1]), 1)
-                # f_m = np.round(np.random.uniform(f_v_range[0], f_v_range[1]), 1)
-                # Price_v = np.round(np.random.uniform(canshu[0], canshu[1]), 1)
-                Q_total_m = np.round(np.random.uniform(Q_total_m_range[0], Q_total_m_range[1]), 1)
-                k_m = np.round(np.random.uniform(k_m_range[0], k_m_range[1]), 1)
-                e_m = np.round(np.random.uniform(e_m_range[0], e_m_range[1]), 1)
-                Theta_m = (k_m * e_m) ** -1
-                ls.append(Q_total_m)
-                ls.append(k_m)
-                ls.append(e_m)
-                ls.append(Theta_m)
-                writer.writerow(ls)
+            csv_writer = csv.writer(f)
+            # 写入排序后的矩阵
+            csv_writer.writerows(sorted_matrix)
+            # writer = csv.writer(f)
+            # for i in range(cnt):
+            #     ls = []
+            #     ls.append(i)
+            #     # Theta_m = np.round(np.random.uniform(Q_total_m_range[0], Q_total_m_range[1]), 1)
+            #     # f_m = np.round(np.random.uniform(f_v_range[0], f_v_range[1]), 1)
+            #     # Price_v = np.round(np.random.uniform(canshu[0], canshu[1]), 1)
+            #     Q_total_m = np.round(np.random.uniform(Q_total_m_range[0], Q_total_m_range[1]), 1)
+            #     k_m = np.round(np.random.uniform(k_m_range[0], k_m_range[1]), 1)
+            #     e_m = np.round(np.random.uniform(e_m_range[0], e_m_range[1]), 1)
+            #     Theta_m = (k_m * e_m) ** -1
+            #     ls.append(Q_total_m)
+            #     ls.append(k_m)
+            #     ls.append(e_m)
+            #     ls.append(Theta_m)
+            #     writer.writerow(ls)
             f.close()
 
     @staticmethod
@@ -210,8 +221,8 @@ if __name__ == '__main__':
     # UserDevice.build()
     # UserDevice.read(v_number)
 
-    # Vechicle.build()
-    # Vechicle.read(v_number)
+    Vechicle.build()
+    Vechicle.read(v_number)
 
-    LM.build()
-    LM.read(v_number)
+    # LM.build()
+    # LM.read(v_number)
