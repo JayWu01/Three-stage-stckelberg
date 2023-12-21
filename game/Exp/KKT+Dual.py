@@ -5,22 +5,22 @@ import numpy as np
 nuser = cst.n_number
 bg = cst.bg
 Theta_m = cst.Theta_m
-# 拉格朗日乘子
-phi_0, phi_1, phi_2, phi_3, phi_4 = 8.2, 2.0, 9.8, 4.9, 1.9
-Mu_0, Mu_1, Mu_2, Mu_3, Mu_4 = 5.4, 1.4, 1.5, 4.6, 6.2
-theta_0, theta_1, theta_2, theta_3, theta_4 = 4.9, 9.2, 5.0, 7.3, 9.5
 # 权重参数
-alpha, beta, zeta = np.array([2.0, 1.0, 1.0]), np.array([1.5, 1.2, 1.2]), np.array([2, 1.5, 1.5])
+# alpha, beta, zeta = np.array([2.0, 1.0, 1.0]), np.array([1.5, 1.2, 1.2]), np.array([2, 1.5, 1.5])
+# varphi, e, a = 1.0, 1.0, 1.0
+# C = [0.5, 0.2, 0.2]  # 三台服务器成本
+# K = [0.2, 0.1, 0.1]  # 服务器功率
+
+# 注意要满足 p_j_min=C[j]<=p_j_max=alpha[j] * beta[j] / zeta[j]
+# alpha, beta, zeta = np.array([2.0, 1.0, 1.0]), np.array([1.5, 1.2, 1.2]), np.array([2, 1.5, 1.5])
+alpha, beta, zeta = np.array([8.0, 9.0, 8.0]), np.array([1.5, 1.2, 1.2]), np.array([2.0, 1.5, 1.5])
 varphi, e, a = 1.0, 1.0, 1.0
-C = [0.5, 0.2, 0.2]  # 三台服务器成本
-# C = [0.0, 0.0, 0.0]  # 三台服务器成本
+# C = [0.5, 0.2, 0.2]  # 三台服务器成本
+C = [2, 1, 1]  # 三台服务器成本
 K = [0.2, 0.1, 0.1]  # 服务器功率
-f_1_max, f_2_max = 3, 2  # M1、M2最大能提供的计算资源
 
 # stage 3决策变量
-# P_rsu = 0.1
 # 车辆类型为theta_m的概率
-# lamda_m = [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
 lamda_m = [0.04, 0.17, 0.09, 0.19, 0.01, 0.14, 0.02, 0.13, 0.01, 0.2]
 v_number = cst.v_number
 Q_total_m = cst.Q_total_m  # 车辆m的计算资源负载
@@ -33,7 +33,7 @@ Pi = 1.0  # 约束C2
 Upsilon_j = [1.0, 1.0, 1.0]  # #约束C3
 Lambda_j = [1.0, 1.0, 1.0]  # #约束C3
 
-
+# Phi_m, Omega_m, Pi, Upsilon_j, Lambda_j
 # f_m, p_m = [], []  # 合同（f_m,p_m）
 # f_j_vop, p_j_vop = [], []  # CEA的资源购买决策、vop的定价
 
@@ -80,7 +80,7 @@ def calculate_utility_for_M1_server(p_1_t, p_0_t, p_2_t, p_vop_1, f_vop_1):
     F_i0, F_i1, F_i2 = find_Optial_mulitUser(p_0_t, p_1_t, p_2_t)
 
     # 奖励回报
-    Reward = p_1_t * np.log(1 + sum(F_i0))
+    Reward = p_1_t * np.log(1 + sum(F_i1))
     # 计算 能耗、成本
     E = a * e * K[1] * ((sum(F_i1) - f_vop_1) ** 2)
     payment = p_vop_1 * np.log(1 + f_vop_1)
@@ -95,7 +95,7 @@ def calculate_utility_for_M2_server(p_2_t, p_0_t, p_1_t, p_vop_2, f_vop_2):
     F_i0, F_i1, F_i2 = find_Optial_mulitUser(p_0_t, p_1_t, p_2_t)
 
     # 奖励回报
-    Reward = p_2_t * np.log(1 + sum(F_i0))
+    Reward = p_2_t * np.log(1 + sum(F_i2))
     # 计算 能耗、成本
     E = a * e * K[2] * ((sum(F_i2) - f_vop_2) ** 2)
     payment = p_vop_2 * np.log(1 + f_vop_2)
@@ -143,9 +143,15 @@ def caculate_VopGradient(f_m, p_j_vop, F):
 
 # 核心代码：拉格朗日交替更新拉格朗日乘子 stageI
 def LagrangeDualStageIforVop(F):
-    global Phi_m, Omega_m, Pi, Upsilon_j, Lambda_j
+    # global Phi_m, Omega_m, Pi, Upsilon_j, Lambda_j
     # global f_m, p_m, p_j_vop, f_j_vop
     # F_i0, F_i1, F_i2 = 12, 11, 24
+
+    Omega_m = cst.Omega_m  # 约束C1
+    Phi_m = cst.Phi_m  # 约束C1
+    Pi = 1.0  # 约束C2
+    Upsilon_j = [1.0, 1.0, 1.0]  # #约束C3
+    Lambda_j = [1.0, 1.0, 1.0]  # #约束C3
     for n in range(cst.max_iteration):
         rho_m = [2 * v_number * ((lamda_m[i] / Theta_m[i]) + (Theta_m[i] ** -1 + Theta_m[i + 1] ** -1) * sum([
             lamda_m[j] for j in range(i + 1, v_number)])) for i in range(v_number - 1)]
@@ -166,9 +172,9 @@ def LagrangeDualStageIforVop(F):
         Upsilon_j_new = [np.maximum(0, Upsilon_j[j] - cst.s_k * Upsilon_j_grad[j]) for j in range(len(K))]
         Lambda_j_new = [np.maximum(0, Lambda_j[j] - cst.s_k * Lambda_j_grad[j]) for j in range(len(K))]
 
-        print("第{}次迭代更新的乘子为：".format(n + 1), Phi_m_new, Omega_m_new, Pi_new, Upsilon_j_new, Lambda_j_new)
+        # print("第{}次迭代更新的乘子为：".format(n + 1), Phi_m_new, Omega_m_new, Pi_new, Upsilon_j_new, Lambda_j_new)
         utility_for_Vop = calculate_utility_for_Vop(f_m, p_j_vop, F)
-        print("第{}次迭代Vop效益值为：".format(n + 1), utility_for_Vop)
+        # print("第{}次迭代Vop效益值为：".format(n + 1), utility_for_Vop)
         LagValue = utility_for_Vop + sum([Phi_m_grad[i] * Phi_m_new[i] for i in range(len(Phi_m_grad))]) + sum(
             [Omega_m_grad[i] * Omega_m_new[i] for i in range(len(Omega_m_grad))]) + Pi_grad * Pi_new + sum(
             [Upsilon_j_grad[j] * Upsilon_j_new[j] for j in range(len(K))]) + sum(
@@ -200,15 +206,16 @@ def find_nash_equilibrium(p_j_vop, f_j_vop):
     # Initialization
     p_0_min, p_1_min, p_2_min = C[0], C[1], C[2]
     p_0_max, p_1_max, p_2_max = alpha[0] * beta[0] / zeta[0], alpha[1] * beta[1] / zeta[1], alpha[2] * beta[2] / zeta[2]
+    # p_j_min=C[j]<=p_j_max=alpha[j] * beta[j] / zeta[j]
     p_0_init, p_1_init, p_2_init = 0.5 * (p_0_min + p_0_max), 0.5 * (p_1_min + p_1_max), 0.5 * (p_2_min + p_2_max),
 
     # Parameter Setup
     Delta, Dt = 0.1, 0.1
     dslow, dfast = 0.5, 2.0
 
+    p_0_t, p_1_t, p_2_t = p_0_init, p_1_init, p_2_init
     while True:
         # Adjust strategy for the hash-server
-        p_0_t, p_1_t, p_2_t = p_0_init, p_1_init, p_2_init
 
         # Calculate utility for the cloud
         Uc = calculate_utility_for_Cloud_server(p_0_t, p_1_t, p_2_t, p_j_vop[0], f_j_vop[0])
@@ -222,14 +229,13 @@ def find_nash_equilibrium(p_j_vop, f_j_vop):
         else:
             p_0_init = p_0_t
 
-        # if (np.abs(p_0_init-p_0_t) <= cst.Error_value).all():
-        #     return p_0_init
-        # # Reduce the step for the hash-server
-        # Dh = dfast * Dh if p0h != ph else dslow * Dh
-        #
-        # # Adjust strategy for the task-server
-        # p0h, p0t = ph, pt
+        if (np.abs(p_0_init - p_0_t) <= cst.Error_value).all():
+            p_0_t = p_0_init
+            break
+        p_0_t = p_0_init
 
+
+    while True:
         # Calculate utility for the M1-server
         U_m1 = calculate_utility_for_M1_server(p_1_t, p_0_t, p_2_t, p_j_vop[1], f_j_vop[1])
         U_m1_add_Delta = calculate_utility_for_M1_server(p_1_t + Delta, p_0_t, p_2_t, p_j_vop[1], f_j_vop[1])
@@ -242,9 +248,13 @@ def find_nash_equilibrium(p_j_vop, f_j_vop):
         else:
             p_1_init = p_1_t
 
-        # if (np.abs(p_1_init-p_1_t) <= cst.Error_value).all():
-        #     return p_1_init
+        if (np.abs(p_1_init-p_1_t) <= cst.Error_value).all():
+            p_1_t = p_1_init
+            break
+        p_1_t = p_1_init
 
+
+    while True:
         # Calculate utility for the M2-server
         U_m2 = calculate_utility_for_M2_server(p_2_t, p_0_t, p_1_t, p_j_vop[2], f_j_vop[2])
         U_m2_add_Delta = calculate_utility_for_M2_server(p_2_t + Delta, p_0_t, p_1_t, p_j_vop[2], f_j_vop[2])
@@ -256,30 +266,34 @@ def find_nash_equilibrium(p_j_vop, f_j_vop):
             p_2_init = max(p_2_t - Delta, p_2_min)
         else:
             p_2_init = p_2_t
-        #
-        # if (np.abs(p_2_init-p_2_t) <= cst.Error_value).all():
-        #     return p_2_init
 
-        if (np.abs(p_0_init - p_0_t) <= cst.Error_value).all() and (
-                np.abs(p_1_init - p_1_t) <= cst.Error_value).all() and (
-                np.abs(p_2_init - p_2_t) <= cst.Error_value).all():
-            # P_0, P_1, P_2 = p_0_init, p_1_init, p_2_init
-            return p_0_init, p_1_init, p_2_init
+        if (np.abs(p_2_init-p_2_t) <= cst.Error_value).all():
+            p_2_t = p_2_init
+            break
+        p_2_t = p_2_init
+
+        # if (np.abs(p_0_init - p_0_t) <= cst.Error_value).all() and (
+        #         np.abs(p_1_init - p_1_t) <= cst.Error_value).all() and (
+        #         np.abs(p_2_init - p_2_t) <= cst.Error_value).all():
+        #     # P_0, P_1, P_2 = p_0_init, p_1_init, p_2_init
+        #     return p_0_init, p_1_init, p_2_init
 
     # The loop continues indefinitely until a stopping criterion is met
     # Return the final pricing strategies (ph, pt)
     # P_0, P_1, P_2 = p_0_init, p_1_init, p_2_init
-    return p_0_init, p_1_init, p_2_init
+    # return p_0_init, p_1_init, p_2_init
+    return p_0_t, p_1_t, p_2_t
 
 
 # stageIII 求解算法
 def optimal_Stage3strategy_KKT(bi, P_0, P_1, P_2):
     # def optimal_Stage3strategy_KKT(bi):
-    global alpha, beta, zeta
+    # global alpha, beta, zeta
     P = np.array([P_0, P_1, P_2])
+    # P = [P_0, P_1, P_2]
     ################################################################### Case 1
     if np.allclose(P, alpha * beta / zeta):
-        print("Case 1")
+        # print("Case 1")
         f_i0, f_i1, f_i2 = 0, 0, 0
         return bi, f_i0, f_i1, f_i2
 
@@ -288,7 +302,7 @@ def optimal_Stage3strategy_KKT(bi, P_0, P_1, P_2):
     f_i1 = alpha[1] / (P[1] * zeta[1]) - beta[1] ** -1
     f_i2 = alpha[2] / (P[2] * zeta[2]) - beta[2] ** -1
     if f_i0 > 0 and f_i1 > 0 and f_i2 > 0 and (bi - (f_i0 * P[0] + f_i1 * P[1] + f_i2 * P[2])) >= 0:
-        print("Case 2-1")
+        # print("Case 2-1")
         return bi, f_i0, f_i1, f_i2
 
     ################################################################### Case 2-2
@@ -300,7 +314,7 @@ def optimal_Stage3strategy_KKT(bi, P_0, P_1, P_2):
     f_i2 = alpha[2] * (B + bi) / (A * P[2]) - beta[2] ** -1
     b = bi - (f_i0 * P[0] + f_i1 * P[1] + f_i2 * P[2])
     if lamda > 0 and f_i0 > 0 and f_i1 > 0 and f_i2 > 0:
-        print("Case 2-2")
+        # print("Case 2-2")
         return bi, f_i0, f_i1, f_i2
 
     ################################################################### Case 3-1
@@ -309,7 +323,7 @@ def optimal_Stage3strategy_KKT(bi, P_0, P_1, P_2):
     f_i2 = alpha[2] / (zeta[2] * P[2]) - beta[2] ** -1
     if P[0] == alpha[0] * beta[0] / zeta[0] and f_i1 > 0 and f_i2 > 0 and (
             bi - (f_i0 * P[0] + f_i1 * P[1] + f_i2 * P[2])) >= 0:
-        print("Case 3-1")
+        # print("Case 3-1")
         return bi, f_i0, f_i1, f_i2
 
     ################################################################### Case 3-2
@@ -328,7 +342,7 @@ def optimal_Stage3strategy_KKT(bi, P_0, P_1, P_2):
     f_i2 = alpha[2] * (B + bi) / (A * P[2]) - beta[2] ** -1
     b = bi - (f_i0 * P[0] + f_i1 * P[1] + f_i2 * P[2])
     if lamda > 0 and mu_i0 >= 0 and f_i1 > 0 and f_i2 > 0:
-        print("Case 3-2")
+        # print("Case 3-2")
         return bi, f_i0, f_i1, f_i2
 
     ################################################################### Case 4-1
@@ -338,7 +352,7 @@ def optimal_Stage3strategy_KKT(bi, P_0, P_1, P_2):
     if P[1] == alpha[1] * beta[1] / zeta[1] and f_i0 > 0 and f_i2 > 0 and (
             bi - sum([f_i0 * P[0] + f_i1 * P[1] + f_i2 * P[2] for i in
                       range(nuser)])) >= 0:
-        print("Case 4-1")
+        # print("Case 4-1")
         return bi, f_i0, f_i1, f_i2
 
     ################################################################## Case 4-2
@@ -358,7 +372,7 @@ def optimal_Stage3strategy_KKT(bi, P_0, P_1, P_2):
     f_i2 = alpha[2] * (B + bi) / (A * P[2]) - beta[2] ** -1
     b = bi - (f_i0 * P[0] + f_i1 * P[1] + f_i2 * P[2])
     if lamda > 0 and mu_i1 >= 0 and f_i0 > 0 and f_i2 > 0:
-        print("Case 4-2")
+        # print("Case 4-2")
         return bi, f_i0, f_i1, f_i2
 
     ################################################################### Case 5-1
@@ -368,7 +382,7 @@ def optimal_Stage3strategy_KKT(bi, P_0, P_1, P_2):
     if P[0] == alpha[0] * beta[0] / zeta[0] and f_i1 > 0 and f_i2 > 0 and (
             bi - sum([f_i0 * P[0] + f_i1 * P[1] + f_i2 * P[2] for i in
                       range(nuser)])) >= 0:
-        print("Case 5-1")
+        # print("Case 5-1")
         return bi, f_i0, f_i1, f_i2
 
     ################################################################### Case 5-2
@@ -387,7 +401,7 @@ def optimal_Stage3strategy_KKT(bi, P_0, P_1, P_2):
     f_i0 = alpha[0] * (B + bi) / (A * P[0]) - beta[0] ** -1
     b = bi - (f_i0 * P[0] + f_i1 * P[1] + f_i2 * P[2])
     if lamda > 0 and mu_i0 >= 0 and f_i0 > 0 and f_i1 > 0:
-        print("Case 5-2")
+        # print("Case 5-2")
         return bi, f_i0, f_i1, f_i2
 
     ################################################################### Case 6-1
@@ -395,7 +409,7 @@ def optimal_Stage3strategy_KKT(bi, P_0, P_1, P_2):
     f_i2 = alpha[2] / (zeta[2] * P[2]) - beta[2] ** -1
     if P[0] == alpha[0] * beta[0] / zeta[0] and P[1] == alpha[1] * beta[1] / zeta[1] and f_i2 > 0 and (
             bi - (f_i0 * P[0] + f_i1 * P[1] + f_i2 * P[2])) >= 0:
-        print("Case 6-1")
+        # print("Case 6-1")
         return bi, f_i0, f_i1, f_i2
 
     ################################################################### Case 6-2
@@ -407,7 +421,7 @@ def optimal_Stage3strategy_KKT(bi, P_0, P_1, P_2):
     mu_i1 = lamda * P[1] - alpha[1] * beta[1]
     b = bi - (f_i0 * P[0] + f_i1 * P[1] + f_i2 * P[2])
     if lamda > 0 and mu_i0 >= 0 and mu_i1 >= 0:
-        print("Case 6-2")
+        # print("Case 6-2")
         return bi, f_i0, f_i1, f_i2
 
     ################################################################### Case 7-1
@@ -415,7 +429,7 @@ def optimal_Stage3strategy_KKT(bi, P_0, P_1, P_2):
     f_i1 = alpha[1] / (zeta[1] * P[1]) - beta[1] ** -1
     if P[0] == alpha[0] * beta[0] / zeta[0] and P[2] == alpha[2] * beta[2] / zeta[2] and f_i1 > 0 and (
             bi - (f_i0 * P[0] + f_i1 * P[1] + f_i2 * P[2])) >= 0:
-        print("Case 7-1")
+        # print("Case 7-1")
         return bi, f_i0, f_i1, f_i2
 
     ################################################################### Case 7-2
@@ -427,7 +441,7 @@ def optimal_Stage3strategy_KKT(bi, P_0, P_1, P_2):
     mu_i2 = lamda * P[2] - alpha[2] * beta[2]
     b = bi - (f_i0 * P[0] + f_i1 * P[1] + f_i2 * P[2])
     if lamda > 0 and mu_i0 >= 0 and mu_i2 >= 0:
-        print("Case 7-2")
+        # print("Case 7-2")
         return bi, f_i0, f_i1, f_i2
 
     ################################################################### Case 8-1
@@ -435,7 +449,7 @@ def optimal_Stage3strategy_KKT(bi, P_0, P_1, P_2):
     f_i0 = alpha[0] / (zeta[0] * P[0]) - beta[0] ** -1
     if P[1] == alpha[1] * beta[1] / zeta[1] and P[2] == alpha[2] * beta[2] / zeta[2] and f_i0 > 0 and (
             bi - (f_i0 * P[0] + f_i1 * P[1] + f_i2 * P[2])) >= 0:
-        print("Case 8-1")
+        # print("Case 8-1")
         return bi, f_i0, f_i1, f_i2
 
     ################################################################### Case 8-2
@@ -447,7 +461,7 @@ def optimal_Stage3strategy_KKT(bi, P_0, P_1, P_2):
     mu_i2 = lamda * P[2] - alpha[2] * beta[2]
     b = bi - (f_i0 * P[0] + f_i1 * P[1] + f_i2 * P[2])
     if lamda > 0 and mu_i2 >= 0 and mu_i1 >= 0:
-        print("Case 8-2")
+        # print("Case 8-2")
         return bi, f_i0, f_i1, f_i2
 
     return bi, 0, 0, 0
@@ -459,19 +473,21 @@ if __name__ == '__main__':
     cst.UserDevice.read(nuser)
     # p_0_init, p_1_init, p_2_init= 0.6, 0.3, 0.3
     P_0, P_1, P_2 = 0.6, 0.3, 0.3
-    F_i0, F_i1, F_i2 = [], [], []
     f_m, p_m = [], []  # 合同（f_m,p_m）
     f_j_vop, p_j_vop = [], []  # CEA的资源购买决策、vop的定价
     U_C, U_M1, U_M2 = 0, 0, 0
     U_C_t, U_M1_t, U_M2_t = 0, 0, 0
+    n=1
     while True:
+        print("--------------------------------------------------------------------------第{}次博弈--------------------------------------------------------------------------：".format(n))
+        F_i0, F_i1, F_i2 = [], [], []
         # Algorithm 1
         for i in range(nuser):
             result = optimal_Stage3strategy_KKT(bg[i], P_0, P_1, P_2)
             F_i0 = np.append(F_i0, result[1])
             F_i1 = np.append(F_i1, result[2])
             F_i2 = np.append(F_i2, result[3])
-        print(F_i0, F_i1, F_i2)
+        print("stageIII的购买决策F_i0, F_i1, F_i2分别为:",F_i0, F_i1, F_i2)
         F = [F_i0, F_i1, F_i2]
         # Algorithm 3
         f_m, p_m, p_j_vop = LagrangeDualStageIforVop(F)
@@ -479,21 +495,25 @@ if __name__ == '__main__':
                    for j in
                    range(len(K))]
 
-        print("合同为：", f_m, p_j_vop)
-        print("CEA的资源购买决策：{}、vop的定价：{}".format(f_j_vop, p_m))
+        print("stageI阶段合同为f_m, p_m：", f_m, p_m)
+        print("stageI阶段Vop对CEA的资源定价p_j_vop为", p_j_vop)
 
         # Algorithm 2
         P_0, P_1, P_2 = find_nash_equilibrium(p_j_vop, f_j_vop)  # 这里加了一个p_j_vop, f_j_vop
-        print(P_0, P_1, P_2)
+        print("stageII阶段CEA的价格P_0, P_1, P_2分别为：",P_0, P_1, P_2)
+        print("stageII阶段CEA的资源购买决策f_j_vop：{}",f_j_vop)
 
         U_C = calculate_utility_for_Cloud_server(P_0, P_1, P_2, p_j_vop[0], f_j_vop[0])
-        U_M1 = calculate_utility_for_M1_server(P_1, P_0, P_2, p_j_vop[0], f_j_vop[0])
-        U_M2 = calculate_utility_for_M2_server(P_2, P_0, P_1, p_j_vop[0], f_j_vop[0])
+        U_M1 = calculate_utility_for_M1_server(P_1, P_0, P_2, p_j_vop[1], f_j_vop[1])
+        U_M2 = calculate_utility_for_M2_server(P_2, P_0, P_1, p_j_vop[2], f_j_vop[2])
+        print("U_C效益函数为：", U_C)
+        print("U_M1效益函数为：", U_M1)
+        print("U_M2效益函数为：", U_M2)
         if (np.abs(U_C - U_C_t) <= cst.Error_value).all() and (np.abs(U_M1 - U_M1_t) <= cst.Error_value).all() and (
                 np.abs(U_M2 - U_M2_t) <= cst.Error_value).all():
             break
         U_C_t = U_C
         U_M1_t = U_M1
         U_M2_t = U_M2
-
+        n+=1
     print("已达到纳什均衡")

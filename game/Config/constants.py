@@ -22,14 +22,14 @@ file_path = 'D:/江西理工大学/边缘计算/Three-stage-stckelberg/game/Data
 
 # 初始化限制车辆参数
 Price_v, Q_total_m, f_m, k_m, e_m, Theta_m = [], [], [], [], [], []
-Q_total_m_range = [10, 20]
+Q_total_m_range = [50, 70]
 k_m_range = [1, 5]
 e_m_range = [1, 5]
 f_m_range = [3, 6]
 
 ############################################################################################################################################
 # Userdevice 配置
-bi_size_range = [6, 10]
+bi_size_range = [20, 40]
 bi_range = [bi_size_range[1], bi_size_range[1] * 1.5]
 
 
@@ -221,8 +221,8 @@ if __name__ == '__main__':
     # UserDevice.build()
     # UserDevice.read(v_number)
 
-    # Vechicle.build()
-    # Vechicle.read(v_number)
+    Vechicle.build()
+    Vechicle.read(v_number)
 
-    LM.build()
-    LM.read(v_number)
+    # LM.build()
+    # LM.read(v_number)
