@@ -15,10 +15,10 @@ max_iteration = 2000
 # 初始化乘子 1*n_number的矩阵  （n_number代表用户数量）
 lamda_1, lamda_2, lamda_3, lamda_4, lamda_5, lamda_6, lamda_7, lamda_8, lamda_9 = [], [], [], [], [], [], [], [], []
 Omega_m, Phi_m = [], []
-canshu = [1, 10]
+canshu = [1, 2]
 
 file_path = 'D:/江西理工大学/边缘计算/Three-stage-stckelberg/game/Data/'
-# file_path = '/Users/wujie/PycharmProjects/subgradpy-master/edge/experiment/Data/'
+# file_path = '/Users/wujie/PycharmProjects/Three-stage-stckelberg/game/Data/'
 
 # 初始化限制车辆参数
 Price_v, Q_total_m, f_m, k_m, e_m, Theta_m = [], [], [], [], [], []
@@ -221,8 +221,8 @@ if __name__ == '__main__':
     # UserDevice.build()
     # UserDevice.read(v_number)
 
-    Vechicle.build()
-    Vechicle.read(v_number)
+    # Vechicle.build()
+    # Vechicle.read(v_number)
 
-    # LM.build()
-    # LM.read(v_number)
+    LM.build()
+    LM.read(v_number)
