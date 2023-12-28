@@ -14,33 +14,24 @@ Theta_m = cst.Theta_m
 # 注意要满足 p_j_min=C[j]<=p_j_max=alpha[j] * beta[j] / zeta[j]
 # alpha, beta, zeta = np.array([1.0, 1.0, 1.0]), np.array([1.0, 1.0, 1.0]), np.array([1.0, 1.0, 1.0])
 # alpha, beta, zeta = np.array([2.0, 1.0, 1.0]), np.array([1.5, 1.2, 1.2]), np.array([2, 1.5, 1.5])
-# alpha, beta, zeta = np.array([3.0, 3.0, 3.0]), np.array([5.0, 5.0, 5.0]), np.array([2.0, 2.0, 2.0])
-alpha, beta, zeta = np.array([16.0, 8.0, 8.0]), np.array([1.0, 1.0, 1.0]), np.array([2.0, 2.0, 2.0])
-# alpha, beta, zeta = np.array([3.0, 3.0, 3.0]), np.array([5.0, 5.0, 5.0]), np.array([0.01, 0.01, 0.01])
-e, a = [2.0, 1.0, 1.0], 1.0
-# e, a = [0.5, 0.3, 0.2], 1.0
-# e, a = [0.3, 0.2, 0.1], 0.8
+alpha, beta, zeta = np.array([3.0, 3.0, 3.0]), np.array([5.0, 5.0, 5.0]), np.array([2.0, 2.0, 2.0])
+# alpha, beta, zeta = np.array([16.0, 8.0, 8.0]), np.array([1.0, 1.0, 1.0]), np.array([2.0, 2.0, 2.0])
+e, a = [0.3, 0.2, 0.1], 0.85  # zuiyou
 C = [0.5, 0.3, 0.2]  # 三台服务器成本
-# C = [4, 2, 1]  # 三台服务器成本
-# C = [0.3, 0.2, 0.1]  # 三台服务器成本
-# C = [5*2, 3*2, 2*2]  # 三台服务器成本
-K = [0.5, 0.3, 0.2]  # 服务器功率
-# K = [20, 10, 10]  # 服务器功率
+# C = [4, 2, 1]
+# C = [2, 1, 0.8]
+# C = [1.4, 0.7, 0.5]
+K = [2.0, 1.0, 0.5]  # 服务器功率
+# K = [0.2, 0.1, 0.05]  # 服务器功率
+# K = [0.5, 0.3, 0.2]  # 服务器功率
 
-# stage 3决策变量
 # 车辆类型为theta_m的概率
 lamda_m = [0.04, 0.17, 0.09, 0.19, 0.01, 0.14, 0.02, 0.13, 0.01, 0.2]
 v_number = cst.v_number
 Q_total_m = cst.Q_total_m  # 车辆m的计算资源负载
 
-# 全局变量
-# stageI
-Omega_m = cst.Omega_m  # 约束C1
-Phi_m = cst.Phi_m  # 约束C1
-Pi = 1.0  # 约束C2
-Upsilon_j = [1.0, 1.0, 1.0]  # #约束C3
-Lambda_j = [1.0, 1.0, 1.0]  # #约束C3
-
+#vop运营商自身的计算资源容量
+Q_vop=10
 
 def find_Optial_mulitUser(P_0, P_1, P_2):
     F_i0, F_i1, F_i2 = [], [], []
@@ -119,9 +110,6 @@ def calculate_utility_for_M2_server(p_2_t, p_0_t, p_1_t, p_vop_2, f_vop_2):
 
 # stage I 计算Vop的效益
 def calculate_utility_for_Vop(f_m, p_j_vop, F):
-    # global Theta_m, lamda_m
-    # fix(f_vop_0,P_vop)
-    # F = [F_i0, F_i1, F_i2]
     # 奖励回报
     # Reward = sum([sum(F[i]) - p_j_vop[i] / (2 * a * e * K[i]) for i in range(len(K))])
     Reward = sum([p_j_vop[i] * (sum(F[i]) - p_j_vop[i] / (2 * a * e[i] * K[i])) for i in range(len(K))])
@@ -135,13 +123,11 @@ def calculate_utility_for_Vop(f_m, p_j_vop, F):
 
 
 # 计算f_m梯度
-def caculate_VopGradient(f_m, p_j_vop, F):
+def caculate_VopGradient(f_m, p_j_vop, F,f_j_vop):
     Phi_m_grad = f_m
     Omega_m_grad = [Q_total_m[i] - f_m[i] for i in range(v_number)]
-    Pi_grad = v_number * sum([lamda_m[i] * f_m[i] for i in range(v_number)]) - sum(
-        [sum(F[j]) - p_j_vop[j] / (2 * a * e[j] * K[j]) for j in range(len(K))])
-    # Pi_grad = v_number * sum([lamda_m[i] * f_m[i] for i in range(v_number)]) - sum(
-    #     [f_vop_j[j] for j in range(len(K))])
+    # f_j_vop = [sum(F[j]) - p_j_vop[j] / (2 * a * e[j] * K[j]) for j in range(len(K))]
+    Pi_grad = v_number * sum([lamda_m[i] * f_m[i] for i in range(v_number)]) - sum(f_j_vop)+Q_vop
     Upsilon_j_grad = p_j_vop
     Lambda_j_grad = [2 * a * e[j] * K[j] * sum(F[j]) - p_j_vop[j] for j in range(len(K))]
     # 0 <= p_j_vop[j] <= sum(F[j]) * 2 * a * e[j] * K[j]
@@ -149,38 +135,44 @@ def caculate_VopGradient(f_m, p_j_vop, F):
 
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
 def checkConstrain(f_m, p_m, p_j_vop,F):
-    for j in range(len(K)):
-        g1 = p_j_vop[j] >= 0
-        g2 = sum(F[j])*a*2*e[j]*K[j]-p_j_vop[j]
 
+    for j in range(v_number):
+        g3 = f_m[j] >= 0
+        g4 = Q_total_m[j] - f_m[j]
+        g5 = v_number * sum([lamda_m[i] * f_m[i] for i in range(v_number)]) - sum([sum(F[j]) - p_j_vop[j] / (2 * a * e[j] * K[j]) for j in range(len(K))])+Q_vop
+
+    for j in range(len(K)):
+        g1 = p_j_vop[j]
+        g2 = sum(F[j])*a*2*e[j]*K[j]-p_j_vop[j]
     return g1>= 0 and g2>= 0
 
-
 p_j_vop_t, p_m_t, f_m_t = [], [], []
+
+
 # 核心代码：拉格朗日交替更新拉格朗日乘子 stageI
-def LagrangeDualStageIforVop(F, f_j_vop):
-    # global Phi_m, Omega_m, Pi, Upsilon_j, Lambda_j
+def LagrangeDualStageIforVop(F):
     global p_j_vop_t, p_m_t, f_m_t
     Omega_m = cst.Omega_m  # 约束C1
     Phi_m = cst.Phi_m  # 约束C1
     Pi = 1.0  # 约束C2
     Upsilon_j = [1.0, 1.0, 1.0]  # #约束C3
     Lambda_j = [1.0, 1.0, 1.0]  # #约束C3
+    # p_j_vop = [1.0, 1.0, 1.0]
     for n in range(cst.max_iteration):
         rho_m = [2 * v_number * ((lamda_m[i] / Theta_m[i]) + (Theta_m[i] ** -1 - Theta_m[i + 1] ** -1) * sum([
             lamda_m[j] for j in range(i + 1, v_number)])) for i in range(v_number - 1)]
         con = [Phi_m[i] - Omega_m[i] + Pi * lamda_m[i] * v_number for i in range(v_number)]
         f_m = [con[m] / rho_m[m] if m != v_number - 1 else Theta_m[m] * con[m] / (2 * v_number * lamda_m[m]) for m in
                range(v_number)]
-
         p_m = [lamda_m[i] * (f_m[i] ** 2 / Theta_m[i] + sum(
-            [(Theta_m[j - 1] ** -1 - Theta_m[j] ** -1) * f_m[j - 1] ** 2 for j in range(1, v_number)])) for i in
+            [(Theta_m[j - 1] ** -1 - Theta_m[j] ** -1) * (f_m[j - 1] ** 2) for j in range(1, v_number)])) for i in
                range(v_number)]
-        p_j_vop = [a * e[j] * K[j] * (sum(F[j]) + Upsilon_j[j] - Lambda_j[j]) for j in range(len(K))]
+        p_j_vop = [a * e[j] * K[j] * (sum(F[j]) + Upsilon_j[j] - Lambda_j[j]) + Pi / 2 for j in range(len(K))]
+        f_j_vop = [sum(F[j]) - p_j_vop[j] / (2 * a * e[j] * K[j]) for j in range(len(K))]
 
-        Phi_m_grad, Omega_m_grad, Pi_grad, Upsilon_j_grad, Lambda_j_grad = caculate_VopGradient(f_m, p_j_vop, F)
+        Phi_m_grad, Omega_m_grad, Pi_grad, Upsilon_j_grad, Lambda_j_grad = caculate_VopGradient(f_m, p_j_vop, F,f_j_vop)
+
         Phi_m_new = [np.maximum(0, Phi_m[i] - cst.s_k * Phi_m_grad[i]) for i in range(v_number)]
         Omega_m_new = [np.maximum(0, Omega_m[i] - cst.s_k * Omega_m_grad[i]) for i in range(v_number)]
         Pi_new = np.maximum(0, Pi - cst.s_k * Pi_grad)
@@ -188,33 +180,35 @@ def LagrangeDualStageIforVop(F, f_j_vop):
         Upsilon_j_new = [np.maximum(0, Upsilon_j[j] - cst.s_k * Upsilon_j_grad[j]) for j in range(len(K))]
         Lambda_j_new = [np.maximum(0, Lambda_j[j] - cst.s_k * Lambda_j_grad[j]) for j in range(len(K))]
 
-        print("第{}次迭代更新的乘子为：".format(n + 1), Phi_m_new, Omega_m_new, Pi_new, Upsilon_j_new, Lambda_j_new)
+        # print("第{}次迭代更新的乘子为：".format(n + 1), Phi_m_new, Omega_m_new, Pi_new, Upsilon_j_new, Lambda_j_new)
         utility_for_Vop = calculate_utility_for_Vop(f_m, p_j_vop, F)
-        print("第{}次迭代Vop效益值为：".format(n + 1), utility_for_Vop)
-        LagValue = utility_for_Vop + sum([Phi_m_grad[i] * Phi_m_new[i] for i in range(len(Phi_m_grad))]) + sum(
-            [Omega_m_grad[i] * Omega_m_new[i] for i in range(len(Omega_m_grad))]) + Pi_grad * Pi_new + sum(
-            [Upsilon_j_grad[j] * Upsilon_j_new[j] for j in range(len(K))]) + sum(
-            [Lambda_j_grad[j] * Lambda_j_new[j] for j in range(len(K))])
+        # print("第{}次迭代Vop效益值为：".format(n + 1), utility_for_Vop)
+        # LagValue = utility_for_Vop + sum([Phi_m_grad[i] * Phi_m_new[i] for i in range(len(Phi_m_grad))]) + sum(
+        #     [Omega_m_grad[i] * Omega_m_new[i] for i in range(len(Omega_m_grad))]) + Pi_grad * Pi_new + sum(
+        #     [Upsilon_j_grad[j] * Upsilon_j_new[j] for j in range(len(K))]) + sum(
+        #     [Lambda_j_grad[j] * Lambda_j_new[j] for j in range(len(K))])
         # if (np.abs(Phi_m_new - Phi_m) <= cst.Error_value).all() and (
         #         np.abs(Omega_m_new - Omega_m) <= cst.Error_value).all() and (
         #         np.abs(Pi_new - Pi) <= cst.Error_value).all() and (
         #         np.abs(Upsilon_j_new - Upsilon_j) <= cst.Error_value).all() and (
         #         np.abs(Lambda_j_new - Lambda_j) <= cst.Error_value).all():
-        if (np.abs(LagValue - utility_for_Vop) <= cst.Error_value).all():
-            Phi_m = Phi_m_new
-            Omega_m = Omega_m_new
-            Pi = Pi_new
-            Upsilon_j = Upsilon_j_new
-            Lambda_j = Lambda_j_new
+        if np.allclose(Phi_m_new, Phi_m, atol=cst.Error_value) and np.allclose(Omega_m_new, Omega_m,
+                                                                               atol=cst.Error_value) and np.allclose(
+            Pi_new, Pi, atol=cst.Error_value) and np.allclose(Upsilon_j_new, Upsilon_j,
+                                                              atol=cst.Error_value) and np.allclose(Lambda_j_new,
+                                                                                                    Lambda_j,
+                                                                                                    atol=cst.Error_value):
+            # if (np.abs(LagValue - utility_for_Vop) <= cst.Error_value).all():
+
             break
         Phi_m = Phi_m_new
         Omega_m = Omega_m_new
         Pi = Pi_new
         Upsilon_j = Upsilon_j_new
         Lambda_j = Lambda_j_new
-    p_j_vop_t, p_m_t, f_m_t = f_m, p_m, p_j_vop
-    checkConstrain(f_m, p_m, p_j_vop,F)
-    return f_m, p_m, p_j_vop, utility_for_Vop
+    p_j_vop_t, p_m_t, f_m_t = p_j_vop, p_m, f_m
+    # checkConstrain(f_m, p_m, p_j_vop, F)
+    return f_m, p_m, f_j_vop, p_j_vop, utility_for_Vop
 
 
 p_0_t_c, p_1_t_c, p_2_t_c = [], [], []
@@ -310,7 +304,7 @@ def optimal_Stage3strategy_KKT(bi, P_0, P_1, P_2):
     f_i1 = alpha[1] * (B + bi) / (A * P[1]) - beta[1] ** -1
     f_i2 = alpha[2] * (B + bi) / (A * P[2]) - beta[2] ** -1
 
-    f_i0 = alpha[0] / ((lamda+zeta[0])*P[0]) - beta[0] ** -1
+    f_i0 = alpha[0] / ((lamda + zeta[0]) * P[0]) - beta[0] ** -1
     # f_i1 = alpha[1] * (B + bi) / (A * P[1]) - beta[1] ** -1
     # f_i2 = alpha[2] * (B + bi) / (A * P[2]) - beta[2] ** -1
     # b = bi - (f_i0 * P[0] + f_i1 * P[1] + f_i2 * P[2])
@@ -483,6 +477,7 @@ if __name__ == '__main__':
     utility_for_user_device_t, utility_for_Vop_t = [0 for i in range(nuser)], 0
     n = 1
     P_0_t, P_1_t, P_2_t = 0.6, 0.3, 0.3
+    P_0_v, P_1_v, P_2_v=[],[],[]
     while True:
         print(
             "--------------------------------------------------------------------------第{}次博弈--------------------------------------------------------------------------：".format(
@@ -491,22 +486,19 @@ if __name__ == '__main__':
         F_i0, F_i1, F_i2 = find_Optial_mulitUser(P_0, P_1, P_2)
         print("stageIII的购买决策F_i0, F_i1, F_i2分别为:", F_i0, F_i1, F_i2)
         F = [F_i0, F_i1, F_i2]
-
         # Algorithm 2
         P_0, P_1, P_2 = find_nash_equilibrium(F, p_j_vop, f_j_vop)  # 这里加了一个p_j_vop, f_j_vop
 
         # Algorithm 3
-        f_m, p_m, p_j_vop, utility_for_Vop = LagrangeDualStageIforVop(F, f_j_vop)
-        checkConstrain(f_m, p_m, p_j_vop,F)
-        f_j_vop = [
-            sum(F[j]) - p_j_vop[j] / (2 * a * e[j] * K[j]) if 0 <= p_j_vop[j] <= sum(F[j]) * 2 * a * e[j] * K[j] else 0
-            for j in
-            range(len(K))]
-        # f_j_vop = [
-        #     sum(F[j]) - p_j_vop[j] / (2 * a * e[j] * K[j])
-        #     for j in
-        #     range(len(K))]
+        f_m, p_m, f_j_vop, p_j_vop, utility_for_Vop = LagrangeDualStageIforVop(F)
 
+        if ([0 <= p_j_vop[j] <= sum(F[j]) * 2 * a * e[j] * K[j] for j in range(len(K))]) is False:
+            print("不满足条件")
+
+        # f_j_vop = [max(sum(F[j]) - p_j_vop[j] / (2 * a * e[j] * K[j]), 0) for j in range(len(K))]
+        sumf_j_vop = sum([sum(F[j]) - p_j_vop[j] / (2 * a * e[j] * K[j]) for j in range(len(K))])
+        sumf_m = sum(p_m)
+        print("多购买了{}的资源".format(sumf_m - sumf_j_vop+Q_vop))
         print("stageI阶段合同为f_m, p_m：", f_m, p_m)
         print("stageI阶段Vop对CEA的资源定价p_j_vop为", p_j_vop)
         print("stageII阶段CEA的价格P_0, P_1, P_2分别为：", P_0, P_1, P_2)
@@ -542,15 +534,18 @@ if __name__ == '__main__':
         utility_for_user_device_t = utility_for_user_device
         utility_for_Vop_t = utility_for_Vop
 
-        U_C_t_v.append(U_C)
-        U_M1_t_v.append(U_M1)
-        U_M2_t_v.append(U_M2)
-        utility_for_user_device_t_v.append(utility_for_user_device)
-        utility_for_Vop_t_v.append(utility_for_Vop)
-
+        if n!=1:
+            U_C_t_v.append(U_C)
+            U_M1_t_v.append(U_M1)
+            U_M2_t_v.append(U_M2)
+            utility_for_user_device_t_v.append(utility_for_user_device)
+            utility_for_Vop_t_v.append(utility_for_Vop)
         n += 1
+        P_0_v.append(P_0), P_1_v.append(P_1), P_2_v.append(P_2)
     print("已达到纳什均衡")
-    print("--------------------------p_0_t_c,p_1_t_c,p_2_t_c-------------------", p_0_t_c, ',', p_1_t_c, ',', p_2_t_c)
+    print("--------------------------P_0_v,P_1_v,P_2_v-------------------", P_0_v, ',', P_1_v, ',', P_2_v)
     print("--------------------------f_m, p_m, p_j_vop-------------------", f_m_t, ',', p_m_t, ',', f_m_t)
     print("--------------------------U_C_t_v, U_M1_t_v, U_M2_t_v-------------------", U_C_t_v, ',', U_M1_t_v, ',',
           U_M2_t_v, ',', utility_for_Vop_t_v)
+
+    checkConstrain(f_m, p_m, p_j_vop, F)
