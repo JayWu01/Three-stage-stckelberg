@@ -4,10 +4,13 @@ import os
 import random
 
 # # 常量
+# n_number = 10
+# v_number = 5
+
 n_number = 20
 v_number = 8
 bg = []
-s_k = 2.1  # (0.8-1.4)
+s_k = 0.5 # (0.8-1.4)
 
 Error_value = 0.000001
 # Error_value = 0.000000000000001
@@ -24,13 +27,18 @@ file_path = 'D:/江西理工大学/边缘计算/Three-stage-stckelberg/game/Data
 
 # 初始化限制车辆参数
 Price_v, Q_total_m, f_m, k_m, e_m, Theta_m = [], [], [], [], [], []
-Q_total_m_range = [50, 70]
-# k_m_range = [1, 5]
-# e_m_range = [1, 5]
-# f_m_range = [3, 6]
-k_m_range = [0.1, 0.5]
-e_m_range = [0.1, 0.5]
-f_m_range = [0.3, 0.6]
+Q_total_m_range = [5, 7]
+
+k_m_range = [0.1, 1.0]
+e_m_range = [0.1, 1.0]
+f_m_range = [0.1, 1.0]
+# k_m_range = [1, 2]
+# e_m_range = [1, 2]
+# f_m_range = [1, 2]
+
+# k_m_range = [2, 5]
+# e_m_range = [2, 5]
+# f_m_range = [2, 5]
 
 ############################################################################################################################################
 # Userdevice 配置
@@ -71,22 +79,6 @@ class Vechicle:
             csv_writer = csv.writer(f)
             # 写入排序后的矩阵
             csv_writer.writerows(sorted_matrix)
-            # writer = csv.writer(f)
-            # for i in range(cnt):
-            #     ls = []
-            #     ls.append(i)
-            #     # Theta_m = np.round(np.random.uniform(Q_total_m_range[0], Q_total_m_range[1]), 1)
-            #     # f_m = np.round(np.random.uniform(f_v_range[0], f_v_range[1]), 1)
-            #     # Price_v = np.round(np.random.uniform(canshu[0], canshu[1]), 1)
-            #     Q_total_m = np.round(np.random.uniform(Q_total_m_range[0], Q_total_m_range[1]), 1)
-            #     k_m = np.round(np.random.uniform(k_m_range[0], k_m_range[1]), 1)
-            #     e_m = np.round(np.random.uniform(e_m_range[0], e_m_range[1]), 1)
-            #     Theta_m = (k_m * e_m) ** -1
-            #     ls.append(Q_total_m)
-            #     ls.append(k_m)
-            #     ls.append(e_m)
-            #     ls.append(Theta_m)
-            #     writer.writerow(ls)
             f.close()
 
     @staticmethod
@@ -115,8 +107,6 @@ class Vechicle:
                     c += 1
                 else:
                     return ans
-            # #根据车辆类型升序
-            # sorted_ls = sorted(ls, key=lambda x: x[-1] if isinstance(x[-1], (int, float)) else x)
             return ans
 
 
@@ -124,8 +114,6 @@ class UserDevice:
     def __init__(self, index, bi, Q_total_v, f_v):
         self.index = index
         self.bi = bi
-        # self.Q_total_v = Q_total_v
-        # self.f_v = f_v
 
     @staticmethod
     def build(file_name='userDevice.csv', cnt=n_number):
@@ -226,8 +214,8 @@ class LM:
 
 
 if __name__ == '__main__':
-    # UserDevice.build()
-    # UserDevice.read(v_number)
+    UserDevice.build()
+    UserDevice.read(v_number)
 
     Vechicle.build()
     Vechicle.read(v_number)
