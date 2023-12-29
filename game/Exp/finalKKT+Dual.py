@@ -1,4 +1,5 @@
 import game.Config.constants as cst
+import random
 
 import numpy as np
 
@@ -16,22 +17,36 @@ Theta_m = cst.Theta_m
 # alpha, beta, zeta = np.array([2.0, 1.0, 1.0]), np.array([1.5, 1.2, 1.2]), np.array([2, 1.5, 1.5])
 alpha, beta, zeta = np.array([3.0, 3.0, 3.0]), np.array([5.0, 5.0, 5.0]), np.array([2.0, 2.0, 2.0])
 # alpha, beta, zeta = np.array([16.0, 8.0, 8.0]), np.array([1.0, 1.0, 1.0]), np.array([2.0, 2.0, 2.0])
-e, a = [0.3, 0.2, 0.1], 0.85  # zuiyou
+# e, a = [3, 2, 1.5], 0.85  # zuiyou
+e, a = [1.5, 1.0, 1.0], 0.85  # zuiyou
 C = [0.5, 0.3, 0.2]  # 三台服务器成本
 # C = [4, 2, 1]
 # C = [2, 1, 0.8]
 # C = [1.4, 0.7, 0.5]
 K = [2.0, 1.0, 0.5]  # 服务器功率
-# K = [0.2, 0.1, 0.05]  # 服务器功率
-# K = [0.5, 0.3, 0.2]  # 服务器功率
 
 # 车辆类型为theta_m的概率
 lamda_m = [0.04, 0.17, 0.09, 0.19, 0.01, 0.14, 0.02, 0.13, 0.01, 0.2]
 v_number = cst.v_number
 Q_total_m = cst.Q_total_m  # 车辆m的计算资源负载
 
-#vop运营商自身的计算资源容量
-Q_vop=10
+# vop运营商自身的计算资源容量
+Q_vop = 0
+# CEA的计算资源上限
+Q_CEA = [float("inf"), 12, 10]
+
+
+def create():
+    global lamda_m
+    # 生成10个均匀分布的概率值（小数点后最多两位）
+    probabilities = [round(random.uniform(0, 1), 2) for _ in range(v_number)]
+
+    # 确保概率值之和为1
+    total_probability = sum(probabilities)
+
+    # 计算归一化后的概率值，并保留小数点后两位
+    lamda_m = [round(prob / total_probability, 2) for prob in probabilities]
+
 
 def find_Optial_mulitUser(P_0, P_1, P_2):
     F_i0, F_i1, F_i2 = [], [], []
@@ -123,29 +138,33 @@ def calculate_utility_for_Vop(f_m, p_j_vop, F):
 
 
 # 计算f_m梯度
-def caculate_VopGradient(f_m, p_j_vop, F,f_j_vop):
+def caculate_VopGradient(f_m, p_j_vop, F, f_j_vop):
     Phi_m_grad = f_m
     Omega_m_grad = [Q_total_m[i] - f_m[i] for i in range(v_number)]
     # f_j_vop = [sum(F[j]) - p_j_vop[j] / (2 * a * e[j] * K[j]) for j in range(len(K))]
-    Pi_grad = v_number * sum([lamda_m[i] * f_m[i] for i in range(v_number)]) - sum(f_j_vop)+Q_vop
+    Pi_grad = v_number * sum([lamda_m[i] * f_m[i] for i in range(v_number)]) - sum(f_j_vop) + Q_vop
     Upsilon_j_grad = p_j_vop
-    Lambda_j_grad = [2 * a * e[j] * K[j] * sum(F[j]) - p_j_vop[j] for j in range(len(K))]
+    # Lambda_j_grad = [2 * a * e[j] * K[j] * sum(F[j]) - p_j_vop[j] for j in range(len(K))]
+    aa = [sum(F[j]) for j in range(len(K))]
+    Q_CEA[0]=sum(F[0])
+    Lambda_j_grad = [2 * a * e[j] * K[j] * Q_CEA[j] - p_j_vop[j] for j in range(len(K))]
     # 0 <= p_j_vop[j] <= sum(F[j]) * 2 * a * e[j] * K[j]
     return Phi_m_grad, Omega_m_grad, Pi_grad, Upsilon_j_grad, Lambda_j_grad
 
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-def checkConstrain(f_m, p_m, p_j_vop,F):
-
+def checkConstrain(f_m, p_m, p_j_vop, F):
     for j in range(v_number):
         g3 = f_m[j] >= 0
         g4 = Q_total_m[j] - f_m[j]
-        g5 = v_number * sum([lamda_m[i] * f_m[i] for i in range(v_number)]) - sum([sum(F[j]) - p_j_vop[j] / (2 * a * e[j] * K[j]) for j in range(len(K))])+Q_vop
+        g5 = v_number * sum([lamda_m[i] * f_m[i] for i in range(v_number)]) - sum(
+            [sum(F[j]) - p_j_vop[j] / (2 * a * e[j] * K[j]) for j in range(len(K))]) + Q_vop
 
     for j in range(len(K)):
         g1 = p_j_vop[j]
-        g2 = sum(F[j])*a*2*e[j]*K[j]-p_j_vop[j]
-    return g1>= 0 and g2>= 0
+        g2 = sum(F[j]) * a * 2 * e[j] * K[j] - p_j_vop[j]
+    return g1 >= 0 and g2 >= 0
+
 
 p_j_vop_t, p_m_t, f_m_t = [], [], []
 
@@ -171,7 +190,8 @@ def LagrangeDualStageIforVop(F):
         p_j_vop = [a * e[j] * K[j] * (sum(F[j]) + Upsilon_j[j] - Lambda_j[j]) + Pi / 2 for j in range(len(K))]
         f_j_vop = [sum(F[j]) - p_j_vop[j] / (2 * a * e[j] * K[j]) for j in range(len(K))]
 
-        Phi_m_grad, Omega_m_grad, Pi_grad, Upsilon_j_grad, Lambda_j_grad = caculate_VopGradient(f_m, p_j_vop, F,f_j_vop)
+        Phi_m_grad, Omega_m_grad, Pi_grad, Upsilon_j_grad, Lambda_j_grad = caculate_VopGradient(f_m, p_j_vop, F,
+                                                                                                f_j_vop)
 
         Phi_m_new = [np.maximum(0, Phi_m[i] - cst.s_k * Phi_m_grad[i]) for i in range(v_number)]
         Omega_m_new = [np.maximum(0, Omega_m[i] - cst.s_k * Omega_m_grad[i]) for i in range(v_number)]
@@ -463,6 +483,7 @@ def optimal_Stage3strategy_KKT(bi, P_0, P_1, P_2):
 
 
 if __name__ == '__main__':
+    create()
     cst.LM.read(v_number)
     cst.Vechicle.read(v_number)
     cst.UserDevice.read(nuser)
@@ -477,7 +498,7 @@ if __name__ == '__main__':
     utility_for_user_device_t, utility_for_Vop_t = [0 for i in range(nuser)], 0
     n = 1
     P_0_t, P_1_t, P_2_t = 0.6, 0.3, 0.3
-    P_0_v, P_1_v, P_2_v=[],[],[]
+    P_0_v, P_1_v, P_2_v = [], [], []
     while True:
         print(
             "--------------------------------------------------------------------------第{}次博弈--------------------------------------------------------------------------：".format(
@@ -497,8 +518,8 @@ if __name__ == '__main__':
 
         # f_j_vop = [max(sum(F[j]) - p_j_vop[j] / (2 * a * e[j] * K[j]), 0) for j in range(len(K))]
         sumf_j_vop = sum([sum(F[j]) - p_j_vop[j] / (2 * a * e[j] * K[j]) for j in range(len(K))])
-        sumf_m = sum(p_m)
-        print("多购买了{}的资源".format(sumf_m - sumf_j_vop+Q_vop))
+        sumf_m = sum(f_m)
+        print("多购买了{}的资源".format(sumf_m - sum(f_j_vop) + Q_vop))
         print("stageI阶段合同为f_m, p_m：", f_m, p_m)
         print("stageI阶段Vop对CEA的资源定价p_j_vop为", p_j_vop)
         print("stageII阶段CEA的价格P_0, P_1, P_2分别为：", P_0, P_1, P_2)
@@ -534,7 +555,7 @@ if __name__ == '__main__':
         utility_for_user_device_t = utility_for_user_device
         utility_for_Vop_t = utility_for_Vop
 
-        if n!=1:
+        if n != 1:
             U_C_t_v.append(U_C)
             U_M1_t_v.append(U_M1)
             U_M2_t_v.append(U_M2)
@@ -544,7 +565,7 @@ if __name__ == '__main__':
         P_0_v.append(P_0), P_1_v.append(P_1), P_2_v.append(P_2)
     print("已达到纳什均衡")
     print("--------------------------P_0_v,P_1_v,P_2_v-------------------", P_0_v, ',', P_1_v, ',', P_2_v)
-    print("--------------------------f_m, p_m, p_j_vop-------------------", f_m_t, ',', p_m_t, ',', f_m_t)
+    print("--------------------------f_m, p_m, p_j_vop-------------------", f_m, ',', p_m, ',', p_j_vop)
     print("--------------------------U_C_t_v, U_M1_t_v, U_M2_t_v-------------------", U_C_t_v, ',', U_M1_t_v, ',',
           U_M2_t_v, ',', utility_for_Vop_t_v)
 

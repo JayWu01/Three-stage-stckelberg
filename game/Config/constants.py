@@ -4,13 +4,14 @@ import os
 import random
 
 # # 常量
-# n_number = 10
-# v_number = 5
+# n_number = 100
+# v_number = 30
 
 n_number = 20
 v_number = 8
 bg = []
-s_k = 0.5 # (0.8-1.4)
+# s_k = 0.5 # (0.8-1.4)
+s_k = 1.5 # (0.8-1.4)
 
 Error_value = 0.000001
 # Error_value = 0.000000000000001
@@ -28,6 +29,7 @@ file_path = 'D:/江西理工大学/边缘计算/Three-stage-stckelberg/game/Data
 # 初始化限制车辆参数
 Price_v, Q_total_m, f_m, k_m, e_m, Theta_m = [], [], [], [], [], []
 Q_total_m_range = [5, 7]
+# Q_total_m_range = [50, 70]
 
 k_m_range = [0.1, 1.0]
 e_m_range = [0.1, 1.0]
@@ -220,5 +222,5 @@ if __name__ == '__main__':
     Vechicle.build()
     Vechicle.read(v_number)
 
-    # LM.build()
-    # LM.read(v_number)
+    LM.build()
+    LM.read(v_number)
