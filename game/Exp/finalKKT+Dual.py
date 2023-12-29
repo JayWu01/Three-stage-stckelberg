@@ -132,8 +132,11 @@ def calculate_utility_for_Vop(f_m, p_j_vop, F):
     payment_cost = v_number * sum([lamda_m[i] * (f_m[i] ** 2 / Theta_m[i] + sum(
         [(Theta_m[j - 1] ** -1 - Theta_m[j] ** -1) * f_m[j - 1] ** 2 for j in range(1, v_number)])) for i in
                                    range(v_number)])
+    f_j_vop = [sum(F[j]) - p_j_vop[j] / (2 * a * e[j] * K[j]) for j in range(len(K))]
+    # 计算 能耗、成本
+    E = (e_vk/2) * ((sum(f_j_vop) - sum(f_m)) ** 2)
     # 计算整体表达式
-    U_vop = Reward - payment_cost
+    U_vop = Reward -E- payment_cost
     return U_vop
 
 
@@ -146,7 +149,7 @@ def caculate_VopGradient(f_m, p_j_vop, F, f_j_vop):
     Upsilon_j_grad = p_j_vop
     # Lambda_j_grad = [2 * a * e[j] * K[j] * sum(F[j]) - p_j_vop[j] for j in range(len(K))]
     aa = [sum(F[j]) for j in range(len(K))]
-    Q_CEA[0]=sum(F[0])
+    Q_CEA[0] = sum(F[0])
     Lambda_j_grad = [2 * a * e[j] * K[j] * Q_CEA[j] - p_j_vop[j] for j in range(len(K))]
     # 0 <= p_j_vop[j] <= sum(F[j]) * 2 * a * e[j] * K[j]
     return Phi_m_grad, Omega_m_grad, Pi_grad, Upsilon_j_grad, Lambda_j_grad
@@ -168,6 +171,10 @@ def checkConstrain(f_m, p_m, p_j_vop, F):
 
 p_j_vop_t, p_m_t, f_m_t = [], [], []
 
+# vop自带服务器计算资源大小
+# a_vop, e_vop, k_vop = 1.0, 1.0, 1.0
+a_vop, e_vop, k_vop = 0.1, 0.1, 0.1
+e_vk=2*e_vop*a_vop*k_vop
 
 # 核心代码：拉格朗日交替更新拉格朗日乘子 stageI
 def LagrangeDualStageIforVop(F):
@@ -178,21 +185,39 @@ def LagrangeDualStageIforVop(F):
     Upsilon_j = [1.0, 1.0, 1.0]  # #约束C3
     Lambda_j = [1.0, 1.0, 1.0]  # #约束C3
     # p_j_vop = [1.0, 1.0, 1.0]
+    f_m=[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0]
+    f_j_vop=[8.0,5.0,8.0]
     for n in range(cst.max_iteration):
+        # -------------------------------------------------下面的效益函数没有考虑了VOP自身的能耗-----------------------------------------------
+        # rho_m = [2 * v_number * ((lamda_m[i] / Theta_m[i]) + (Theta_m[i] ** -1 - Theta_m[i + 1] ** -1) * sum([
+        #     lamda_m[j] for j in range(i + 1, v_number)])) for i in range(v_number - 1)]
+        # con = [Phi_m[i] - Omega_m[i] + Pi * lamda_m[i] * v_number for i in range(v_number)]
+        # f_m = [con[m] / rho_m[m] if m != v_number - 1 else Theta_m[m] * con[m] / (2 * v_number * lamda_m[m]) for m in
+        #        range(v_number)]
+        # p_m = [lamda_m[i] * (f_m[i] ** 2 / Theta_m[i] + sum(
+        #     [(Theta_m[j - 1] ** -1 - Theta_m[j] ** -1) * (f_m[j - 1] ** 2) for j in range(1, v_number)])) for i in
+        #        range(v_number)]
+        # p_j_vop = [a * e[j] * K[j] * (sum(F[j]) + Upsilon_j[j] - Lambda_j[j]) + Pi / 2 for j in range(len(K))]
+        # f_j_vop = [sum(F[j]) - p_j_vop[j] / (2 * a * e[j] * K[j]) for j in range(len(K))]
+
+        # #-------------------------------------------------下面的效益函数考虑了VOP自身的能耗-----------------------------------------------
         rho_m = [2 * v_number * ((lamda_m[i] / Theta_m[i]) + (Theta_m[i] ** -1 - Theta_m[i + 1] ** -1) * sum([
             lamda_m[j] for j in range(i + 1, v_number)])) for i in range(v_number - 1)]
         con = [Phi_m[i] - Omega_m[i] + Pi * lamda_m[i] * v_number for i in range(v_number)]
-        f_m = [con[m] / rho_m[m] if m != v_number - 1 else Theta_m[m] * con[m] / (2 * v_number * lamda_m[m]) for m in
+        f_m_mine = [sum([num for idx, num in enumerate(f_m) if idx != m]) for m in range(v_number)]
+        e_vk=2*e_vop*a_vop*k_vop
+        ZZ=[e_vk*(sum(f_j_vop)-f_m_mine[m]+con[m]) for m in range(v_number)]
+        f_m = [ZZ[m] / (e_vk+rho_m[m]) if m != v_number - 1 else Theta_m[m] * ZZ[m] / (2 * v_number * lamda_m[m]+e_vk*Theta_m[m]) for m in
                range(v_number)]
         p_m = [lamda_m[i] * (f_m[i] ** 2 / Theta_m[i] + sum(
             [(Theta_m[j - 1] ** -1 - Theta_m[j] ** -1) * (f_m[j - 1] ** 2) for j in range(1, v_number)])) for i in
                range(v_number)]
-        p_j_vop = [a * e[j] * K[j] * (sum(F[j]) + Upsilon_j[j] - Lambda_j[j]) + Pi / 2 for j in range(len(K))]
+        p_j_vop = [(a * e[j] * K[j] * (sum(F[j]) + Upsilon_j[j] - Lambda_j[j]) + Pi / 2+(sum(F[j])-sum(p_m))*e_vk/2)/(1+e_vk/(4*a*e[j]*K[j])) for j in range(len(K))]
         f_j_vop = [sum(F[j]) - p_j_vop[j] / (2 * a * e[j] * K[j]) for j in range(len(K))]
+        # -------------------------------------------------------------------------------------------------------------
 
         Phi_m_grad, Omega_m_grad, Pi_grad, Upsilon_j_grad, Lambda_j_grad = caculate_VopGradient(f_m, p_j_vop, F,
                                                                                                 f_j_vop)
-
         Phi_m_new = [np.maximum(0, Phi_m[i] - cst.s_k * Phi_m_grad[i]) for i in range(v_number)]
         Omega_m_new = [np.maximum(0, Omega_m[i] - cst.s_k * Omega_m_grad[i]) for i in range(v_number)]
         Pi_new = np.maximum(0, Pi - cst.s_k * Pi_grad)
