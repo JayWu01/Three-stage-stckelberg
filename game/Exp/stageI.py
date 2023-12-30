@@ -1,3 +1,5 @@
+import random
+
 import game.Config.constantstest as cst
 
 import numpy as np
@@ -8,13 +10,13 @@ Theta_m = cst.Theta_m
 # 权重参数
 alpha, beta, zeta = np.array([3, 2.0, 1.5]), np.array([1.5, 1.0, 0.8]), np.array([1.5, 1.0, 0.8])
 # alpha, beta, zeta = np.array([16.0, 8.0, 8.0]), np.array([1.0, 1.0, 1.0]), np.array([2.0, 2.0, 2.0])
-# e, a = [2.0, 1.0, 1.0], 1.0
+# e, a = [2.0, 1.0, 1.0], 0.85
 # e, a = [0.4, 0.3, 0.2], 0.85
 e, a = [0.3, 0.2, 0.1], 0.85 # zuiyou
-# C = [0.5, 0.3, 0.2]  # 三台服务器成本
+C = [0.5, 0.3, 0.2]  # 三台服务器成本
 # C = [4, 2, 1]
 # C = [2, 1, 0.8]
-C = [1.4, 0.7, 0.5]
+# C = [1.4, 0.7, 0.5]
 # K = [2.0, 1.0, 0.5]  # 服务器功率
 K = [0.2, 0.1, 0.05]  # 服务器功率
 # K = [20, 10, 10]  # 服务器功率
@@ -35,6 +37,17 @@ Pi = 1.0  # 约束C2
 Upsilon_j = [1.0, 1.0, 1.0]  # #约束C3
 Lambda_j = [1.0, 1.0, 1.0]  # #约束C3
 
+
+def create():
+    global lamda_m
+    # 生成10个均匀分布的概率值（小数点后最多两位）
+    probabilities = [round(random.uniform(0, 1), 2) for _ in range(v_number)]
+
+    # 确保概率值之和为1
+    total_probability = sum(probabilities)
+
+    # 计算归一化后的概率值，并保留小数点后两位
+    lamda_m = [round(prob / total_probability, 2) for prob in probabilities]
 
 def find_Optial_mulitUser(P_0, P_1, P_2):
     F_i0, F_i1, F_i2 = [], [], []
@@ -61,19 +74,17 @@ def calculate_utility_for_Cloud_server(p_0_t, p_1_t, p_2_t, p_vop_0, f_vop_0):
     # fix(f_vop_0,P_vop)
     F_i0, F_i1, F_i2 = find_Optial_mulitUser(p_0_t, p_1_t, p_2_t)
     f_vop_0 = sum(F_i0) - p_vop_0 / (2 * a * e[0] * K[0])
-    if 0<=p_vop_0 <=sum(F_i0)*2*a*e[0]*K[0]:
-        # 奖励回报
-        # Reward = p_0_t * np.log(1 + sum(F_i0))
-        Reward = (p_0_t - C[0]) * sum(F_i0)
-        # Reward = (np.log(1+p_0_t-C[0]))* sum(F_i0)
-        # 计算 能耗、成本
-        E = a * e[0] * K[0] * ((sum(F_i0) - f_vop_0) ** 2)
-        # payment = p_vop_0 * np.log(1 + f_vop_0)
-        payment = p_vop_0 * f_vop_0
-        # 计算整体表达式
-        U = Reward - E - payment
-    else:
-        U = -float("inf")
+    # 奖励回报
+    # Reward = p_0_t * np.log(1 + sum(F_i0))
+    Reward = (p_0_t - C[0]) * sum(F_i0)
+    # Reward = (np.log(1+p_0_t-C[0]))* sum(F_i0)
+    # 计算 能耗、成本
+    E = a * e[0] * K[0] * ((sum(F_i0) - f_vop_0) ** 2)
+    # payment = p_vop_0 * np.log(1 + f_vop_0)
+    payment = p_vop_0 * f_vop_0
+    # 计算整体表达式
+    U = Reward - E - payment
+
     return U
 
 
@@ -83,19 +94,16 @@ def calculate_utility_for_M1_server(p_1_t, p_0_t, p_2_t, p_vop_1, f_vop_1):
 
     F_i0, F_i1, F_i2 = find_Optial_mulitUser(p_0_t, p_1_t, p_2_t)
     f_vop_1 = sum(F_i1) - p_vop_1 / (2 * a * e[1] * K[1])
-    if 0<=p_vop_1 <=sum(F_i1)*2*a*e[1]*K[1]:
-        # 奖励回报
-        # Reward = p_1_t * np.log(1 + sum(F_i1))
-        Reward = (p_1_t - C[1]) * sum(F_i1)
-        # Reward = (np.log(1 + p_1_t - C[1])) * sum(F_i1)
-        # 计算 能耗、成本
-        E = a * e[1] * K[1] * ((sum(F_i1) - f_vop_1) ** 2)
-        # payment = p_vop_1 * np.log(1 + f_vop_1)
-        payment = p_vop_1 * f_vop_1
-        # 计算整体表达式
-        U = Reward - E - payment
-    else:
-        U=-float("inf")
+    # 奖励回报
+    # Reward = p_1_t * np.log(1 + sum(F_i1))
+    Reward = (p_1_t - C[1]) * sum(F_i1)
+    # Reward = (np.log(1 + p_1_t - C[1])) * sum(F_i1)
+    # 计算 能耗、成本
+    E = a * e[1] * K[1] * ((sum(F_i1) - f_vop_1) ** 2)
+    # payment = p_vop_1 * np.log(1 + f_vop_1)
+    payment = p_vop_1 * f_vop_1
+    # 计算整体表达式
+    U = Reward - E - payment
     return U
 
 
@@ -104,19 +112,17 @@ def calculate_utility_for_M2_server(p_2_t, p_0_t, p_1_t, p_vop_2, f_vop_2):
     # f_vop_2 = P_vop = 0.5
     F_i0, F_i1, F_i2 = find_Optial_mulitUser(p_0_t, p_1_t, p_2_t)
     f_vop_2=sum(F_i2)-p_vop_2/(2*a*e[2]*K[2])
-    if 0<=p_vop_2 <=sum(F_i2)*2*a*e[2]*K[2]:
-        # 奖励回报
-        # Reward = p_2_t * np.log(1 + sum(F_i2))
-        Reward = (p_2_t - C[2]) * sum(F_i2)
-        # Reward = (np.log(1 + p_2_t - C[2])) * sum(F_i2)
-        # 计算 能耗、成本
-        E = a * e[2] * K[2] * ((sum(F_i2) - f_vop_2) ** 2)
-        # payment = p_vop_2 * np.log(1 + f_vop_2)
-        payment = p_vop_2 * f_vop_2
-        # 计算整体表达式
-        U = Reward - E - payment
-    else:
-        U=-float("inf")
+    # 奖励回报
+    # Reward = p_2_t * np.log(1 + sum(F_i2))
+    Reward = (p_2_t - C[2]) * sum(F_i2)
+    # Reward = (np.log(1 + p_2_t - C[2])) * sum(F_i2)
+    # 计算 能耗、成本
+    E = a * e[2] * K[2] * ((sum(F_i2) - f_vop_2) ** 2)
+    # payment = p_vop_2 * np.log(1 + f_vop_2)
+    payment = p_vop_2 * f_vop_2
+    # 计算整体表达式
+    U = Reward - E - payment
+
     return U
 
 
@@ -183,7 +189,7 @@ def LagrangeDualStageIforVop(F):
     Pi = 1.0  # 约束C2
     Upsilon_j = [1.0, 1.0, 1.0]  # #约束C3
     Lambda_j = [1.0, 1.0, 1.0]  # #约束C3
-    # p_j_vop=[1.0, 1.0, 1.0]
+    p_j_vop=[1.0, 1.0, 1.0]
     for n in range(cst.max_iteration):
         rho_m = [2 * v_number * ((lamda_m[i] / Theta_m[i]) + (Theta_m[i] ** -1 - Theta_m[i + 1] ** -1) * sum([
             lamda_m[j] for j in range(i + 1, v_number)])) for i in range(v_number - 1)]
@@ -204,8 +210,8 @@ def LagrangeDualStageIforVop(F):
 
         Phi_m_new = [np.maximum(0, Phi_m[i] - cst.s_k * Phi_m_grad[i]) for i in range(v_number)]
         Omega_m_new = [np.maximum(0, Omega_m[i] - cst.s_k * Omega_m_grad[i]) for i in range(v_number)]
-        Pi_new = np.maximum(0, Pi - cst.s_k * Pi_grad)
-        # Pi_new = 0
+        # Pi_new = np.maximum(0, Pi - cst.s_k * Pi_grad)
+        Pi_new = 0
         Upsilon_j_new = [np.maximum(0, Upsilon_j[j] - cst.s_k * Upsilon_j_grad[j]) for j in range(len(K))]
         Lambda_j_new = [np.maximum(0, Lambda_j[j] - cst.s_k * Lambda_j_grad[j]) for j in range(len(K))]
 
@@ -262,8 +268,6 @@ def find_nash_equilibrium(p_j_vop, f_j_vop):
     Delta, Dt = 0.1, 0.1
     dslow, dfast = 0.5, 2.0
 
-    # p_0_t, p_1_t, p_2_t = p_0_init, p_1_init, p_2_init
-
     # Calculate utility for the cloud
     Uc = calculate_utility_for_Cloud_server(p_0_init, p_1_init, p_2_init, p_j_vop[0], f_j_vop[0])
     Uc_add_Delta = calculate_utility_for_Cloud_server(p_0_init + Delta, p_1_init, p_2_init, p_j_vop[0], f_j_vop[0])
@@ -311,10 +315,7 @@ def find_nash_equilibrium(p_j_vop, f_j_vop):
 
 # stageIII 求解算法
 def optimal_Stage3strategy_KKT(bi, P_0, P_1, P_2):
-    # def optimal_Stage3strategy_KKT(bi):
-    # global alpha, beta, zeta
     P = np.array([P_0, P_1, P_2])
-    # P = [P_0, P_1, P_2]
     ################################################################### Case 1
     if np.allclose(P, alpha * beta / zeta):
         # print("Casse 1")
@@ -500,28 +501,12 @@ if __name__ == '__main__':
     cst.LM.read(v_number)
     cst.Vechicle.read(v_number)
     cst.UserDevice.read(nuser)
+    create()
     U_C_t_v, U_M1_t_v, U_M2_t_v = [], [], []
     U_C_t, U_M1_t, U_M2_t = 0, 0, 0
     utility_for_user_device_t_v, utility_for_Vop_t_v = [], []
     P_0_t, P_1_t, P_2_t = 0.6, 0.3, 0.3
     P_0, P_1, P_2 = 4.35, 2.25, 2.2
-    F_i0, F_i1, F_i2 = [0.83908046 , 0.83908046 ,  0.83908046  , 0.83908046  , 0.53103448  , 0.83908046 ,
- 0.8390804 , 6 ,  0.83908046 ,  0.83908046 ,  0.83908046 ,  0.83908046 ,  0.83908046 ,
- 0.65402299  , 0.83908046 ,  0.39770115 ,  0.83908046 ,  0.83908046 ,  0.83793103 ,
- 0.42988506  , 0.83908046] , [0.77777778 ,  0.77777778 ,  0.77777778 ,  0.77777778 ,  0.48 ,   0.77777778 ,
- 0.77777778  , 0.77777778  , 0.77777778 ,  0.77777778 ,  0.77777778 ,  0.77777778 ,
- 0.59888889  , 0.77777778 ,  0.35111111  , 0.77777778 ,  0.77777778 ,  0.77666667 ,
- 0.38222222 ,  0.77777778] , [0.81818182 ,  0.81818182 ,  0.81818182 ,  0.81818182 ,  0.51363636 ,  0.81818182 ,
- 0.81818182 ,  0.81818182  , 0.81818182  , 0.81818182  , 0.81818182 ,  0.81818182 ,
- 0.63522727 ,  0.81818182 ,  0.38181818  , 0.81818182  , 0.81818182 ,  0.81704545 ,
- 0.41363636 ,  0.81818182]
-
-    # # Algorithm 1
-    # print("stageIII的购买决策F_i0, F_i1, F_i2分别为:", F_i0, F_i1, F_i2)
-    # F = [F_i0, F_i1, F_i2]
-    #
-    # # Algorithm 3
-    # f_m, p_m, p_j_vop, utility_for_Vop = LagrangeDualStageIforVop(F)
 
     while True:
         print(
@@ -543,11 +528,10 @@ if __name__ == '__main__':
         P_0, P_1, P_2 = find_nash_equilibrium(p_j_vop, f_j_vop)  # 这里加了一个p_j_vop, f_j_vop
 
         checkConstrain(f_m, p_m, p_j_vop, F)
-        # f_j_vop = [
-        #     sum(F[j]) - p_j_vop[j] / (2 * a * e[j] * K[j])
-        #     for j in
-        #     range(len(K))]
 
+        sumf_j_vop=sum([sum(F[j]) - p_j_vop[j] / (2 * a * e[j] * K[j]) for j in range(len(K))])
+        sumf_m=sum(p_m)
+        print("多购买了{}的资源".format(sumf_m-sumf_j_vop))
         print("stageI阶段合同为f_m, p_m：", f_m, p_m)
         print("stageI阶段Vop对CEA的资源定价p_j_vop为", p_j_vop)
         print("stageII阶段CEA的价格P_0, P_1, P_2分别为：", P_0, P_1, P_2)

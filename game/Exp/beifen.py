@@ -12,12 +12,14 @@ Theta_m = cst.Theta_m
 # K = [0.2, 0.1, 0.1]  # 服务器功率
 
 # 注意要满足 p_j_min=C[j]<=p_j_max=alpha[j] * beta[j] / zeta[j]
-alpha, beta, zeta = np.array([2.0, 1.0, 1.0]), np.array([1.5, 1.2, 1.2]), np.array([2, 1.5, 1.5])
-# alpha, beta, zeta = np.array([8.0, 9.0, 8.0]), np.array([1.5, 1.2, 1.2]), np.array([2.0, 1.5, 1.5])
-varphi, e, a = 1.0, 1.0, 1.0
-C = [0.5, 0.2, 0.2]  # 三台服务器成本
-# C = [2, 1, 1]  # 三台服务器成本
-K = [0.2, 0.1, 0.1]  # 服务器功率
+# alpha, beta, zeta = np.array([2.0, 1.0, 1.0]), np.array([1.5, 1.2, 1.2]), np.array([2, 1.5, 1.5])
+alpha, beta, zeta = np.array([3.0, 3.0, 3.0]), np.array([5.0, 5.0, 5.0]), np.array([2.0, 2.0, 2.0])
+# e, a = [2.0, 1.0, 1.0], 1.0
+e, a = [0.5, 0.3, 0.2], 1.0
+C = [0.5, 0.3, 0.2]  # 三台服务器成本
+# C = [5*2, 3*2, 2*2]  # 三台服务器成本
+K = [0.5, 0.3, 0.2]  # 服务器功率
+# K = [2, 1, 1]  # 服务器功率
 
 # stage 3决策变量
 # 车辆类型为theta_m的概率
@@ -48,7 +50,7 @@ Lambda_j = [1.0, 1.0, 1.0]  # #约束C3
 
 
 def find_Optial_mulitUser(P_0, P_1, P_2):
-    cst.UserDevice.read(nuser)
+    # cst.UserDevice.read(nuser)
     F_i0, F_i1, F_i2 = [], [], []
     # global F_i0, F_i1, F_i2
     for i in range(nuser):
@@ -60,16 +62,36 @@ def find_Optial_mulitUser(P_0, P_1, P_2):
     return F_i0, F_i1, F_i2
 
 
+# 计算用户的效益函数值
+def calculate_utility_for_user_device(F_i0, F_i1, F_i2, p_0_t, p_1_t, p_2_t):
+    # fix(f_vop_0,P_vop)
+    F = [F_i0, F_i1, F_i2]
+    P = [p_0_t, p_1_t, p_2_t]
+    # 奖励回报
+    # Reward = alpha * np.log(1 + sum(F_i0))
+    # Reward = [sum([alpha[j] * np.log(1+beta[j]*F[i][j])-P[j]*F[i][j] for j in range[len(K)]]) for i in range(nuser)]
+    # # 计算 能耗、成本
+    # E = a * e * K[0] * ((sum(F_i0) - f_vop_0) ** 2)
+    # payment = p_vop_0 * np.log(1 + f_vop_0)
+    # 计算整体表达式
+    U = [sum([alpha[j] * np.log(1 + beta[j] * F[j][i]) - zeta[j] * P[j] * F[j][i] for j in range(len(K))]) for i in
+         range(nuser)]
+    return U
+
+
 # 计算云服务器的效益函数值
 def calculate_utility_for_Cloud_server(p_0_t, p_1_t, p_2_t, p_vop_0, f_vop_0):
     # fix(f_vop_0,P_vop)
     F_i0, F_i1, F_i2 = find_Optial_mulitUser(p_0_t, p_1_t, p_2_t)
 
     # 奖励回报
-    Reward = p_0_t * np.log(1 + sum(F_i0))
+    # Reward = p_0_t * np.log(1 + sum(F_i0))
+    Reward = (p_0_t - C[0]) * sum(F_i0)
+    # Reward = (np.log(1+p_0_t-C[0]))* sum(F_i0)
     # 计算 能耗、成本
-    E = a * e * K[0] * ((sum(F_i0) - f_vop_0) ** 2)
-    payment = p_vop_0 * np.log(1 + f_vop_0)
+    E = a * e[0] * K[0] * ((sum(F_i0) - f_vop_0) ** 2)
+    # payment = p_vop_0 * np.log(1 + f_vop_0)
+    payment = p_vop_0 * f_vop_0
     # 计算整体表达式
     U = Reward - E - payment
     return U
@@ -81,10 +103,13 @@ def calculate_utility_for_M1_server(p_1_t, p_0_t, p_2_t, p_vop_1, f_vop_1):
     F_i0, F_i1, F_i2 = find_Optial_mulitUser(p_0_t, p_1_t, p_2_t)
 
     # 奖励回报
-    Reward = p_1_t * np.log(1 + sum(F_i1))
+    # Reward = p_1_t * np.log(1 + sum(F_i1))
+    Reward = (p_1_t - C[1]) * sum(F_i1)
+    # Reward = (np.log(1 + p_1_t - C[1])) * sum(F_i1)
     # 计算 能耗、成本
-    E = a * e * K[1] * ((sum(F_i1) - f_vop_1) ** 2)
-    payment = p_vop_1 * np.log(1 + f_vop_1)
+    E = a * e[1] * K[1] * ((sum(F_i1) - f_vop_1) ** 2)
+    # payment = p_vop_1 * np.log(1 + f_vop_1)
+    payment = p_vop_1 * f_vop_1
     # 计算整体表达式
     U = Reward - E - payment
     return U
@@ -96,10 +121,13 @@ def calculate_utility_for_M2_server(p_2_t, p_0_t, p_1_t, p_vop_2, f_vop_2):
     F_i0, F_i1, F_i2 = find_Optial_mulitUser(p_0_t, p_1_t, p_2_t)
 
     # 奖励回报
-    Reward = p_2_t * np.log(1 + sum(F_i2))
+    # Reward = p_2_t * np.log(1 + sum(F_i2))
+    Reward = (p_2_t - C[2]) * sum(F_i2)
+    # Reward = (np.log(1 + p_2_t - C[2])) * sum(F_i2)
     # 计算 能耗、成本
-    E = a * e * K[2] * ((sum(F_i2) - f_vop_2) ** 2)
-    payment = p_vop_2 * np.log(1 + f_vop_2)
+    E = a * e[2] * K[2] * ((sum(F_i2) - f_vop_2) ** 2)
+    # payment = p_vop_2 * np.log(1 + f_vop_2)
+    payment = p_vop_2 * f_vop_2
     # 计算整体表达式
     U = Reward - E - payment
     return U
@@ -112,7 +140,7 @@ def calculate_utility_for_Vop(f_m, p_j_vop, F):
     # F = [F_i0, F_i1, F_i2]
     # 奖励回报
     # Reward = sum([sum(F[i]) - p_j_vop[i] / (2 * a * e * K[i]) for i in range(len(K))])
-    Reward = sum([p_j_vop[i] * (sum(F[i]) - p_j_vop[i] / (2 * a * e * K[i])) for i in range(len(K))])
+    Reward = sum([p_j_vop[i] * (sum(F[i]) - p_j_vop[i] / (2 * a * e[i] * K[i])) for i in range(len(K))])
     # 付给车辆的成本
     payment_cost = v_number * sum([lamda_m[i] * (f_m[i] ** 2 / Theta_m[i] + sum(
         [(Theta_m[j - 1] ** -1 - Theta_m[j] ** -1) * f_m[j - 1] ** 2 for j in range(1, v_number)])) for i in
@@ -131,19 +159,19 @@ def caculate_VopGradient(f_m, p_j_vop, F):
     Phi_m_grad = f_m
     Omega_m_grad = [Q_total_m[i] - f_m[i] for i in range(v_number)]
     Pi_grad = v_number * sum([lamda_m[i] * f_m[i] for i in range(v_number)]) - sum(
-        [sum(F[j]) - p_j_vop[j] / (2 * a * e * K[j]) for j in range(len(K))])
+        [sum(F[j]) - p_j_vop[j] / (2 * a * e[j] * K[j]) for j in range(len(K))])
     # f_vop_j = [8, 6, 9]
     # Pi_grad = v_number * sum([lamda_m[i] * f_m[i] for i in range(v_number)]) - sum(
     #     [f_vop_j[j] for j in range(len(K))])
     Upsilon_j_grad = p_j_vop
-    Lambda_j_grad = [2 * a * e * K[j] * sum(F[j]) - p_j_vop[j] for j in range(len(K))]
+    Lambda_j_grad = [2 * a * e[j] * K[j] * sum(F[j]) - p_j_vop[j] for j in range(len(K))]
     return Phi_m_grad, Omega_m_grad, Pi_grad, Upsilon_j_grad, Lambda_j_grad
 
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # 核心代码：拉格朗日交替更新拉格朗日乘子 stageI
-def LagrangeDualStageIforVop(F):
+def LagrangeDualStageIforVop(F, f_j_vop):
     # global Phi_m, Omega_m, Pi, Upsilon_j, Lambda_j
     # global f_m, p_m, p_j_vop, f_j_vop
     # F_i0, F_i1, F_i2 = 12, 11, 24
@@ -163,7 +191,7 @@ def LagrangeDualStageIforVop(F):
         p_m = [lamda_m[i] * (f_m[i] ** 2 / Theta_m[i] + sum(
             [(Theta_m[j - 1] ** -1 - Theta_m[j] ** -1) * f_m[j - 1] ** 2 for j in range(1, v_number)])) for i in
                range(v_number)]
-        p_j_vop = [2 * a * e * K[j] * (sum(F[j]) + Upsilon_j[j] - Lambda_j[j]) for j in range(len(K))]
+        p_j_vop = [2 * a * e[j] * K[j] * (sum(F[j]) + Upsilon_j[j] - Lambda_j[j]) for j in range(len(K))]
 
         Phi_m_grad, Omega_m_grad, Pi_grad, Upsilon_j_grad, Lambda_j_grad = caculate_VopGradient(f_m, p_j_vop, F)
         Phi_m_new = [np.maximum(0, Phi_m[i] - cst.s_k * Phi_m_grad[i]) for i in range(v_number)]
@@ -198,23 +226,29 @@ def LagrangeDualStageIforVop(F):
         Upsilon_j = Upsilon_j_new
         Lambda_j = Lambda_j_new
 
-    return f_m, p_m, p_j_vop
+    return f_m, p_m, p_j_vop, utility_for_Vop
+
+
+p_0_t_c, p_1_t_c, p_2_t_c = [], [], []
 
 
 # stageII 求解算法
-def find_nash_equilibrium(p_j_vop, f_j_vop):
+def find_nash_equilibrium(F, p_j_vop, f_j_vop):
+    # global P_0, P_1, P_2
     # Initialization
     p_0_min, p_1_min, p_2_min = C[0], C[1], C[2]
     p_0_max, p_1_max, p_2_max = alpha[0] * beta[0] / zeta[0], alpha[1] * beta[1] / zeta[1], alpha[2] * beta[2] / zeta[2]
     # p_j_min=C[j]<=p_j_max=alpha[j] * beta[j] / zeta[j]
-    p_0_init, p_1_init, p_2_init = 0.5 * (p_0_min + p_0_max), 0.5 * (p_1_min + p_1_max), 0.5 * (p_2_min + p_2_max),
+    p_0_init, p_1_init, p_2_init = 0.5 * (p_0_min + p_0_max), 0.5 * (p_1_min + p_1_max), 0.5 * (p_2_min + p_2_max)
 
     # Parameter Setup
-    Delta, Dt = 0.1, 0.1
+    Delta, Dt = 0.05, 0.05
     dslow, dfast = 0.5, 2.0
 
     p_0_t, p_1_t, p_2_t = p_0_init, p_1_init, p_2_init
     while True:
+        # Adjust strategy for the hash-server
+
         # Calculate utility for the cloud
         Uc = calculate_utility_for_Cloud_server(p_0_t, p_1_t, p_2_t, p_j_vop[0], f_j_vop[0])
         Uc_add_Delta = calculate_utility_for_Cloud_server(p_0_t + Delta, p_1_t, p_2_t, p_j_vop[0], f_j_vop[0])
@@ -231,6 +265,7 @@ def find_nash_equilibrium(p_j_vop, f_j_vop):
             p_0_t = p_0_init
             break
         p_0_t = p_0_init
+        p_0_t_c.append(p_0_t)
 
     while True:
         # Calculate utility for the M1-server
@@ -249,7 +284,7 @@ def find_nash_equilibrium(p_j_vop, f_j_vop):
             p_1_t = p_1_init
             break
         p_1_t = p_1_init
-
+        p_1_t_c.append(p_1_t)
     while True:
         # Calculate utility for the M2-server
         U_m2 = calculate_utility_for_M2_server(p_2_t, p_0_t, p_1_t, p_j_vop[2], f_j_vop[2])
@@ -267,19 +302,25 @@ def find_nash_equilibrium(p_j_vop, f_j_vop):
             p_2_t = p_2_init
             break
         p_2_t = p_2_init
-
+        p_2_t_c.append(p_2_t)
         # if (np.abs(p_0_init - p_0_t) <= cst.Error_value).all() and (
         #         np.abs(p_1_init - p_1_t) <= cst.Error_value).all() and (
         #         np.abs(p_2_init - p_2_t) <= cst.Error_value).all():
         #     # P_0, P_1, P_2 = p_0_init, p_1_init, p_2_init
         #     return p_0_init, p_1_init, p_2_init
 
+    # The loop continues indefinitely until a stopping criterion is met
+    # Return the final pricing strategies (ph, pt)
     # P_0, P_1, P_2 = p_0_init, p_1_init, p_2_init
+    # return p_0_init, p_1_init, p_2_init
+    print("--------------------------p_0_t_c,p_1_t_c,p_2_t_c-------------------", p_0_t_c, ',', p_1_t_c, ',', p_2_t_c)
     return p_0_t, p_1_t, p_2_t
 
 
 # stageIII 求解算法
 def optimal_Stage3strategy_KKT(bi, P_0, P_1, P_2):
+    # def optimal_Stage3strategy_KKT(bi):
+    # global alpha, beta, zeta
     P = np.array([P_0, P_1, P_2])
     # P = [P_0, P_1, P_2]
     ################################################################### Case 1
@@ -465,10 +506,12 @@ if __name__ == '__main__':
     # p_0_init, p_1_init, p_2_init= 0.6, 0.3, 0.3
     P_0, P_1, P_2 = 0.6, 0.3, 0.3
     f_m, p_m = [], []  # 合同（f_m,p_m）
-    f_j_vop, p_j_vop = [], []  # CEA的资源购买决策、vop的定价
+    f_j_vop, p_j_vop = [], [0.6, 0.3, 0.3]  # CEA的资源购买决策、vop的定价
     U_C, U_M1, U_M2 = 0, 0, 0
     U_C_t, U_M1_t, U_M2_t = 0, 0, 0
+    utility_for_user_device_t, utility_for_Vop_t = 0, 0
     n = 1
+    P_0_t, P_1_t, P_2_t = 0.6, 0.3, 0.3
     while True:
         print(
             "--------------------------------------------------------------------------第{}次博弈--------------------------------------------------------------------------：".format(
@@ -482,31 +525,49 @@ if __name__ == '__main__':
             F_i2 = np.append(F_i2, result[3])
         print("stageIII的购买决策F_i0, F_i1, F_i2分别为:", F_i0, F_i1, F_i2)
         F = [F_i0, F_i1, F_i2]
+        utility_for_user_device = calculate_utility_for_user_device(F_i0, F_i1, F_i2, P_0, P_1, P_2)
+
         # Algorithm 3
-        f_m, p_m, p_j_vop = LagrangeDualStageIforVop(F)
-        f_j_vop = [sum(F[j]) - p_j_vop[j] / (2 * a * e * K[j]) if 0 <= p_j_vop[j] <= sum(F[j]) * 2 * a * e * K[j] else 0
-                   for j in
-                   range(len(K))]
+        f_m, p_m, p_j_vop, utility_for_Vop = LagrangeDualStageIforVop(F, f_j_vop)
 
         print("stageI阶段合同为f_m, p_m：", f_m, p_m)
         print("stageI阶段Vop对CEA的资源定价p_j_vop为", p_j_vop)
 
         # Algorithm 2
-        P_0, P_1, P_2 = find_nash_equilibrium(p_j_vop, f_j_vop)
+        f_j_vop = [
+            sum(F[j]) - p_j_vop[j] / (2 * a * e[j] * K[j]) if 0 <= p_j_vop[j] <= sum(F[j]) * 2 * a * e[j] * K[j] else 0
+            for j in
+            range(len(K))]
+        P_0, P_1, P_2 = find_nash_equilibrium(F, p_j_vop, f_j_vop)  # 这里加了一个p_j_vop, f_j_vop
         print("stageII阶段CEA的价格P_0, P_1, P_2分别为：", P_0, P_1, P_2)
         print("stageII阶段CEA的资源购买决策f_j_vop：{}", f_j_vop)
-
         U_C = calculate_utility_for_Cloud_server(P_0, P_1, P_2, p_j_vop[0], f_j_vop[0])
         U_M1 = calculate_utility_for_M1_server(P_1, P_0, P_2, p_j_vop[1], f_j_vop[1])
         U_M2 = calculate_utility_for_M2_server(P_2, P_0, P_1, p_j_vop[2], f_j_vop[2])
+
+        print("------------------------------------------")
+        print("user的效益函数为：", utility_for_user_device)
+        print("------------------------------------------")
         print("U_C效益函数为：", U_C)
         print("U_M1效益函数为：", U_M1)
         print("U_M2效益函数为：", U_M2)
+        print("------------------------------------------")
+        print("stageI阶段Vop的效益函数为", utility_for_Vop)
+        print("------------------------------------------")
+        # if (np.abs(P_0_t - P_0) <= cst.Error_value).all() and (np.abs(P_1_t - P_1) <= cst.Error_value).all() and (
+        #         np.abs(P_2_t - P_2) <= cst.Error_value).all():
+        #     break
+        P_0_t, P_1_t, P_2_t = P_0, P_1, P_2
         if (np.abs(U_C - U_C_t) <= cst.Error_value).all() and (np.abs(U_M1 - U_M1_t) <= cst.Error_value).all() and (
-                np.abs(U_M2 - U_M2_t) <= cst.Error_value).all():
+                np.abs(U_M2 - U_M2_t) <= cst.Error_value).all() and all(diff < 1 for diff in [np.abs(a - b) for a, b in
+                                                                                              zip(utility_for_user_device_t,
+                                                                                                  utility_for_user_device)]) and (
+                np.abs(utility_for_Vop - utility_for_Vop_t) <= cst.Error_value).all():
             break
         U_C_t = U_C
         U_M1_t = U_M1
         U_M2_t = U_M2
+        utility_for_user_device_t = utility_for_user_device
+        utility_for_Vop_t = utility_for_Vop
         n += 1
     print("已达到纳什均衡")
