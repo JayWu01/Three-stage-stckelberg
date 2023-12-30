@@ -320,7 +320,7 @@ if __name__ == '__main__':
     plt.legend()
     plt.xlabel('iterations', fontsize=16, fontweight='bold')
     plt.ylabel('Duality gap value', fontsize=16, fontweight='bold')
-    plt.grid(True)
+    
     plt.xticks(fontsize=16)  # 修改x轴刻度字体大小
     plt.yticks(fontsize=16)  # 修改y轴刻度字体大小
 
@@ -346,6 +346,6 @@ if __name__ == '__main__':
     plt.ylabel('Utility value', fontsize=16, fontweight='bold')
     plt.xticks(fontsize=16)  # 修改x轴刻度字体大小
     plt.yticks(fontsize=16)  # 修改y轴刻度字体大小
-    plt.grid(True)
+    
     plt.tight_layout()
     plt.show()

@@ -1,16 +1,30 @@
 import matplotlib.pyplot as plt
+import matplotlib
+# 预设字体格式，并传给rc方法
+font = {'family': 'SimHei', "size":16}
+matplotlib.rc('font', **font)  # 一次定义终身使用
+# 四组数据
+
 P_0_v,P_1_v,P_2_v,p_j_vop_v=[5.799999999999994, 5.699999999999994, 5.699999999999994, 5.599999999999994, 5.599999999999994, 5.599999999999994, 5.599999999999994, 5.599999999999994, 5.599999999999994, 5.599999999999994, 5.599999999999994] , [4.899999999999997, 4.799999999999997, 4.6999999999999975, 4.6999999999999975, 4.599999999999998, 4.499999999999998, 4.499999999999998, 4.499999999999998, 4.499999999999998, 4.499999999999998, 4.499999999999998] , [4.349999999999999, 4.249999999999999, 4.1499999999999995, 4.05, 3.9499999999999997, 3.8499999999999996, 3.7499999999999996, 3.7499999999999996, 3.7499999999999996, 3.7499999999999996, 3.7499999999999996] , [[4.016132695323941, 2.8492514256757135, 2.281272529185228], [4.0765342902865696, 2.7924479022173063, 2.186761754801194], [3.8902607751561784, 2.7225574409053226, 2.077420799646637], [3.934933903505381, 2.5320811845561493, 1.9637535162974467], [3.7543060840161533, 2.4726859156228684, 1.867416261252474], [3.5776389489798697, 2.4223649574667103, 1.7790902025461826], [3.3930757597965724, 2.2396492232875875, 1.6849776706691246], [3.3930757597965724, 2.2396492232875875, 1.6849776706691246], [3.3930757597965724, 2.2396492232875875, 1.6849776706691246], [3.3930757597965724, 2.2396492232875875, 1.6849776706691246], [3.3930757597965724, 2.2396492232875875, 1.6849776706691246]]
 
 p_j_vop_0=[row[0] for row in p_j_vop_v]
 p_j_vop_1=[row[1] for row in p_j_vop_v]
 p_j_vop_2=[row[2] for row in p_j_vop_v]
 # 绘制折线图
-plt.plot(range(len(P_0_v)), P_0_v, label='云服务器对用户的最优定价', marker='.',color="black")
-plt.plot(range(len(P_1_v)), P_1_v, label='M1云服务器对用户的最优定价', marker='o',color="red")
-plt.plot(range(len(P_2_v)), P_2_v, label='M2服务器对用户的最优定价', marker='s',color="blue")
-plt.plot(range(len(p_j_vop_0)), p_j_vop_0, label='VOP对云服务器的最优定价', marker='^')
-plt.plot(range(len(p_j_vop_1)), p_j_vop_1, label='VOP对M1云服务器最优定价', marker='^')
-plt.plot(range(len(p_j_vop_2)), p_j_vop_2, label='VOP对M2服务器的最优定价', marker='^')
+# plt.plot(range(len(P_0_v)), P_0_v, label='云服务器对用户的最优定价', marker='.',color="black")
+# plt.plot(range(len(P_1_v)), P_1_v, label='M1云服务器对用户的最优定价', marker='o',color="red")
+# plt.plot(range(len(P_2_v)), P_2_v, label='M2服务器对用户的最优定价', marker='s',color="blue")
+# plt.plot(range(len(p_j_vop_0)), p_j_vop_0, label='VOP对云服务器的最优定价', marker='^',color="green")
+# plt.plot(range(len(p_j_vop_1)), p_j_vop_1, label='VOP对M1云服务器最优定价', marker='*')
+# plt.plot(range(len(p_j_vop_2)), p_j_vop_2, label='VOP对M2服务器的最优定价', marker='<')
+
+plt.plot(range(len(P_0_v)), P_0_v,  marker='O',color="black")
+plt.plot(range(len(P_1_v)), P_1_v, marker='o',color="red")
+plt.plot(range(len(P_2_v)), P_2_v,  marker='s',color="blue")
+plt.plot(range(len(p_j_vop_0)), p_j_vop_0, marker='^',color="green")
+plt.plot(range(len(p_j_vop_1)), p_j_vop_1,marker='*')
+plt.plot(range(len(p_j_vop_2)), p_j_vop_2, marker='<')
+
 
 # 添加标题和轴标签
 plt.xlabel('VOP预留的资源', fontsize=16)
@@ -20,5 +34,5 @@ plt.yticks(fontsize=13.5)  # 修改y轴刻度字体大小
 # 添加图例并设置字体大小
 plt.legend(fontsize='16')
 # 显示图形
-# 
+
 plt.show()
