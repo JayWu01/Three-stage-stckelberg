@@ -7,14 +7,14 @@ import random
 # n_number = 100
 # v_number = 30
 
-n_number = 20
+n_number = 30
 v_number = 8
 bg = []
 # s_k = 0.5 # (0.8-1.4)
 s_k = 1.5 # (0.8-1.4)
 
-Error_value = 0.000001
-# Error_value = 0.000000000000001
+# Error_value = 0.000001
+Error_value = 0.000000000000001
 max_iteration = 2000
 
 # 变量 按照一定规则生成
@@ -31,9 +31,17 @@ Price_v, Q_total_m, f_m, k_m, e_m, Theta_m = [], [], [], [], [], []
 Q_total_m_range = [5, 7]
 # Q_total_m_range = [50, 70]
 
-k_m_range = [0.1, 1.0]
-e_m_range = [0.1, 1.0]
-f_m_range = [0.1, 1.0]
+# k_m_range = [0.1, 1.0]
+# e_m_range = [0.1, 1.0]
+# f_m_range = [0.1, 1.0]
+
+k_m_range = [0.2, 0.25]
+e_m_range = [0.2, 0.25]
+f_m_range = [0.2, 0.25]
+# k_m_range = [0.3, 0.35]
+# e_m_range = [0.3, 0.35]
+# f_m_range = [0.3, 0.35]
+
 # k_m_range = [1, 2]
 # e_m_range = [1, 2]
 # f_m_range = [1, 2]
@@ -216,11 +224,11 @@ class LM:
 
 
 if __name__ == '__main__':
-    UserDevice.build()
-    UserDevice.read(v_number)
+    # UserDevice.build()
+    # UserDevice.read(v_number)
 
     Vechicle.build()
     Vechicle.read(v_number)
 
-    LM.build()
-    LM.read(v_number)
+    # LM.build()
+    # LM.read(v_number)
