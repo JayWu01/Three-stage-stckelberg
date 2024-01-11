@@ -17,13 +17,13 @@ Theta_m = cst.Theta_m
 # alpha, beta, zeta = np.array([2.0, 1.0, 1.0]), np.array([1.5, 1.2, 1.2]), np.array([2, 1.5, 1.5])
 alpha, beta, zeta = np.array([3.0, 3.0, 3.0]), np.array([5.0, 5.0, 5.0]), np.array([2.0, 2.0, 2.0])
 # alpha, beta, zeta = np.array([16.0, 8.0, 8.0]), np.array([1.0, 1.0, 1.0]), np.array([2.0, 2.0, 2.0])
-# e, a = [3, 2, 1.5], 0.85  # zuiyou
-e, a = [1.5, 1.0, 1.0], 0.85  # zuiyou
+# e, a = [1.5, 1.0, 1.0], 0.85  # zuiyou
+e, a = [1.5, 1.0, 0.8], 1.0  # zuiyou
 C = [0.5, 0.3, 0.2]  # 三台服务器成本
 # C = [4, 2, 1]
 # C = [2, 1, 0.8]
 # C = [1.4, 0.7, 0.5]
-K = [2.0, 1.0, 0.5]  # 服务器功率
+K = [2.0, 1.0, 0.8]  # 服务器功率
 
 # 车辆类型为theta_m的概率
 lamda_m = [0.04, 0.17, 0.09, 0.19, 0.01, 0.14, 0.02, 0.13, 0.01, 0.2]
@@ -32,7 +32,7 @@ Q_total_m = cst.Q_total_m  # 车辆m的计算资源负载
 
 # vop运营商自身的计算资源容量
 # 2-5
-Q_vop = 8
+Q_vop = 0
 # CEA的计算资源上限
 Q_CEA = [float("inf"), 12, 10]
 
@@ -190,31 +190,32 @@ def LagrangeDualStageIforVop(F):
     f_j_vop=[8.0,5.0,8.0]
     for n in range(cst.max_iteration):
         # -------------------------------------------------下面的效益函数没有考虑了VOP自身的能耗-----------------------------------------------
-        # rho_m = [2 * v_number * ((lamda_m[i] / Theta_m[i]) + (Theta_m[i] ** -1 - Theta_m[i + 1] ** -1) * sum([
-        #     lamda_m[j] for j in range(i + 1, v_number)])) for i in range(v_number - 1)]
-        # con = [Phi_m[i] - Omega_m[i] + Pi * lamda_m[i] * v_number for i in range(v_number)]
-        # f_m = [con[m] / rho_m[m] if m != v_number - 1 else Theta_m[m] * con[m] / (2 * v_number * lamda_m[m]) for m in
-        #        range(v_number)]
-        # p_m = [lamda_m[i] * (f_m[i] ** 2 / Theta_m[i] + sum(
-        #     [(Theta_m[j - 1] ** -1 - Theta_m[j] ** -1) * (f_m[j - 1] ** 2) for j in range(1, v_number)])) for i in
-        #        range(v_number)]
-        # p_j_vop = [a * e[j] * K[j] * (sum(F[j]) + Upsilon_j[j] - Lambda_j[j]) + Pi / 2 for j in range(len(K))]
-        # f_j_vop = [sum(F[j]) - p_j_vop[j] / (2 * a * e[j] * K[j]) for j in range(len(K))]
-
-        # #-------------------------------------------------下面的效益函数考虑了VOP自身的能耗-----------------------------------------------
         rho_m = [2 * v_number * ((lamda_m[i] / Theta_m[i]) + (Theta_m[i] ** -1 - Theta_m[i + 1] ** -1) * sum([
             lamda_m[j] for j in range(i + 1, v_number)])) for i in range(v_number - 1)]
         con = [Phi_m[i] - Omega_m[i] + Pi * lamda_m[i] * v_number for i in range(v_number)]
-        f_m_mine = [sum([num for idx, num in enumerate(f_m) if idx != m]) for m in range(v_number)]
-        e_vk=2*e_vop*a_vop*k_vop
-        ZZ=[e_vk*(sum(f_j_vop)-f_m_mine[m]+con[m]) for m in range(v_number)]
-        f_m = [ZZ[m] / (e_vk+rho_m[m]) if m != v_number - 1 else Theta_m[m] * ZZ[m] / (2 * v_number * lamda_m[m]+e_vk*Theta_m[m]) for m in
+        f_m = [con[m] / rho_m[m] if m != v_number - 1 else Theta_m[m] * con[m] / (2 * v_number * lamda_m[m]) for m in
                range(v_number)]
         p_m = [lamda_m[i] * (f_m[i] ** 2 / Theta_m[i] + sum(
             [(Theta_m[j - 1] ** -1 - Theta_m[j] ** -1) * (f_m[j - 1] ** 2) for j in range(1, v_number)])) for i in
                range(v_number)]
-        p_j_vop = [(a * e[j] * K[j] * (sum(F[j]) + Upsilon_j[j] - Lambda_j[j]) + Pi / 2+(sum(F[j])-sum(p_m))*e_vk/2)/(1+e_vk/(4*a*e[j]*K[j])) for j in range(len(K))]
-        f_j_vop = [sum(F[j]) - p_j_vop[j] / (2 * a * e[j] * K[j]) for j in range(len(K))]
+        p_j_vop = [a * e[j] * K[j] * (sum(F[j]) + Upsilon_j[j] - Lambda_j[j]) + Pi / 2 for j in range(len(K))]
+        f_j_vop = [np.maximum(0, sum(F[j]) - p_j_vop[j] / (2 * a * e[j] * K[j])) for j in range(len(K))]
+        # f_j_vop = [sum(F[j]) - p_j_vop[j] / (2 * a * e[j] * K[j]) for j in range(len(K))]
+
+        # #-------------------------------------------------下面的效益函数考虑了VOP自身的能耗-----------------------------------------------
+        # rho_m = [2 * v_number * ((lamda_m[i] / Theta_m[i]) + (Theta_m[i] ** -1 - Theta_m[i + 1] ** -1) * sum([
+        #     lamda_m[j] for j in range(i + 1, v_number)])) for i in range(v_number - 1)]
+        # con = [Phi_m[i] - Omega_m[i] + Pi * lamda_m[i] * v_number for i in range(v_number)]
+        # f_m_mine = [sum([num for idx, num in enumerate(f_m) if idx != m]) for m in range(v_number)]
+        # e_vk=2*e_vop*a_vop*k_vop
+        # ZZ=[e_vk*(sum(f_j_vop)-f_m_mine[m]+con[m]) for m in range(v_number)]
+        # f_m = [ZZ[m] / (e_vk+rho_m[m]) if m != v_number - 1 else Theta_m[m] * ZZ[m] / (2 * v_number * lamda_m[m]+e_vk*Theta_m[m]) for m in
+        #        range(v_number)]
+        # p_m = [lamda_m[i] * (f_m[i] ** 2 / Theta_m[i] + sum(
+        #     [(Theta_m[j - 1] ** -1 - Theta_m[j] ** -1) * (f_m[j - 1] ** 2) for j in range(1, v_number)])) for i in
+        #        range(v_number)]
+        # p_j_vop = [(a * e[j] * K[j] * (sum(F[j]) + Upsilon_j[j] - Lambda_j[j]) + Pi / 2+(sum(F[j])-sum(p_m))*e_vk/2)/(1+e_vk/(4*a*e[j]*K[j])) for j in range(len(K))]
+        # f_j_vop = [sum(F[j]) - p_j_vop[j] / (2 * a * e[j] * K[j]) for j in range(len(K))]
         # -------------------------------------------------------------------------------------------------------------
 
         Phi_m_grad, Omega_m_grad, Pi_grad, Upsilon_j_grad, Lambda_j_grad = caculate_VopGradient(f_m, p_j_vop, F,
@@ -225,8 +226,8 @@ def LagrangeDualStageIforVop(F):
         # Pi_new = 0
         Upsilon_j_new = [np.maximum(0, Upsilon_j[j] - cst.s_k * Upsilon_j_grad[j]) for j in range(len(K))]
         Lambda_j_new = [np.maximum(0, Lambda_j[j] - cst.s_k * Lambda_j_grad[j]) for j in range(len(K))]
-
-        # print("第{}次迭代更新的乘子为：".format(n + 1), Phi_m_new, Omega_m_new, Pi_new, Upsilon_j_new, Lambda_j_new)
+        # if(n!=0):
+        print("第{}次迭代更新的乘子为：".format(n + 1), Phi_m_new, Omega_m_new, Pi_new, Upsilon_j_new, Lambda_j_new)
         utility_for_Vop = calculate_utility_for_Vop(f_m, p_j_vop, F)
         # print("第{}次迭代Vop效益值为：".format(n + 1), utility_for_Vop)
         # LagValue = utility_for_Vop + sum([Phi_m_grad[i] * Phi_m_new[i] for i in range(len(Phi_m_grad))]) + sum(
@@ -544,9 +545,11 @@ if __name__ == '__main__':
             print("不满足条件")
 
         # f_j_vop = [max(sum(F[j]) - p_j_vop[j] / (2 * a * e[j] * K[j]), 0) for j in range(len(K))]
-        sumf_j_vop = sum([sum(F[j]) - p_j_vop[j] / (2 * a * e[j] * K[j]) for j in range(len(K))])
-        sumf_m = sum(f_m)
-        print("多购买了{}的资源".format(sumf_m - sum(f_j_vop) + Q_vop))
+        # sumf_j_vop = sum([sum(F[j]) - p_j_vop[j] / (2 * a * e[j] * K[j]) for j in range(len(K))])
+        # sumf_m = sum(f_m)
+        sumf_m = v_number * sum([lamda_m[i] * f_m[i] for i in range(v_number)]) - sum(f_j_vop)
+        print("多购买了{}的资源".format(sumf_m))
+        # print("多购买了{}的资源".format(- sum(f_j_vop) + Q_vop))
         print("stageI阶段合同为f_m, p_m：", f_m, p_m)
         print("stageI阶段Vop对CEA的资源定价p_j_vop为", p_j_vop)
         print("stageII阶段CEA的价格P_0, P_1, P_2分别为：", P_0, P_1, P_2)
