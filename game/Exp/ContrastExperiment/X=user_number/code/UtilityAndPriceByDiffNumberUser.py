@@ -497,8 +497,8 @@ def optimal_Stage3strategy_KKT(bi, P_0, P_1, P_2):
 
 if __name__ == '__main__':
     create()
-    n_user = [20, 30, 40, 50, 60, 70, 80, 90, 100]
-    # n_user = [20]
+    # n_user = [20, 30, 40, 50, 60, 70, 80, 90, 100]
+    n_user = [70]
     U_C_t_v, U_M1_t_v, U_M2_t_v = [], [], []
     utility_for_user_device_t_v, utility_for_Vop_t_v = [], []
     utility_for_user_device_t, utility_for_Vop_t = [0 for i in range(nuser)], 0
@@ -553,7 +553,7 @@ if __name__ == '__main__':
 
             print("------------------------------------------")
             print("user的效益函数为：", utility_for_user_device)
-            print("------------------------------------------")
+            print("------------------------------------------user={}".format(nuser))
             print("U_C效益函数为：", U_C)
             print("U_M1效益函数为：", U_M1)
             print("U_M2效益函数为：", U_M2)

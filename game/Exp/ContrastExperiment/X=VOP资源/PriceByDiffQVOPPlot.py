@@ -18,7 +18,7 @@ p_j_vop_2=[row[2] for row in p_j_vop_v]
 # plt.plot(range(len(p_j_vop_1)), p_j_vop_1, label='VOP对M1云服务器最优定价', marker='*')
 # plt.plot(range(len(p_j_vop_2)), p_j_vop_2, label='VOP对M2服务器的最优定价', marker='<')
 
-plt.plot(range(len(P_0_v)), P_0_v,  marker='O',color="black")
+plt.plot(range(len(P_0_v)), P_0_v,  marker='o',color="black")
 plt.plot(range(len(P_1_v)), P_1_v, marker='o',color="red")
 plt.plot(range(len(P_2_v)), P_2_v,  marker='s',color="blue")
 plt.plot(range(len(p_j_vop_0)), p_j_vop_0, marker='^',color="green")
