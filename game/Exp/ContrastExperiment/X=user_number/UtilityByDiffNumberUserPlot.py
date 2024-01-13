@@ -18,10 +18,10 @@ U_Vop = [0.7126600016906195, 1.1928068463221584, 1.601926878972256, 1.8125773009
 # 绘制折线图
 X_range = [10, 20, 30, 40, 50, 60, 70]
 
-plt.plot(X_range, U_C_t, marker='o', color="black")
-plt.plot(X_range, U_M1, marker='o', color="red")
-plt.plot(X_range, U_M2, marker='s', color="blue")
-plt.plot(X_range, U_Vop, marker='^', color="green")
+plt.plot(X_range, U_C_t, marker='o', color="black",label='U_C_t')
+plt.plot(X_range, U_M1, marker='o', color="red",label='U_M1')
+plt.plot(X_range, U_M2, marker='s', color="blue",label='U_M2')
+plt.plot(X_range, U_Vop, marker='^', color="green",label='U_Vop')
 # plt.plot(range(len(p_j_vop_1)), p_j_vop_1,marker='*')
 # plt.plot(range(len(p_j_vop_2)), p_j_vop_2, marker='<')
 
