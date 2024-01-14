@@ -121,7 +121,8 @@ def calculate_utility_for_Vop(f_m, p_j_vop, F):
                                    range(v_number)])
     f_j_vop = [sum(F[j]) - p_j_vop[j] / (2 * a * e[j] * K[j]) for j in range(len(K))]
     # 计算 能耗、成本
-    E = (e_vk/2) * ((sum(f_j_vop) - sum(f_m)) ** 2)
+    # E = (e_vk/2) * ((sum(f_j_vop) - sum(f_m)) ** 2)
+    E = 0
     # 计算整体表达式
     U_vop = Reward -E- payment_cost
     return U_vop
@@ -505,6 +506,7 @@ if __name__ == '__main__':
     average_utility_for_user_v = []
     P_0_v, P_1_v, P_2_v, p_j_vop_v = [], [], [], []
     F_0_v, F_1_v, F_2_v, F_j_vop_v = [], [], [], []
+    f_m_v, p_m_v= [], []
     for index, number in enumerate(n_user):
         # p_0_init, p_1_init, p_2_init= 0.6, 0.3, 0.3
         P_0, P_1, P_2 = 0.6, 0.3, 0.3
@@ -537,10 +539,9 @@ if __name__ == '__main__':
             if ([0 <= p_j_vop[j] <= sum(F[j]) * 2 * a * e[j] * K[j] for j in range(len(K))]) is False:
                 print("不满足条件")
 
-            # f_j_vop = [max(sum(F[j]) - p_j_vop[j] / (2 * a * e[j] * K[j]), 0) for j in range(len(K))]
-            sumf_j_vop = sum([sum(F[j]) - p_j_vop[j] / (2 * a * e[j] * K[j]) for j in range(len(K))])
-            sumf_m = sum(f_m)
-            print("多购买了{}的资源".format(sumf_m - sum(f_j_vop) + Q_vop))
+
+
+            print("多购买了{}的资源".format(v_number * sum([lamda_m[i] * f_m[i] for i in range(v_number)]) - sum(f_j_vop)))
             print("stageI阶段合同为f_m, p_m：", f_m, p_m)
             print("stageI阶段Vop对CEA的资源定价p_j_vop为", p_j_vop)
             print("stageII阶段CEA的价格P_0, P_1, P_2分别为：", P_0, P_1, P_2)
@@ -553,7 +554,6 @@ if __name__ == '__main__':
 
             print("------------------------------------------")
             print("user的效益函数为：", utility_for_user_device)
-            print("------------------------------------------user={}".format(nuser))
             print("U_C效益函数为：", U_C)
             print("U_M1效益函数为：", U_M1)
             print("U_M2效益函数为：", U_M2)
@@ -576,21 +576,25 @@ if __name__ == '__main__':
             utility_for_Vop_t = utility_for_Vop
             n+=1
 
+        print("------------------------------------------user={}".format(nuser))
+        print("已达到纳什均衡")
         U_C_t_v.append(U_C)
         U_M1_t_v.append(U_M1)
         U_M2_t_v.append(U_M2)
         utility_for_user_device_t_v.append(utility_for_user_device)
         utility_for_Vop_t_v.append(utility_for_Vop)
         average_utility_for_user_v.append(np.average(utility_for_user_device))
-        P_0_v.append(P_0), P_1_v.append(P_1), P_2_v.append(P_2),p_j_vop_v.append(p_j_vop)
-        F_0_v.append(sum(F_i0)), F_1_v.append(sum(F_i1)), F_2_v.append(sum(F_i2)),F_j_vop_v.append(f_j_vop)
-        print("已达到纳什均衡")
-    print("--------------------------P_0_v,P_1_v,P_2_v,p_j_vop_v-------------------", P_0_v, ',', P_1_v, ',', P_2_v, ',', p_j_vop_v)
-    print("--------------------------F_0_v,F_1_v,F_2_v,f_j_vop_v-------------------", F_0_v, ',', F_1_v, ',', F_2_v, ',', F_j_vop_v)
+        P_0_v.append(P_0), P_1_v.append(P_1), P_2_v.append(P_2), p_j_vop_v.append(p_j_vop)
+        F_0_v.append(sum(F_i0)), F_1_v.append(sum(F_i1)), F_2_v.append(sum(F_i2)), F_j_vop_v.append(f_j_vop)
+        f_m_v.append(f_m),p_m_v.append(p_m)
+    print("stageI阶段合同为f_m, p_m：", f_m_v, p_m_v)
+    print("P_0_v,P_1_v,P_2_v,p_j_vop_v=", P_0_v, ',', P_1_v, ',', P_2_v, ',', p_j_vop_v)
+    print("F_0_v,F_1_v,F_2_v,f_j_vop_v=", F_0_v, ',', F_1_v, ',', F_2_v, ',', F_j_vop_v)
     # print("--------------------------f_m, p_m, p_j_vop-------------------", f_m, ',', p_m, ',', p_j_vop)
-    print("--------------------------U_user_v,U_C_t_v, U_M1_t_v, U_M2_t_v, U_vop_v-------------------",
+    print("U_user_v,U_C_t_v, U_M1_t_v, U_M2_t_v, U_vop_v=",
           average_utility_for_user_v, ',', U_C_t_v, ',', U_M1_t_v, ',',
           U_M2_t_v, ',', utility_for_Vop_t_v)
     print("用户平均效益值", average_utility_for_user_v)
+    print("整体社会效益为", sum(utility_for_user_device) + U_C + U_M1 + U_M2 + utility_for_Vop)
 
         # checkConstrain(f_m, p_m, p_j_vop, F)

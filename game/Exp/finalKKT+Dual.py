@@ -121,7 +121,8 @@ def calculate_utility_for_Vop(f_m, p_j_vop, F):
                                    range(v_number)])
     f_j_vop = [sum(F[j]) - p_j_vop[j] / (2 * a * e[j] * K[j]) for j in range(len(K))]
     # 计算 能耗、成本
-    E = (e_vk/2) * ((sum(f_j_vop) - sum(f_m)) ** 2)
+    # E = (e_vk/2) * ((sum(f_j_vop) - sum(f_m)) ** 2)
+    E = 0
     # 计算整体表达式
     U_vop = Reward -E- payment_cost
     return U_vop

@@ -7,7 +7,7 @@ import random
 # n_number = 100
 # v_number = 30
 
-n_number = 30
+n_number = 20
 v_number = 8
 bg = []
 # s_k = 0.5 # (0.8-1.4)
