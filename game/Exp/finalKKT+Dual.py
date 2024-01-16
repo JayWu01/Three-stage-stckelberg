@@ -182,7 +182,7 @@ def LagrangeDualStageIforVop(F):
         con = [Phi_m[i] - Omega_m[i] + Pi * lamda_m[i] * v_number for i in range(v_number)]
         f_m = [con[m] / rho_m[m] if m != v_number - 1 else Theta_m[m] * con[m] / (2 * v_number * lamda_m[m]) for m in
                range(v_number)]
-        p_m = [lamda_m[i] * (f_m[i] ** 2 / Theta_m[i] + sum(
+        p_m = [(f_m[i] ** 2 / Theta_m[i] + sum(
             [(Theta_m[j - 1] ** -1 - Theta_m[j] ** -1) * (f_m[j - 1] ** 2) for j in range(1, v_number)])) for i in
                range(v_number)]
         p_j_vop = [a * e[j] * K[j] * (sum(F[j]) + Upsilon_j[j] - Lambda_j[j]) + Pi / 2 for j in range(len(K))]
@@ -557,7 +557,7 @@ if __name__ == '__main__':
         print("------------------------------------------")
         print("stageI阶段Vop的效益函数为", utility_for_Vop)
         print("------------------------------------------")
-        print("整体社会效益为",sum(utility_for_user_device)+U_C+U_M1+U_M2+utility_for_Vop)
+        # print("整体社会效益为",sum(utility_for_user_device)+U_C+U_M1+U_M2+utility_for_Vop)
         print("------------------------------------------")
         # if (np.abs(P_0_t - P_0) <= cst.Error_value).all() and (np.abs(P_1_t - P_1) <= cst.Error_value).all() and (
         #         np.abs(P_2_t - P_2) <= cst.Error_value).all():
@@ -590,5 +590,8 @@ if __name__ == '__main__':
     print("--------------------------U_user_v,U_C_t_v, U_M1_t_v, U_M2_t_v-------------------", average_utility_for_user_v, ',',  U_C_t_v, ',', U_M1_t_v, ',',
           U_M2_t_v, ',', utility_for_Vop_t_v)
     print("用户平均效益值", average_utility_for_user_v)
+    utilityTorTotalVechicle = sum([p_m[m] - (f_m[m] ** 2 / Theta_m[m]) for m in range(v_number)])
+    print("车辆整体效益值", utilityTorTotalVechicle)
+    print("整体社会效益为", sum(utility_for_user_device) + U_C + U_M1 + U_M2 + utility_for_Vop + utilityTorTotalVechicle)
 
     checkConstrain(f_m, p_m, p_j_vop, F)

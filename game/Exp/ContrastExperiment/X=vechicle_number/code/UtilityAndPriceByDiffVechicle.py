@@ -183,7 +183,7 @@ def LagrangeDualStageIforVop(F):
         con = [Phi_m[i] - Omega_m[i] + Pi * lamda_m[i] * v_number for i in range(v_number)]
         f_m = [con[m] / rho_m[m] if m != v_number - 1 else Theta_m[m] * con[m] / (2 * v_number * lamda_m[m]) for m in
                range(v_number)]
-        p_m = [lamda_m[i] * (f_m[i] ** 2 / Theta_m[i] + sum(
+        p_m = [(f_m[i] ** 2 / Theta_m[i] + sum(
             [(Theta_m[j - 1] ** -1 - Theta_m[j] ** -1) * (f_m[j - 1] ** 2) for j in range(1, v_number)])) for i in
                range(v_number)]
         p_j_vop = [a * e[j] * K[j] * (sum(F[j]) + Upsilon_j[j] - Lambda_j[j]) + Pi / 2 for j in range(len(K))]

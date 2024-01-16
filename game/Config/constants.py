@@ -29,7 +29,8 @@ file_path = 'D:/江西理工大学/边缘计算/Three-stage-stckelberg/game/Data
 # 初始化限制车辆参数
 Price_v, Q_total_m, f_m, k_m, e_m, Theta_m = [], [], [], [], [], []
 Q_total_m_range = [5, 7]
-# Q_total_m_range = [50, 70]
+# Q_total_m_range = [1, 3]
+
 
 # k_m_range = [0.1, 1.0]
 # e_m_range = [0.1, 1.0]

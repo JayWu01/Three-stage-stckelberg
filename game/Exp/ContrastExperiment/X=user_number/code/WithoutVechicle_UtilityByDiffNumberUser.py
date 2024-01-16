@@ -1,8 +1,8 @@
 import game.Config.constants as cst
 import random
-
 import numpy as np
 
+#消融实验
 nuser = cst.n_number
 bg = cst.bg
 Theta_m = cst.Theta_m
@@ -68,7 +68,7 @@ def calculate_utility_for_Cloud_server(p_0_t, p_1_t, p_2_t, p_vop_0, f_vop_0):
     # Reward = (np.log(1+p_0_t-C[0]))* sum(F_i0)
     # 计算 能耗、成本
     E = a * e[0] * K[0] * ((sum(F_i0) - f_vop_0) ** 2)
-    # payment = p_vop_0 * np.log(1 + f_vop_0)
+    # payment = 0
     payment = p_vop_0 * f_vop_0
     # 计算整体表达式
     U = Reward - E - payment
@@ -86,7 +86,7 @@ def calculate_utility_for_M1_server(p_1_t, p_0_t, p_2_t, p_vop_1, f_vop_1):
     # Reward = (np.log(1 + p_1_t - C[1])) * sum(F_i1)
     # 计算 能耗、成本
     E = a * e[1] * K[1] * ((sum(F_i1) - f_vop_1) ** 2)
-    # payment = p_vop_1 * np.log(1 + f_vop_1)
+    # payment = 0
     payment = p_vop_1 * f_vop_1
     # 计算整体表达式
     U = Reward - E - payment
@@ -104,7 +104,7 @@ def calculate_utility_for_M2_server(p_2_t, p_0_t, p_1_t, p_vop_2, f_vop_2):
     # Reward = (np.log(1 + p_2_t - C[2])) * sum(F_i2)
     # 计算 能耗、成本
     E = a * e[2] * K[2] * ((sum(F_i2) - f_vop_2) ** 2)
-    # payment = p_vop_2 * np.log(1 + f_vop_2)
+    # payment = 0
     payment = p_vop_2 * f_vop_2
     # 计算整体表达式
     U = Reward - E - payment
@@ -500,7 +500,7 @@ def optimal_Stage3strategy_KKT(bi, P_0, P_1, P_2):
 if __name__ == '__main__':
     create()
     # n_user = [20, 30, 40, 50, 60, 70, 80, 90, 100]
-    n_user = [60]
+    n_user = [20]
     U_C_t_v, U_M1_t_v, U_M2_t_v = [], [], []
     utility_for_user_device_t_v, utility_for_Vop_t_v = [], []
     utility_for_user_device_t, utility_for_Vop_t = [0 for i in range(nuser)], 0
@@ -518,6 +518,7 @@ if __name__ == '__main__':
         P_0_t, P_1_t, P_2_t = 0.6, 0.3, 0.3
         n = 1
         nuser=number
+        v_number=0  #核心代码，这里取车辆数为0
         cst.UserDevice.read(nuser)
         cst.LM.read(v_number)
         cst.Vechicle.read(v_number)
@@ -536,13 +537,13 @@ if __name__ == '__main__':
 
             # Algorithm 3
             f_m, p_m, f_j_vop, p_j_vop, utility_for_Vop = LagrangeDualStageIforVop(F)
-
+            f_j_vop=[0,0,0]
             if ([0 <= p_j_vop[j] <= sum(F[j]) * 2 * a * e[j] * K[j] for j in range(len(K))]) is False:
                 print("不满足条件")
 
 
 
-            print("多购买了{}的资源".format(v_number * sum([lamda_m[i] * f_m[i] for i in range(v_number)]) - sum(f_j_vop)))
+            # print("多购买了{}的资源".format(v_number * sum([lamda_m[i] * f_m[i] for i in range(v_number)]) - sum(f_j_vop)))
             print("stageI阶段合同为f_m, p_m：", f_m, p_m)
             print("stageI阶段Vop对CEA的资源定价p_j_vop为", p_j_vop)
             print("stageII阶段CEA的价格P_0, P_1, P_2分别为：", P_0, P_1, P_2)
@@ -551,7 +552,7 @@ if __name__ == '__main__':
             U_C = calculate_utility_for_Cloud_server(P_0, P_1, P_2, p_j_vop[0], f_j_vop[0])
             U_M1 = calculate_utility_for_M1_server(P_1, P_0, P_2, p_j_vop[1], f_j_vop[1])
             U_M2 = calculate_utility_for_M2_server(P_2, P_0, P_1, p_j_vop[2], f_j_vop[2])
-            utility_for_Vop = calculate_utility_for_Vop(f_m, p_j_vop, F)
+            # utility_for_Vop = calculate_utility_for_Vop(f_m, p_j_vop, F)
 
             print("------------------------------------------")
             print("user的效益函数为：", utility_for_user_device)
@@ -559,22 +560,21 @@ if __name__ == '__main__':
             print("U_M1效益函数为：", U_M1)
             print("U_M2效益函数为：", U_M2)
             print("------------------------------------------")
-            print("stageI阶段Vop的效益函数为", utility_for_Vop)
+            # print("stageI阶段Vop的效益函数为", utility_for_Vop)
             print("------------------------------------------")
-            print("整体社会效益为", sum(utility_for_user_device) + U_C + U_M1 + U_M2 + utility_for_Vop)
+            print("整体社会效益为", sum(utility_for_user_device) + U_C + U_M1 + U_M2)
             print("------------------------------------------")
             P_0_t, P_1_t, P_2_t = P_0, P_1, P_2
             if (np.abs(U_C - U_C_t) <= cst.Error_value).all() and (np.abs(U_M1 - U_M1_t) <= cst.Error_value).all() and (
                     np.abs(U_M2 - U_M2_t) <= cst.Error_value).all() and all(diff < 1 for diff in [np.abs(a - b) for a, b in
                                                                                                   zip(utility_for_user_device_t,
-                                                                                                      utility_for_user_device)]) and (
-                    np.abs(utility_for_Vop - utility_for_Vop_t) <= cst.Error_value).all():
+                                                                                                      utility_for_user_device)]) :
                 break
             U_C_t = U_C
             U_M1_t = U_M1
             U_M2_t = U_M2
             utility_for_user_device_t = utility_for_user_device
-            utility_for_Vop_t = utility_for_Vop
+            # utility_for_Vop_t = utility_for_Vop
             n+=1
 
         print("------------------------------------------user={}".format(nuser))
@@ -583,7 +583,7 @@ if __name__ == '__main__':
         U_M1_t_v.append(U_M1)
         U_M2_t_v.append(U_M2)
         utility_for_user_device_t_v.append(utility_for_user_device)
-        utility_for_Vop_t_v.append(utility_for_Vop)
+        # utility_for_Vop_t_v.append(utility_for_Vop)
         average_utility_for_user_v.append(np.average(utility_for_user_device))
         P_0_v.append(P_0), P_1_v.append(P_1), P_2_v.append(P_2), p_j_vop_v.append(p_j_vop)
         F_0_v.append(sum(F_i0)), F_1_v.append(sum(F_i1)), F_2_v.append(sum(F_i2)), F_j_vop_v.append(f_j_vop)
@@ -596,6 +596,6 @@ if __name__ == '__main__':
           average_utility_for_user_v, ',', U_C_t_v, ',', U_M1_t_v, ',',
           U_M2_t_v, ',', utility_for_Vop_t_v)
     print("用户平均效益值", average_utility_for_user_v)
-    print("整体社会效益为", sum(utility_for_user_device) + U_C + U_M1 + U_M2 + utility_for_Vop)
+    print("整体社会效益为", sum(utility_for_user_device) + U_C + U_M1 + U_M2)
 
         # checkConstrain(f_m, p_m, p_j_vop, F)
