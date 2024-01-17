@@ -1,8 +1,6 @@
 import game.Config.constants as cst
 import random
-
 import numpy as np
-
 nuser = cst.n_number
 bg = cst.bg
 Theta_m = cst.Theta_m
@@ -21,7 +19,8 @@ Q_total_m = cst.Q_total_m  # 车辆m的计算资源负载
 Q_vop = 0
 # CEA的计算资源上限
 Q_CEA = [float("inf"), 12, 10]
-
+# beta_v = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+# alpha_v = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
 
 def create():
     global lamda_m
@@ -112,9 +111,12 @@ def calculate_utility_for_M2_server(p_2_t, p_0_t, p_1_t, p_vop_2, f_vop_2):
 
 # stage I 计算Vop的效益
 def calculate_utility_for_Vop(f_m, p_j_vop, F):
-    # 奖励回报
+    # 回报
     # Reward = sum([sum(F[i]) - p_j_vop[i] / (2 * a * e * K[i]) for i in range(len(K))])
     Reward = sum([p_j_vop[i] * (sum(F[i]) - p_j_vop[i] / (2 * a * e[i] * K[i])) for i in range(len(K))])
+    # 奖励
+    # award = sum([alpha_v[m] * np.log(1+beta_v[m]*f_m[m]) for m in range(v_number)])
+    award = 0
     # 付给车辆的成本
     payment_cost = v_number * sum([lamda_m[i] * (f_m[i] ** 2 / Theta_m[i] + sum(
         [(Theta_m[j - 1] ** -1 - Theta_m[j] ** -1) * f_m[j - 1] ** 2 for j in range(1, v_number)])) for i in
@@ -124,22 +126,18 @@ def calculate_utility_for_Vop(f_m, p_j_vop, F):
     # E = (e_vk/2) * ((sum(f_j_vop) - sum(f_m)) ** 2)
     E = 0
     # 计算整体表达式
-    U_vop = Reward -E- payment_cost
+    U_vop = Reward +award -E- payment_cost
     return U_vop
 
 
-# 计算f_m梯度
-def caculate_VopGradient(f_m, p_j_vop, F, f_j_vop):
+# 计算f_m梯度 
+def caculate_VopGradient(f_m,p_m, p_j_vop, F, f_j_vop):
     Phi_m_grad = f_m
     Omega_m_grad = [Q_total_m[i] - f_m[i] for i in range(v_number)]
-    # f_j_vop = [sum(F[j]) - p_j_vop[j] / (2 * a * e[j] * K[j]) for j in range(len(K))]
-    Pi_grad = v_number * sum([lamda_m[i] * f_m[i] for i in range(v_number)]) - sum(f_j_vop)
+    Pi_grad = sum(f_m) - sum(f_j_vop)
     Upsilon_j_grad = p_j_vop
-    # Lambda_j_grad = [2 * a * e[j] * K[j] * sum(F[j]) - p_j_vop[j] for j in range(len(K))]
-    aa = [sum(F[j]) for j in range(len(K))]
     Q_CEA[0] = sum(F[0])
     Lambda_j_grad = [2 * a * e[j] * K[j] * Q_CEA[j] - p_j_vop[j] for j in range(len(K))]
-    # 0 <= p_j_vop[j] <= sum(F[j]) * 2 * a * e[j] * K[j]
     return Phi_m_grad, Omega_m_grad, Pi_grad, Upsilon_j_grad, Lambda_j_grad
 
 
@@ -177,20 +175,26 @@ def LagrangeDualStageIforVop(F):
     f_j_vop=[8.0,5.0,8.0]
     for n in range(cst.max_iteration):
         # -------------------------------------------------下面的效益函数没有考虑了VOP自身的能耗-----------------------------------------------
-        rho_m = [2 * v_number * ((lamda_m[i] / Theta_m[i]) + (Theta_m[i] ** -1 - Theta_m[i + 1] ** -1) * sum([
-            lamda_m[j] for j in range(i + 1, v_number)])) for i in range(v_number - 1)]
-        con = [Phi_m[i] - Omega_m[i] + Pi * lamda_m[i] * v_number for i in range(v_number)]
-        f_m = [con[m] / rho_m[m] if m != v_number - 1 else Theta_m[m] * con[m] / (2 * v_number * lamda_m[m]) for m in
-               range(v_number)]
-        p_m = [lamda_m[i] * (f_m[i] ** 2 / Theta_m[i] + sum(
-            [(Theta_m[j - 1] ** -1 - Theta_m[j] ** -1) * (f_m[j - 1] ** 2) for j in range(1, v_number)])) for i in
-               range(v_number)]
+        # rho_m = [2 * v_number * ((lamda_m[i] / Theta_m[i]) + (Theta_m[i] ** -1 - Theta_m[i + 1] ** -1) * sum([
+        #     lamda_m[j] for j in range(i + 1, v_number)])) for i in range(v_number - 1)]
+        # con = [Phi_m[i] - Omega_m[i] + Pi * lamda_m[i] * v_number+1 for i in range(v_number)]
+        # f_m = [con[m] / rho_m[m] if m != v_number - 1 else Theta_m[m] * con[m] / (2 * v_number * lamda_m[m]) for m in
+        #        range(v_number)]
+        # p_m = [(f_m[i] ** 2 / Theta_m[i] + sum(
+        #     [(Theta_m[j - 1] ** -1 - Theta_m[j] ** -1) * (f_m[j - 1] ** 2) for j in range(1, v_number)])) for i in
+        #        range(v_number)]
+        # p_j_vop = [a * e[j] * K[j] * (sum(F[j]) + Upsilon_j[j] - Lambda_j[j]) + Pi / 2 for j in range(len(K))]
+        # f_j_vop = [np.maximum(0, sum(F[j]) - p_j_vop[j] / (2 * a * e[j] * K[j])) for j in range(len(K))]
+        # # f_j_vop = [sum(F[j]) - p_j_vop[j] / (2 * a * e[j] * K[j]) for j in range(len(K))]
+
+        # #-------------------------------------------------下面的效益函数考虑了VOP向车辆购买资源的满意度-----------------------------------------------
+        p_m = [0.5 for m in range(v_number)]
+        f_m=  [0.5*p_m[m]*Theta_m[m] for m in range(v_number)]
         p_j_vop = [a * e[j] * K[j] * (sum(F[j]) + Upsilon_j[j] - Lambda_j[j]) + Pi / 2 for j in range(len(K))]
         f_j_vop = [np.maximum(0, sum(F[j]) - p_j_vop[j] / (2 * a * e[j] * K[j])) for j in range(len(K))]
-        # f_j_vop = [sum(F[j]) - p_j_vop[j] / (2 * a * e[j] * K[j]) for j in range(len(K))]
+        # -------------------------------------------------------------------------------------------------------------
 
-
-        Phi_m_grad, Omega_m_grad, Pi_grad, Upsilon_j_grad, Lambda_j_grad = caculate_VopGradient(f_m, p_j_vop, F,
+        Phi_m_grad, Omega_m_grad, Pi_grad, Upsilon_j_grad, Lambda_j_grad = caculate_VopGradient(f_m, p_m,p_j_vop, F,
                                                                                                 f_j_vop)
         Phi_m_new = [np.maximum(0, Phi_m[i] - cst.s_k * Phi_m_grad[i]) for i in range(v_number)]
         Omega_m_new = [np.maximum(0, Omega_m[i] - cst.s_k * Omega_m_grad[i]) for i in range(v_number)]
@@ -199,7 +203,7 @@ def LagrangeDualStageIforVop(F):
         Upsilon_j_new = [np.maximum(0, Upsilon_j[j] - cst.s_k * Upsilon_j_grad[j]) for j in range(len(K))]
         Lambda_j_new = [np.maximum(0, Lambda_j[j] - cst.s_k * Lambda_j_grad[j]) for j in range(len(K))]
         # if(n!=0):
-        # print("第{}次迭代更新的乘子为：".format(n + 1), Phi_m_new, Omega_m_new, Pi_new, Upsilon_j_new, Lambda_j_new)
+        print("第{}次迭代更新的乘子为：".format(n + 1), Phi_m_new, Omega_m_new, Pi_new, Upsilon_j_new, Lambda_j_new)
         utility_for_Vop = calculate_utility_for_Vop(f_m, p_j_vop, F)
         if np.allclose(Phi_m_new, Phi_m, atol=cst.Error_value) and np.allclose(Omega_m_new, Omega_m,
                                                                                atol=cst.Error_value) and np.allclose(
@@ -207,7 +211,6 @@ def LagrangeDualStageIforVop(F):
                                                               atol=cst.Error_value) and np.allclose(Lambda_j_new,
                                                                                                     Lambda_j,
                                                                                                     atol=cst.Error_value):
-            # if (np.abs(LagValue - utility_for_Vop) <= cst.Error_value).all():
 
             break
         Phi_m = Phi_m_new
@@ -236,7 +239,7 @@ def find_nash_equilibrium(F, p_j_vop, f_j_vop):
     global p_0_t_c, p_1_t_c, p_2_t_c
     # Parameter Setup
     Delta, Dt = 0.1, 0.1
-    dslow, dfast = 0.5, 2.0
+    dslow, dfast = 0.6, 1.2
 
     # p_0_t, p_1_t, p_2_t = p_0_init, p_1_init, p_2_init
 
@@ -474,7 +477,7 @@ def optimal_Stage3strategy_KKT(bi, P_0, P_1, P_2):
 if __name__ == '__main__':
     create()
     # n_user = [20, 30, 40, 50, 60, 70, 80, 90, 100]
-    n_user = [10]
+    n_user = [60]
     U_C_t_v, U_M1_t_v, U_M2_t_v = [], [], []
     utility_for_user_device_t_v, utility_for_Vop_t_v = [], []
     utility_for_user_device_t, utility_for_Vop_t = [0 for i in range(nuser)], 0
@@ -510,11 +513,6 @@ if __name__ == '__main__':
 
             # Algorithm 3
             f_m, p_m, f_j_vop, p_j_vop, utility_for_Vop = LagrangeDualStageIforVop(F)
-
-            if ([0 <= p_j_vop[j] <= sum(F[j]) * 2 * a * e[j] * K[j] for j in range(len(K))]) is False:
-                print("不满足条件")
-
-
 
             print("多购买了{}的资源".format(v_number * sum([lamda_m[i] * f_m[i] for i in range(v_number)]) - sum(f_j_vop)))
             print("stageI阶段合同为f_m, p_m：", f_m, p_m)
@@ -570,6 +568,7 @@ if __name__ == '__main__':
           average_utility_for_user_v, ',', U_C_t_v, ',', U_M1_t_v, ',',
           U_M2_t_v, ',', utility_for_Vop_t_v)
     print("用户平均效益值", average_utility_for_user_v)
-    print("整体社会效益为", sum(utility_for_user_device) + U_C + U_M1 + U_M2 + utility_for_Vop)
-
+    utilityTorTotalVechicle = sum([p_m[m] * f_m[m] - (f_m[m] ** 2 / Theta_m[m]) for m in range(v_number)])
+    print("车辆整体效益值", utilityTorTotalVechicle)
+    print("整体社会效益为", sum(utility_for_user_device) + U_C + U_M1 + U_M2 + utility_for_Vop + utilityTorTotalVechicle)
         # checkConstrain(f_m, p_m, p_j_vop, F)

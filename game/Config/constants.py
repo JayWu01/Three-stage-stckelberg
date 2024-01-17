@@ -16,7 +16,8 @@ s_k = 1.5 # (0.8-1.4)
 # Error_value = 0.000001
 Error_value = 0.000000000000001
 max_iteration = 2000
-
+epsilon=0.01   # 博弈停止的精度阈值
+error_price=0.001
 # 变量 按照一定规则生成
 # 初始化乘子 1*n_number的矩阵  （n_number代表用户数量）
 lamda_1, lamda_2, lamda_3, lamda_4, lamda_5, lamda_6, lamda_7, lamda_8, lamda_9 = [], [], [], [], [], [], [], [], []

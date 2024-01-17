@@ -190,21 +190,6 @@ def LagrangeDualStageIforVop(F):
         f_j_vop = [np.maximum(0, sum(F[j]) - p_j_vop[j] / (2 * a * e[j] * K[j])) for j in range(len(K))]
         # f_j_vop = [sum(F[j]) - p_j_vop[j] / (2 * a * e[j] * K[j]) for j in range(len(K))]
 
-        # #-------------------------------------------------下面的效益函数考虑了VOP自身的能耗-----------------------------------------------
-        # rho_m = [2 * v_number * ((lamda_m[i] / Theta_m[i]) + (Theta_m[i] ** -1 - Theta_m[i + 1] ** -1) * sum([
-        #     lamda_m[j] for j in range(i + 1, v_number)])) for i in range(v_number - 1)]
-        # con = [Phi_m[i] - Omega_m[i] + Pi * lamda_m[i] * v_number for i in range(v_number)]
-        # f_m_mine = [sum([num for idx, num in enumerate(f_m) if idx != m]) for m in range(v_number)]
-        # e_vk=2*e_vop*a_vop*k_vop
-        # ZZ=[e_vk*(sum(f_j_vop)-f_m_mine[m]+con[m]) for m in range(v_number)]
-        # f_m = [ZZ[m] / (e_vk+rho_m[m]) if m != v_number - 1 else Theta_m[m] * ZZ[m] / (2 * v_number * lamda_m[m]+e_vk*Theta_m[m]) for m in
-        #        range(v_number)]
-        # p_m = [lamda_m[i] * (f_m[i] ** 2 / Theta_m[i] + sum(
-        #     [(Theta_m[j - 1] ** -1 - Theta_m[j] ** -1) * (f_m[j - 1] ** 2) for j in range(1, v_number)])) for i in
-        #        range(v_number)]
-        # p_j_vop = [(a * e[j] * K[j] * (sum(F[j]) + Upsilon_j[j] - Lambda_j[j]) + Pi / 2+(sum(F[j])-sum(p_m))*e_vk/2)/(1+e_vk/(4*a*e[j]*K[j])) for j in range(len(K))]
-        # f_j_vop = [sum(F[j]) - p_j_vop[j] / (2 * a * e[j] * K[j]) for j in range(len(K))]
-        # -------------------------------------------------------------------------------------------------------------
 
         Phi_m_grad, Omega_m_grad, Pi_grad, Upsilon_j_grad, Lambda_j_grad = caculate_VopGradient(f_m, p_j_vop, F,
                                                                                                 f_j_vop)
@@ -218,15 +203,6 @@ def LagrangeDualStageIforVop(F):
         # print("第{}次迭代更新的乘子为：".format(n + 1), Phi_m_new, Omega_m_new, Pi_new, Upsilon_j_new, Lambda_j_new)
         utility_for_Vop = calculate_utility_for_Vop(f_m, p_j_vop, F)
         # print("第{}次迭代Vop效益值为：".format(n + 1), utility_for_Vop)
-        # LagValue = utility_for_Vop + sum([Phi_m_grad[i] * Phi_m_new[i] for i in range(len(Phi_m_grad))]) + sum(
-        #     [Omega_m_grad[i] * Omega_m_new[i] for i in range(len(Omega_m_grad))]) + Pi_grad * Pi_new + sum(
-        #     [Upsilon_j_grad[j] * Upsilon_j_new[j] for j in range(len(K))]) + sum(
-        #     [Lambda_j_grad[j] * Lambda_j_new[j] for j in range(len(K))])
-        # if (np.abs(Phi_m_new - Phi_m) <= cst.Error_value).all() and (
-        #         np.abs(Omega_m_new - Omega_m) <= cst.Error_value).all() and (
-        #         np.abs(Pi_new - Pi) <= cst.Error_value).all() and (
-        #         np.abs(Upsilon_j_new - Upsilon_j) <= cst.Error_value).all() and (
-        #         np.abs(Lambda_j_new - Lambda_j) <= cst.Error_value).all():
         if np.allclose(Phi_m_new, Phi_m, atol=cst.Error_value) and np.allclose(Omega_m_new, Omega_m,
                                                                                atol=cst.Error_value) and np.allclose(
             Pi_new, Pi, atol=cst.Error_value) and np.allclose(Upsilon_j_new, Upsilon_j,
@@ -255,16 +231,95 @@ p_0_max, p_1_max, p_2_max = alpha[0] * beta[0] / zeta[0], alpha[1] * beta[1] / z
 p_0_init, p_1_init, p_2_init = 0.5 * (p_0_min + p_0_max), 0.5 * (p_1_min + p_1_max), 0.5 * (p_2_min + p_2_max)
 
 
-# p_0_init, p_1_init, p_2_init = 0.5,0.3,0.2
+def find_nash_equilibrium1(F, p_j_vop, f_j_vop):
+    # global p_0_init, p_1_init, p_2_init
+    # global p_0_t_c, p_1_t_c, p_2_t_c
+    # Parameter Setup
+    # Delta, Dt = 0.1, 0.1
+    error_price=cst.error_price
+    p_0_min, p_1_min, p_2_min = C[0], C[1], C[2]
+    p_0_max, p_1_max, p_2_max = alpha[0] * beta[0] / zeta[0], alpha[1] * beta[1] / zeta[1], alpha[2] * beta[2] / zeta[2]
+    p_0_init, p_1_init, p_2_init = 0.5 * (p_0_min + p_0_max), 0.5 * (p_1_min + p_1_max), 0.5 * (p_2_min + p_2_max)
+    Delta_0, Delta_1, Delta_2 = 1, 1, 1
+    dslow, dfast = 0.6, 1.2
+    # dslow, dfast = 0.2, 1.2
+    # dslow, dfast = 1, 1
+    p_0_t, p_1_t, p_2_t = 0, 0, 0
+    n = 0
+    while True:
+        # Calculate utility for the cloud
+        Uc = calculate_utility_for_Cloud_server(p_0_init, p_1_init, p_2_init, p_j_vop[0], f_j_vop[0])
+        Uc_add_Delta = calculate_utility_for_Cloud_server(p_0_init + Delta_0, p_1_init, p_2_init, p_j_vop[0],
+                                                          f_j_vop[0])
+        Uc_minus_Delta = calculate_utility_for_Cloud_server(p_0_init - Delta_0, p_1_init, p_2_init, p_j_vop[0],
+                                                            f_j_vop[0])
+
+        if Uc_add_Delta >= Uc and Uc_add_Delta >= Uc_minus_Delta:
+            p_0_init = min(p_0_init + Delta_0, p_0_max)
+        elif Uc_minus_Delta >= Uc and Uc_minus_Delta >= Uc_add_Delta:
+            p_0_init = max(p_0_init - Delta_0, p_0_min)
+        else:
+            p_0_init = p_0_init
+
+        if (np.abs(p_0_init - p_0_t) <= error_price).all():
+            Delta_0 = Delta_0 * dfast
+        else:
+            Delta_0 = Delta_0 * dslow
+
+        p_0_t_c.append(p_0_init)
+
+        # Calculate utility for the M1-server
+        U_m1 = calculate_utility_for_M1_server(p_1_init, p_0_init, p_2_init, p_j_vop[1], f_j_vop[1])
+        U_m1_add_Delta = calculate_utility_for_M1_server(p_1_init + Delta_1, p_0_init, p_2_init, p_j_vop[1], f_j_vop[1])
+        U_m1_minus_Delta = calculate_utility_for_M1_server(p_1_init - Delta_1, p_0_init, p_2_init, p_j_vop[1],
+                                                           f_j_vop[1])
+
+        if U_m1_add_Delta >= U_m1 and U_m1_add_Delta >= U_m1_minus_Delta:
+            p_1_init = min(p_1_init + Delta_1, p_1_max)
+        elif U_m1_minus_Delta >= U_m1 and U_m1_minus_Delta >= U_m1_add_Delta:
+            p_1_init = max(p_1_init - Delta_1, p_1_min)
+        else:
+            p_1_init = p_1_init
+
+        if (np.abs(p_1_init - p_1_t) <= error_price).all():
+            Delta_1 = Delta_1 * dfast
+        else:
+            Delta_1 = Delta_1 * dslow
+
+        p_1_t_c.append(p_1_init)
+
+        # Calculate utility for the M2-server
+        U_m2 = calculate_utility_for_M2_server(p_2_init, p_0_init, p_1_init, p_j_vop[2], f_j_vop[2])
+        U_m2_add_Delta = calculate_utility_for_M2_server(p_2_init + Delta_2, p_0_init, p_1_init, p_j_vop[2], f_j_vop[2])
+        U_m2_minus_Delta = calculate_utility_for_M2_server(p_2_init - Delta_2, p_0_init, p_1_init, p_j_vop[2],
+                                                           f_j_vop[2])
+
+        if U_m2_add_Delta >= U_m2 and U_m2_add_Delta >= U_m2_minus_Delta:
+            p_2_init = min(p_2_init + Delta_2, p_2_max)
+        elif U_m2_minus_Delta >= U_m2 and U_m2_minus_Delta >= U_m2_add_Delta:
+            p_2_init = max(p_2_init - Delta_2, p_2_min)
+        else:
+            p_2_init = p_2_init
+
+        if (np.abs(p_2_init - p_2_t) <= error_price).all():
+            Delta_2 = Delta_2 * dfast
+        else:
+            Delta_2 = Delta_2 * dslow
+
+        p_2_t_c.append(p_2_init)
+        n = n + 1
+        # print("第{}迭代定价".format(n))
+        if (np.abs(p_0_init - p_0_t) <= error_price).all() and (np.abs(p_1_init - p_1_t) <= error_price).all() and (
+                np.abs(p_2_init - p_2_t) <= error_price).all():
+            break
+        p_0_t, p_1_t, p_2_t = p_0_init, p_1_init, p_2_init
+    return p_0_init, p_1_init, p_2_init
 # stageII 求解算法
 def find_nash_equilibrium(F, p_j_vop, f_j_vop):
     global p_0_init, p_1_init, p_2_init
     global p_0_t_c, p_1_t_c, p_2_t_c
     # Parameter Setup
     Delta, Dt = 0.1, 0.1
-    dslow, dfast = 0.5, 2.0
-
-    # p_0_t, p_1_t, p_2_t = p_0_init, p_1_init, p_2_init
 
     # Calculate utility for the cloud
     Uc = calculate_utility_for_Cloud_server(p_0_init, p_1_init, p_2_init, p_j_vop[0], f_j_vop[0])
@@ -499,8 +554,8 @@ def optimal_Stage3strategy_KKT(bi, P_0, P_1, P_2):
 
 if __name__ == '__main__':
     create()
-    # n_user = [20, 30, 40, 50, 60, 70, 80, 90, 100]
-    n_user = [60]
+    # n_user = [10,20, 30, 40, 50, 60, 70]
+    n_user = 30
     U_C_t_v, U_M1_t_v, U_M2_t_v = [], [], []
     utility_for_user_device_t_v, utility_for_Vop_t_v = [], []
     utility_for_user_device_t, utility_for_Vop_t = [0 for i in range(nuser)], 0
@@ -508,7 +563,8 @@ if __name__ == '__main__':
     P_0_v, P_1_v, P_2_v, p_j_vop_v = [], [], [], []
     F_0_v, F_1_v, F_2_v, F_j_vop_v = [], [], [], []
     f_m_v, p_m_v= [], []
-    for index, number in enumerate(n_user):
+    # for index, number in enumerate(n_user):
+    for number in range(n_user):
         # p_0_init, p_1_init, p_2_init= 0.6, 0.3, 0.3
         P_0, P_1, P_2 = 0.6, 0.3, 0.3
         f_m, p_m = [], []  # 合同（f_m,p_m）
@@ -563,6 +619,9 @@ if __name__ == '__main__':
             print("------------------------------------------")
             print("整体社会效益为", sum(utility_for_user_device) + U_C + U_M1 + U_M2 + utility_for_Vop)
             print("------------------------------------------")
+            # if (np.abs(P_0_t - P_0) <= cst.epsilon).all() and (np.abs(P_1_t - P_1) <= cst.epsilon).all() and (
+            #         np.abs(P_2_t - P_2) <= cst.epsilon).all():
+            #     break
             P_0_t, P_1_t, P_2_t = P_0, P_1, P_2
             if (np.abs(U_C - U_C_t) <= cst.Error_value).all() and (np.abs(U_M1 - U_M1_t) <= cst.Error_value).all() and (
                     np.abs(U_M2 - U_M2_t) <= cst.Error_value).all() and all(diff < 1 for diff in [np.abs(a - b) for a, b in
