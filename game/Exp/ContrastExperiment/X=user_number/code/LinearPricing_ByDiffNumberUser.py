@@ -238,7 +238,7 @@ def find_nash_equilibrium(F, p_j_vop, f_j_vop):
     global p_0_init, p_1_init, p_2_init
     global p_0_t_c, p_1_t_c, p_2_t_c
     # Parameter Setup
-    Delta, Dt = 0.1, 0.1
+    Delta= 0.05
     dslow, dfast = 0.6, 1.2
 
     # p_0_t, p_1_t, p_2_t = p_0_init, p_1_init, p_2_init

@@ -235,7 +235,7 @@ def find_nash_equilibrium1(F, p_j_vop, f_j_vop):
     # global p_0_init, p_1_init, p_2_init
     # global p_0_t_c, p_1_t_c, p_2_t_c
     # Parameter Setup
-    # Delta, Dt = 0.1, 0.1
+    # Delta= 0.05
     error_price=cst.error_price
     p_0_min, p_1_min, p_2_min = C[0], C[1], C[2]
     p_0_max, p_1_max, p_2_max = alpha[0] * beta[0] / zeta[0], alpha[1] * beta[1] / zeta[1], alpha[2] * beta[2] / zeta[2]
@@ -319,7 +319,7 @@ def find_nash_equilibrium(F, p_j_vop, f_j_vop):
     global p_0_init, p_1_init, p_2_init
     global p_0_t_c, p_1_t_c, p_2_t_c
     # Parameter Setup
-    Delta, Dt = 0.1, 0.1
+    Delta= 0.05
 
     # Calculate utility for the cloud
     Uc = calculate_utility_for_Cloud_server(p_0_init, p_1_init, p_2_init, p_j_vop[0], f_j_vop[0])
@@ -555,7 +555,7 @@ def optimal_Stage3strategy_KKT(bi, P_0, P_1, P_2):
 if __name__ == '__main__':
     create()
     # n_user = [10,20, 30, 40, 50, 60, 70]
-    n_user = 30
+    n_user = [10]
     U_C_t_v, U_M1_t_v, U_M2_t_v = [], [], []
     utility_for_user_device_t_v, utility_for_Vop_t_v = [], []
     utility_for_user_device_t, utility_for_Vop_t = [0 for i in range(nuser)], 0
@@ -563,8 +563,8 @@ if __name__ == '__main__':
     P_0_v, P_1_v, P_2_v, p_j_vop_v = [], [], [], []
     F_0_v, F_1_v, F_2_v, F_j_vop_v = [], [], [], []
     f_m_v, p_m_v= [], []
-    # for index, number in enumerate(n_user):
-    for number in range(n_user):
+    for index, number in enumerate(n_user):
+    # for number in range(n_user):
         # p_0_init, p_1_init, p_2_init= 0.6, 0.3, 0.3
         P_0, P_1, P_2 = 0.6, 0.3, 0.3
         f_m, p_m = [], []  # 合同（f_m,p_m）
@@ -596,8 +596,6 @@ if __name__ == '__main__':
             if ([0 <= p_j_vop[j] <= sum(F[j]) * 2 * a * e[j] * K[j] for j in range(len(K))]) is False:
                 print("不满足条件")
 
-
-
             print("多购买了{}的资源".format(v_number * sum([lamda_m[i] * f_m[i] for i in range(v_number)]) - sum(f_j_vop)))
             print("stageI阶段合同为f_m, p_m：", f_m, p_m)
             print("stageI阶段Vop对CEA的资源定价p_j_vop为", p_j_vop)
@@ -623,11 +621,11 @@ if __name__ == '__main__':
             #         np.abs(P_2_t - P_2) <= cst.epsilon).all():
             #     break
             P_0_t, P_1_t, P_2_t = P_0, P_1, P_2
-            if (np.abs(U_C - U_C_t) <= cst.Error_value).all() and (np.abs(U_M1 - U_M1_t) <= cst.Error_value).all() and (
-                    np.abs(U_M2 - U_M2_t) <= cst.Error_value).all() and all(diff < 1 for diff in [np.abs(a - b) for a, b in
+            if (np.abs(U_C - U_C_t) <= cst.epsilon).all() and (np.abs(U_M1 - U_M1_t) <= cst.epsilon).all() and (
+                    np.abs(U_M2 - U_M2_t) <= cst.epsilon).all() and all(diff < 1 for diff in [np.abs(a - b) for a, b in
                                                                                                   zip(utility_for_user_device_t,
                                                                                                       utility_for_user_device)]) and (
-                    np.abs(utility_for_Vop - utility_for_Vop_t) <= cst.Error_value).all():
+                    np.abs(utility_for_Vop - utility_for_Vop_t) <= cst.epsilon).all():
                 break
             U_C_t = U_C
             U_M1_t = U_M1
