@@ -23,17 +23,26 @@ Q_vop = 0
 Q_CEA = [float("inf"), 12, 10]
 
 
+# def create():
+#     global lamda_m
+#     # 生成10个均匀分布的概率值（小数点后最多两位）
+#     probabilities = [round(random.uniform(0, 1), 2) for _ in range(v_number)]
+#
+#     # 确保概率值之和为1
+#     total_probability = sum(probabilities)
+#
+#     # 计算归一化后的概率值，并保留小数点后两位
+#     lamda_m = [round(prob / total_probability, 2) for prob in probabilities]
+
 def create():
+    lamda_m_t =[[1.0], [0.45, 0.55], [0.22, 0.39, 0.39], [0.55, 0.03, 0.29, 0.13], [0.17, 0.17, 0.14, 0.26, 0.26],
+     [0.21, 0.19, 0.22, 0.18, 0.02, 0.18], [0.06, 0.25, 0.16, 0.23, 0.24, 0.05, 0.0],
+     [0.06, 0.06, 0.1, 0.2, 0.29, 0.23, 0.05, 0.02], [0.13, 0.1, 0.17, 0.17, 0.0, 0.05, 0.15, 0.12, 0.12],
+     [0.1, 0.05, 0.03, 0.13, 0.12, 0.11, 0.13, 0.13, 0.11, 0.1]]
+
     global lamda_m
-    # 生成10个均匀分布的概率值（小数点后最多两位）
-    probabilities = [round(random.uniform(0, 1), 2) for _ in range(v_number)]
 
-    # 确保概率值之和为1
-    total_probability = sum(probabilities)
-
-    # 计算归一化后的概率值，并保留小数点后两位
-    lamda_m = [round(prob / total_probability, 2) for prob in probabilities]
-
+    lamda_m = lamda_m_t[v_number-1]
 
 def find_Optial_mulitUser(P_0, P_1, P_2):
     F_i0, F_i1, F_i2 = [], [], []
@@ -581,7 +590,7 @@ def optimal_Stage3strategy_KKT(bi, P_0, P_1, P_2):
 
 if __name__ == '__main__':
     cst.UserDevice.read(nuser)
-    n_vechicle = 8
+    n_vechicle = 10
     U_C_t_v, U_M1_t_v, U_M2_t_v = [], [], []
     utility_for_user_device_t_v, utility_for_Vop_t_v = [], []
     utility_for_user_device_t, utility_for_Vop_t = [0 for i in range(nuser)], 0

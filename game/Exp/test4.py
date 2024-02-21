@@ -1,24 +1,59 @@
-import matplotlib.pyplot as plt
-P_0_v,P_1_v,P_2_v,p_j_vop_v=[5.799999999999994, 5.699999999999994, 5.699999999999994, 5.599999999999994, 5.599999999999994, 5.599999999999994, 5.599999999999994, 5.599999999999994, 5.599999999999994, 5.599999999999994, 5.599999999999994] , [4.899999999999997, 4.799999999999997, 4.6999999999999975, 4.6999999999999975, 4.599999999999998, 4.499999999999998, 4.499999999999998, 4.499999999999998, 4.499999999999998, 4.499999999999998, 4.499999999999998] , [4.349999999999999, 4.249999999999999, 4.1499999999999995, 4.05, 3.9499999999999997, 3.8499999999999996, 3.7499999999999996, 3.7499999999999996, 3.7499999999999996, 3.7499999999999996, 3.7499999999999996] , [[4.016132695323941, 2.8492514256757135, 2.281272529185228], [4.0765342902865696, 2.7924479022173063, 2.186761754801194], [3.8902607751561784, 2.7225574409053226, 2.077420799646637], [3.934933903505381, 2.5320811845561493, 1.9637535162974467], [3.7543060840161533, 2.4726859156228684, 1.867416261252474], [3.5776389489798697, 2.4223649574667103, 1.7790902025461826], [3.3930757597965724, 2.2396492232875875, 1.6849776706691246], [3.3930757597965724, 2.2396492232875875, 1.6849776706691246], [3.3930757597965724, 2.2396492232875875, 1.6849776706691246], [3.3930757597965724, 2.2396492232875875, 1.6849776706691246], [3.3930757597965724, 2.2396492232875875, 1.6849776706691246]]
+import numpy as np
 
-p_j_vop_0=[row[0] for row in p_j_vop_v]
-p_j_vop_1=[row[1] for row in p_j_vop_v]
-p_j_vop_2=[row[2] for row in p_j_vop_v]
-# 绘制折线图
-plt.plot(range(len(P_0_v)), P_0_v, label='云服务器对用户的最优定价', marker='.',color="black")
-plt.plot(range(len(P_1_v)), P_1_v, label='M1云服务器对用户的最优定价', marker='o',color="red")
-plt.plot(range(len(P_2_v)), P_2_v, label='M2服务器对用户的最优定价', marker='s',color="blue")
-plt.plot(range(len(p_j_vop_0)), p_j_vop_0, label='VOP对云服务器的最优定价', marker='^')
-plt.plot(range(len(p_j_vop_1)), p_j_vop_1, label='VOP对M1云服务器最优定价', marker='^')
-plt.plot(range(len(p_j_vop_2)), p_j_vop_2, label='VOP对M2服务器的最优定价', marker='^')
+# 定义问题
+n_var = 10
+lb = 1
+ub = 10
 
-# 添加标题和轴标签
-plt.xlabel('VOP预留的资源', fontsize=16)
-plt.ylabel('价格', fontsize=16)
-plt.xticks(fontsize=13.5)  # 修改x轴刻度字体大小
-plt.yticks(fontsize=13.5)  # 修改y轴刻度字体大小
-# 添加图例并设置字体大小
-plt.legend(fontsize='16')
-# 显示图形
-# 
-plt.show()
+# 定义算法参数
+population_size = 100
+generations = 50
+crossover_probability = 0.9
+mutation_factor = 0.8
+
+# 初始化种群
+population = np.random.uniform(lb, ub, size=(population_size, n_var))
+
+# 定义目标函数
+def objective_function(x):
+    return -np.sum(x)  # 最大化问题，加负号
+
+# 定义约束条件
+def constraint1(x):
+    return np.all((x >= 1) & (x <= 10))
+
+def constraint2(x):
+    return np.sum(x) - 10
+
+# 差分进化算法
+for gen in range(generations):
+    for i in range(population_size):
+        # 随机选择三个个体作为变异向量
+        indices = np.random.choice(population_size, 3, replace=False)
+        a, b, c = population[indices]
+
+        # 变异操作
+        mutant = a + mutation_factor * (b - c)
+
+        # 限制变异向量在合法范围内
+        mutant = np.clip(mutant, lb, ub)
+
+        # 交叉操作
+        crossover_mask = np.random.rand(n_var) < crossover_probability
+        trial_vector = np.where(crossover_mask, mutant, population[i])
+
+        # 评估适应度
+        if constraint1(trial_vector) and constraint2(trial_vector) <= 0:
+            if objective_function(trial_vector) > objective_function(population[i]):
+                population[i] = trial_vector
+
+# 选择 Pareto 最优解
+pareto_front = [ind for ind in population if constraint1(ind) and constraint2(ind) <= 0]
+best_solution = max(pareto_front, key=objective_function)
+
+print("Pareto Front:")
+for ind in pareto_front:
+    print(f"Objective: {objective_function(ind)}, Variables: {ind}")
+
+print("\nBest Solution:")
+print(f"Objective: {objective_function(best_solution)}, Variables: {best_solution}")
