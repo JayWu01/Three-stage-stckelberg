@@ -1,13 +1,15 @@
-import random
-
-# 生成10个均匀分布的概率值（小数点后最多两位）
-probabilities = [round(random.uniform(0, 1), 2) for _ in range(10)]
-
-# 确保概率值之和为1
-total_probability = sum(probabilities)
-
-# 计算归一化后的概率值，并保留小数点后两位
-probabilities_normalized = [round(prob / total_probability, 2) for prob in probabilities]
-
-print("Original Probabilities:", probabilities)
-print("Normalized Probabilities (sum to 1):", probabilities_normalized)
+#导入库
+import matplotlib.pyplot as plt
+import numpy as np
+#设定画布。dpi越大图越清晰，绘图时间越久
+fig=plt.figure(dpi=300)
+#导入数据
+x=list(np.arange(1, 21))
+y=np.random.randn(20)
+#绘图命令
+plt.plot(x, y, lw=4, ls='-', c='b', alpha=0.1)
+plt.plot()
+#show出图形
+plt.show()
+#保存图片
+fig.savefig("画布")
