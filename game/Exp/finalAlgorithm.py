@@ -8,11 +8,14 @@ Theta_m = cst.Theta_m
 # 权重参数
 # alpha, beta, zeta = np.array([3.0, 3.0, 3.0]), np.array([5.0, 5.0, 5.0]), np.array([2.0, 2.0, 2.0])
 alpha, beta, zeta = np.array([0.3, 0.3, 0.3]), np.array([0.5, 0.3, 0.2]), np.array([0.2, 0.2, 0.2])
-e, a = [2, 1, 1], 0.1  # zuiyou
-C = [0.2, 0.5, 0.35]  # 三台服务器成本
-K = [2, 1, 1]  # 服务器功率
+e, a = [5, 2, 3], 1  # zuiyou
+C = [0.5, 0.2, 0.3]  # 三台服务器成本
+K = [1, 1, 1]  # 服务器功率
+# e, a = [5, 2, 2], 0.1  # zuiyou
+# C = [0.2, 0.5, 0.35]  # 三台服务器成本
+# K = [5, 2, 1]  # 服务器功率
 # CEA的计算资源上限
-Q_CEA = [float("inf"), 800, 1000]
+Q_CEA = [float("inf"), 80, 100]
 
 
 # 车辆类型为theta_m的概率
@@ -20,21 +23,10 @@ lamda_m = [0.04, 0.17, 0.09, 0.19, 0.01, 0.14, 0.02, 0.13, 0.01, 0.2]
 v_number = cst.v_number
 Q_total_m = cst.Q_total_m  # 车辆m的计算资源负载
 
-# def create():
-#     global lamda_m
-#     # 生成10个均匀分布的概率值（小数点后最多两位）
-#     probabilities = [round(random.uniform(0, 1), 2) for _ in range(v_number)]
-#
-#     # 确保概率值之和为1
-#     total_probability = sum(probabilities)
-#
-#     # 计算归一化后的概率值，并保留小数点后两位
-#     lamda_m = [round(prob / total_probability, 2) for prob in probabilities]
-
 def create():
     lamda_m_t = [[1.0], [0.45, 0.55], [0.22, 0.39, 0.39], [0.55, 0.03, 0.29, 0.13], [0.17, 0.17, 0.14, 0.26, 0.26],
-                 [0.21, 0.19, 0.22, 0.18, 0.02, 0.18], [0.06, 0.25, 0.16, 0.23, 0.24, 0.05, 0.0],
-                 [0.06, 0.06, 0.1, 0.2, 0.29, 0.23, 0.05, 0.02], [0.13, 0.1, 0.17, 0.17, 0.0, 0.05, 0.15, 0.12, 0.12],
+                 [0.21, 0.19, 0.22, 0.18, 0.02, 0.18], [0.06, 0.25, 0.16, 0.13, 0.24, 0.05, 0.1],
+                 [0.06, 0.06, 0.1, 0.2, 0.29, 0.23, 0.05, 0.02], [0.13, 0.1, 0.07, 0.17, 0.1, 0.05, 0.15, 0.12, 0.12],
                  [0.1, 0.05, 0.03, 0.13, 0.12, 0.11, 0.13, 0.13, 0.11, 0.1]]
 
     global lamda_m
@@ -124,18 +116,6 @@ def caculate_VopGradient(f_m, p_j_vop, F, f_j_vop, Rho_m):
 
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-# def checkConstrain(f_m, p_m, p_j_vop, F):
-#     for j in range(v_number):
-#         g3 = f_m[j] >= 0
-#         g4 = Q_total_m[j] - f_m[j]
-#         g5 = v_number * sum([lamda_m[i] * f_m[i] for i in range(v_number)]) - sum(
-#             [sum(F[j]) - p_j_vop[j] / (2 * a * e[j] * K[j]) for j in range(len(K))])
-#
-#     for j in range(len(K)):
-#         g1 = p_j_vop[j]
-#         g2 = sum(F[j]) * a * 2 * e[j] * K[j] - p_j_vop[j]
-#     return g1 >= 0 and g2 >= 0
-
 
 p_j_vop_t, p_m_t, f_m_t = [], [], []
 
@@ -189,8 +169,8 @@ def LagrangeDualStageIforVop(F):
         # Pi_new = 0
         Upsilon_j_new = [np.maximum(0, Upsilon_j[j] - cst.s_k * Upsilon_j_grad[j]) for j in range(len(K))]
         Lambda_j_new = [np.maximum(0, Lambda_j[j] - cst.s_k * Lambda_j_grad[j]) for j in range(len(K))]
-        print("第{}次迭代更新的乘子为：".format(n + 1), Phi_m_new, Omega_m_new, Pi_new, Upsilon_j_new, Lambda_j_new, Rho_m_new,
-              Rho_m_new, )
+        # print("第{}次迭代更新的乘子为：".format(n + 1), Phi_m_new, Omega_m_new, Pi_new, Upsilon_j_new, Lambda_j_new, Rho_m_new,
+        #       Rho_m_new, )
         utility_for_Vop = calculate_utility_for_Vop(f_m, p_j_vop, F)
         if np.allclose(Phi_m_new, Phi_m, atol=cst.Error_value) and np.allclose(Omega_m_new, Omega_m,atol=cst.Error_value) \
                 and np.allclose(Rho_m_new, Rho_m,atol=cst.Error_value) and np.allclose(Pi_new, Pi, atol=cst.Error_value) \
@@ -212,9 +192,6 @@ p_0_t_c, p_1_t_c, p_2_t_c = [], [], []
 # Initialization
 p_0_min, p_1_min, p_2_min = C[0], C[1], C[2]
 p_0_max, p_1_max, p_2_max = alpha[0] * beta[0] / zeta[0], alpha[1] * beta[1] / zeta[1], alpha[2] * beta[2] / zeta[2]
-# p_j_min=C[j]<=p_j_max=alpha[j] * beta[j] / zeta[j]
-# p_0_init, p_1_init, p_2_init = 0.5 * (p_0_min + p_0_max), 0.5 * (p_1_min + p_1_max), 0.5 * (p_2_min + p_2_max)
-# p_0_init, p_1_init, p_2_init = 8, 10, 15
 p_0_init, p_1_init, p_2_init = C[0], C[1], C[2]
 
 
