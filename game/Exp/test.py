@@ -1,15 +1,35 @@
-#导入库
-import matplotlib.pyplot as plt
-import numpy as np
-#设定画布。dpi越大图越清晰，绘图时间越久
-fig=plt.figure(dpi=300)
-#导入数据
-x=list(np.arange(1, 21))
-y=np.random.randn(20)
-#绘图命令
-plt.plot(x, y, lw=4, ls='-', c='b', alpha=0.1)
-plt.plot()
-#show出图形
-plt.show()
-#保存图片
-fig.savefig("画布")
+def ODCA(beta, B, p):
+    num_EUs = len(B)
+    num_MECs = len(p)
+    f = [[0] * num_MECs for _ in range(num_EUs)]  # Resource purchase decisions for each EU
+    for i in range(num_EUs):
+        Sz = set()
+        j = 0
+        while j <= num_MECs - 1:
+            if p[j] == 0:
+                f[i][j] = 0
+            else:
+                if j in Sz:
+                    f[i][j] = 0
+                else:
+                    Snew = set(range(num_MECs)) - Sz
+                    S_prime = {k for k in Snew if p[k] == 0}
+                    Mnew = len(Snew) - len(S_prime)
+                    f[i][j] = (B[i] + sum(p[k] / beta[k] for k in Snew)) / (Mnew * p[j]) - beta[j] ** -1
+                    if f[i][j] < 0:
+                        f[i][j] = 0
+                        Sz.add(j)
+                        break
+                    else:
+                        j = j + 1
+    return f
+
+# Example usage:
+beta = [0.5, 0.3, 0.2]  # Constants for each EU
+# beta = [2, 1, 0.5]  # Constants for each EU
+# beta = [0.25, 0.15, 0.1, 0.1]  # Constants for each EU
+B = [10, 20, 30]  # Budget of each EU used for resource purchase
+p = [2, 1, 1.5]  # Prices of MECs
+
+result = ODCA(beta, B, p)
+print(result)
