@@ -7,13 +7,15 @@ import random
 # n_number = 100
 # v_number = 30
 
-n_number = 20
+n_number = 10
 v_number = 10
+ecsp_number=3
 bg = []
 s_k =0.04# (0.8-1.4)
+# s_k =0.1# (0.8-1.4)
 # s_k = 1.5 # (0.8-1.4)
 
-Error_value = 0.0000001
+Error_value = 0.00001
 # Error_value = 0.000000000000001
 max_iteration = 2000
 epsilon=0.01   # 博弈停止的精度阈值
@@ -44,6 +46,15 @@ bi_size_range = [10, 30]
 bi_range = [bi_size_range[0], bi_size_range[1]]
 
 
+############################################################################################################################################
+# ECSP 配置
+C_cloud_range = [0.2]
+C_mec_range = [0.35, 0.8]
+Q_ecsp_range = [300, 400]
+e_cloud_range = [0.3]
+e_mec_range = [0.1,0.5]
+ecsp_beta_range=[0.1,0.3]
+ecsp_beta,ecsp_cost, Q_ecsp, ecsp_enery=[],[],[],[]
 ############################################################################################################################################
 class Vechicle:
     def __init__(self, index, Q_total_m, k_m, e_m, Theta_m, f_m):
@@ -157,6 +168,74 @@ class UserDevice:
             return ans
 
 
+class ECSP:
+    def __init__(self, index,ecsp_beta, ecsp_cost, Q_ecsp, ecsp_enery):
+        self.index = index
+        self.ecsp_beta = ecsp_beta
+        self.ecsp_cost = ecsp_cost
+        self.Q_ecsp = Q_ecsp
+        self.ecsp_enery = ecsp_enery
+
+    @staticmethod
+    def build(file_name='ecsp.csv', cnt=ecsp_number):
+        """
+        生成csv数据集文件
+        随机生成csv数据集文件
+        :param name: 文件名称
+        :param cnt: 循环次数
+        """
+        file_name = os.path.join(file_path, file_name)
+        with open(file_name, 'w', newline="") as f:
+            writer = csv.writer(f)
+            for i in range(cnt):
+                ls = []
+                ls.append(i)
+                if i==0:
+                    ecsp_beta = ecsp_beta_range[0]
+                    ecsp_cost = np.round(np.random.uniform(C_cloud_range[0], C_cloud_range[0]), 1)
+                    Q_ecsp = float("inf")
+                    ecsp_enery = round(random.uniform(e_cloud_range[0], e_cloud_range[0]), 1)
+                else:
+                    ecsp_beta = ecsp_beta_range[1]
+                    ecsp_cost = np.round(np.random.uniform(C_mec_range[0], C_mec_range[1]), 1)
+                    Q_ecsp = round(random.uniform(Q_ecsp_range[0], Q_ecsp_range[1]))
+                    ecsp_enery = round(random.uniform(e_mec_range[0], e_mec_range[1]), 2)
+                ls.append(ecsp_beta)
+                ls.append(ecsp_cost)
+                ls.append(Q_ecsp)
+                ls.append(ecsp_enery)
+                writer.writerow(ls)
+            f.close()
+
+    @staticmethod
+    def read(count, file_name='ecsp.csv'):
+        """
+        从文件中读取服务
+        :param name: 文件名
+        :return: 返回读取完成的服务
+        """
+        ans = []
+        c = 0
+        ecsp_beta.clear()
+        ecsp_cost.clear()
+        Q_ecsp.clear()
+        ecsp_enery.clear()
+        file_name = os.path.join(file_path, file_name)
+        with open(file_name) as f:
+            reader = csv.reader(f)
+            for i, rows in enumerate(reader):
+                if c < count:
+                    ls = rows
+                    ecsp_beta.append(float(ls[1]))
+                    ecsp_cost.append(float(ls[2]))
+                    Q_ecsp.append(float(ls[3]))
+                    ecsp_enery.append(float(ls[4]))
+                    c += 1
+                else:
+                    return ans
+            return ans
+
+
 class LM:
     def __init__(self, index, Phi_m, Omega_m, Rho_m, Pi, Upsilon_j, Lambda_j):
         self.index = index
@@ -219,11 +298,13 @@ class LM:
 
 
 if __name__ == '__main__':
-    UserDevice.build()
-    UserDevice.read(v_number)
+    # UserDevice.build()
+    # UserDevice.read(v_number)
+    #
+    # Vechicle.build()
+    # Vechicle.read(v_number)
+    #
+    # LM.build()
+    # LM.read(v_number)
 
-    Vechicle.build()
-    Vechicle.read(v_number)
-
-    LM.build()
-    LM.read(v_number)
+    ECSP.build()

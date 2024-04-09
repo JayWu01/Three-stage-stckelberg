@@ -1,4 +1,6 @@
+import copy
 import game.Config.constants as cst
+from decimal import Decimal
 
 import numpy as np
 
@@ -18,9 +20,12 @@ K = 1.0
 ecsp_beta, ecsp_cost, Q_ecsp, ecsp_enery = cst.ecsp_beta, cst.ecsp_cost, cst.Q_ecsp, cst.ecsp_enery
 
 # 车辆类型为theta_m的概率
-lamda_m = [0.04, 0.17, 0.09, 0.19, 0.01, 0.14, 0.02, 0.13, 0.01, 0.2]
 v_number = cst.v_number
 Q_total_m = cst.Q_total_m  # 车辆m的计算资源负载
+p_t_v = [[] for _ in range(ecsp_number)]  # 创建一个包含 n 个空列表的列表
+
+p_init = list()
+print("=====>start<=====")
 
 
 def create():
@@ -537,6 +542,7 @@ def create():
 
 
 def find_Optial_mulitUser(P):
+    np.set_printoptions(precision=16)
     result = ODCA(bg, P)
     # F = list(zip(*result))
     F = np.array(result)
@@ -544,15 +550,18 @@ def find_Optial_mulitUser(P):
 
 
 # 计算用户的效益函数值
+# alpha = np.array([0.1, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3])
 def calculate_utility_for_user_device(F):
     U = [sum([bg[i] * np.log(1 + ecsp_beta[j] * F[i][j]) for j in range(ecsp_number)]) for i in
          range(nuser)]
+    # U = [sum([alpha[j] * np.log(1 + ecsp_beta[j] * F[i][j]) for j in range(ecsp_number)]) for i in
+    #      range(nuser)]
     return U
 
 
 def calculate_utility_for_server(p_j_t, p_t, p_vop_j, f_vop_j, j):
     # p_j_t 为求nash均衡时变化的值
-    p_v = p_t
+    p_v = [i for i in p_t]
     p_v[j] = p_j_t
     F_i = find_Optial_mulitUser(p_v)
     # 奖励回报
@@ -568,10 +577,10 @@ def calculate_utility_for_server(p_j_t, p_t, p_vop_j, f_vop_j, j):
 # stage I 计算Vop的效益
 def calculate_utility_for_Vop(f_m, p_j_vop, F):
     # 奖励回报
-    Reward = sum([p_j_vop[j] * (sum(F[:, j]) - p_j_vop[j] / (2 * a * ecsp_enery[j] * K)) for j in range(ecsp_number)])
+    Reward = sum([p_j_vop[j] * (sum(F[:, j]) - (p_j_vop[j] / (2 * a * ecsp_enery[j] * K))) for j in range(ecsp_number)])
     # 付给车辆的成本
-    payment_cost = v_number * sum([lamda_m[i] * (f_m[i] ** 2 / Theta_m[i] + sum(
-        [(Theta_m[j - 1] ** -1 - Theta_m[j] ** -1) * f_m[j - 1] ** 2 for j in range(1, v_number)])) for i in
+    payment_cost = v_number * sum([lamda_m[i] * ((f_m[i] ** 2 / Theta_m[i]) + sum(
+        [((Theta_m[j - 1] ** -1) - (Theta_m[j] ** -1)) * f_m[j - 1] ** 2 for j in range(1, v_number)])) for i in
                                    range(v_number)])
     # 计算整体表达式
     U_vop = Reward - payment_cost
@@ -595,7 +604,6 @@ def caculate_VopGradient(f_m, p_j_vop, F, f_j_vop, Rho_m):
 p_j_vop_t, p_m_t, f_m_t = [], [], []
 
 # vop自带服务器计算资源大小
-# a_vop, e_vop, k_vop = 1.0, 1.0, 1.0
 a_vop, e_vop, k_vop = 0.1, 0.1, 0.1
 e_vk = 2 * e_vop * a_vop * k_vop
 
@@ -607,19 +615,20 @@ def LagrangeDualStageIforVop(F):
     Phi_m = cst.Phi_m  # 约束C1
     Rho_m = cst.Rho_m  # f_m递增约束
     Pi = 1.0  # 约束C2
-    Upsilon_j = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]  # #约束C3
-    Lambda_j = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]  # #约束C3
-    f_m = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
-    f_j_vop = [8.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0]
+    # Upsilon_j = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]  # #约束C3
+    # Lambda_j = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]  # #约束C3
+    # f_m = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+    # f_j_vop = [8.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0]
+    Upsilon_j = [1.0, 1.0, 1.0]  # #约束C3
+    Lambda_j = [1.0, 1.0, 1.0]  # #约束C3
+    f_m = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+    f_j_vop = [8.0, 5.0, 8.0]
     for n in range(cst.max_iteration):
         # -------------------------------------------------下面的效益函数没有考虑了VOP自身的能耗-----------------------------------------------
         rho_m = [2 * v_number * ((lamda_m[i] / Theta_m[i]) + (Theta_m[i] ** -1 - Theta_m[i + 1] ** -1) * sum([
             lamda_m[j] for j in range(i + 1, v_number)])) for i in range(v_number - 1)]
-        # con = [Phi_m[i] - Omega_m[i] +(Rho_m[i]-Rho_m[i+1]) +Pi * lamda_m[i] * v_number for i in range(v_number)]
         con = [Phi_m[i] - Omega_m[i] + (Rho_m[i] - Rho_m[i + 1]) + Pi * lamda_m[i] * v_number if i != v_number - 1 else
                Phi_m[i] - Omega_m[i] + Rho_m[i] + Pi * lamda_m[i] * v_number for i in range(v_number)]
-        # f_m = [con[m] / rho_m[m] if m != v_number - 1 else Theta_m[m] * con[m] / (2 * v_number * lamda_m[m]) for m in
-        #        range(v_number)]
         f_m = [
             con[m] / rho_m[m] if (m != v_number - 1 and con[m] > 0 and rho_m[m] != 0)
             else Theta_m[m] * con[m] / (2 * v_number * lamda_m[m]) if (m == v_number - 1 and con[m] > 0)
@@ -666,10 +675,8 @@ def LagrangeDualStageIforVop(F):
     return f_m, p_m, f_j_vop, p_j_vop, utility_for_Vop
 
 
-p_t_v = [[] for _ in range(ecsp_number)]  # 创建一个包含 n 个空列表的列表
-p_init = ecsp_cost
-
-
+# p_init = ecsp_cost
+# ecsp_cost_pro = [i for i in ecsp_cost]
 def find_nash_equilibrium(p_j_vop, f_j_vop):
     global p_init
     global p_t_v
@@ -726,9 +733,13 @@ if __name__ == '__main__':
     cst.Vechicle.read(v_number)
     cst.UserDevice.read(nuser)
     cst.ECSP.read(ecsp_number)
-    P = ecsp_cost
+    P = [i for i in ecsp_cost]
+    # P = ecsp_cost
+    p_init = [i for i in ecsp_cost]
+
     f_m, p_m = [], []  # 合同（f_m,p_m）
-    f_j_vop = p_j_vop = [0.6 for i in range(ecsp_number)]  # CEA的资源购买决策、vop的定价 初始值
+    # f_j_vop = p_j_vop = [0.6 for i in range(ecsp_number)]  # CEA的资源购买决策、vop的定价 初始值
+    f_j_vop, p_j_vop = [0.6, 0.3, 0.3], [0.6, 0.3, 0.3]  # CEA的资源购买决策、vop的定价
     U_j_t, U_j_t_v = [], []
     utility_for_user_device_t_v, utility_for_Vop_t_v = [], []
     utility_for_user_device_t, utility_for_Vop_t = [0 for i in range(nuser)], 0
@@ -741,10 +752,13 @@ if __name__ == '__main__':
                 n))
         # Algorithm 1
         F = find_Optial_mulitUser(P)
-        # print("stageIII的购买决策F_i0, F_i1, F_i2分别为:", F)
+        print("stageIII的购买决策F_i0, F_i1, F_i2分别为:", F)
         # Algorithm 2
         P = find_nash_equilibrium(p_j_vop, f_j_vop)  # 这里加了一个p_j_vop, f_j_vop
 
+        # 判断是否满足预算约束
+        Budgt = [sum([F[i][j] * P[j] for j in range(ecsp_number)]) for i in range(nuser)]
+        abs = [a - b for a, b in zip(bg, Budgt)]
         # Algorithm 3
         f_m, p_m, f_j_vop, p_j_vop, utility_for_Vop = LagrangeDualStageIforVop(F)
 
@@ -771,7 +785,6 @@ if __name__ == '__main__':
         print("------------------------------------------")
         # print("整体社会效益为",sum(utility_for_user_device)+U_C+U_M1+U_M2+utility_for_Vop)
         print("------------------------------------------")
-
         # if (np.abs(U_C - U_C_t) <= cst.Error_value).all() and (np.abs(U_M1 - U_M1_t) <= cst.Error_value).all() and (
         #         np.abs(U_M2 - U_M2_t) <= cst.Error_value).all() and all(diff < 1 for diff in [np.abs(a - b) for a, b in
         #                                                                                       zip(utility_for_user_device_t,
