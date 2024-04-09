@@ -615,14 +615,14 @@ def LagrangeDualStageIforVop(F):
     Phi_m = cst.Phi_m  # 约束C1
     Rho_m = cst.Rho_m  # f_m递增约束
     Pi = 1.0  # 约束C2
-    # Upsilon_j = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]  # #约束C3
-    # Lambda_j = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]  # #约束C3
-    # f_m = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
-    # f_j_vop = [8.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0]
-    Upsilon_j = [1.0, 1.0, 1.0]  # #约束C3
-    Lambda_j = [1.0, 1.0, 1.0]  # #约束C3
-    f_m = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
-    f_j_vop = [8.0, 5.0, 8.0]
+    Upsilon_j = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]  # #约束C3
+    Lambda_j = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]  # #约束C3
+    f_m = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+    f_j_vop = [8.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0]
+    # Upsilon_j = [1.0, 1.0, 1.0]  # #约束C3
+    # Lambda_j = [1.0, 1.0, 1.0]  # #约束C3
+    # f_m = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+    # f_j_vop = [8.0, 5.0, 8.0]
     for n in range(cst.max_iteration):
         # -------------------------------------------------下面的效益函数没有考虑了VOP自身的能耗-----------------------------------------------
         rho_m = [2 * v_number * ((lamda_m[i] / Theta_m[i]) + (Theta_m[i] ** -1 - Theta_m[i + 1] ** -1) * sum([
@@ -738,8 +738,8 @@ if __name__ == '__main__':
     p_init = [i for i in ecsp_cost]
 
     f_m, p_m = [], []  # 合同（f_m,p_m）
-    # f_j_vop = p_j_vop = [0.6 for i in range(ecsp_number)]  # CEA的资源购买决策、vop的定价 初始值
-    f_j_vop, p_j_vop = [0.6, 0.3, 0.3], [0.6, 0.3, 0.3]  # CEA的资源购买决策、vop的定价
+    f_j_vop = p_j_vop = [0.6 for i in range(ecsp_number)]  # CEA的资源购买决策、vop的定价 初始值
+    # f_j_vop, p_j_vop = [0.6, 0.3, 0.3], [0.6, 0.3, 0.3]  # CEA的资源购买决策、vop的定价
     U_j_t, U_j_t_v = [], []
     utility_for_user_device_t_v, utility_for_Vop_t_v = [], []
     utility_for_user_device_t, utility_for_Vop_t = [0 for i in range(nuser)], 0

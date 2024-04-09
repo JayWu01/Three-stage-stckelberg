@@ -9,7 +9,7 @@ import random
 
 n_number = 10
 v_number = 10
-ecsp_number=3
+ecsp_number=5
 bg = []
 s_k =0.04# (0.8-1.4)
 # s_k =0.1# (0.8-1.4)
