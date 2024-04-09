@@ -810,7 +810,7 @@ if __name__ == '__main__':
     print("已达到纳什均衡")
     print("--------------------------P_0_v,P_1_v,P_2_v-------------------", P_v)
     print("--------------------------f_m, p_m, p_j_vop-------------------", f_m, ',', p_m, ',', p_j_vop)
-    print("--------------------------U_user_v,U_j_t_v-------------------",
+    print("--------------------------U_user_v,U_j_t_v,U_vop_v-------------------",
           average_utility_for_user_v, ',', U_j_t_v, ',', utility_for_Vop_t_v)
     print("用户平均效益值", average_utility_for_user_v)
     utilityTorTotalVechicle = sum([p_m[m] - (f_m[m] ** 2 / Theta_m[m]) for m in range(v_number)])
