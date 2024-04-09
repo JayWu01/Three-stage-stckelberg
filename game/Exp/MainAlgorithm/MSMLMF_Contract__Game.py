@@ -615,14 +615,10 @@ def LagrangeDualStageIforVop(F):
     Phi_m = cst.Phi_m  # 约束C1
     Rho_m = cst.Rho_m  # f_m递增约束
     Pi = 1.0  # 约束C2
-    Upsilon_j = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]  # #约束C3
-    Lambda_j = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]  # #约束C3
-    f_m = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
-    f_j_vop = [8.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0]
-    # Upsilon_j = [1.0, 1.0, 1.0]  # #约束C3
-    # Lambda_j = [1.0, 1.0, 1.0]  # #约束C3
-    # f_m = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
-    # f_j_vop = [8.0, 5.0, 8.0]
+    Upsilon_j = [1.0 for i in range(ecsp_number)]  # #约束C3
+    Lambda_j = [1.0 for i in range(ecsp_number)]  # #约束C3
+    f_m = [1.0 for i in range(v_number)]
+    f_j_vop = [1.0 for i in range(ecsp_number)]
     for n in range(cst.max_iteration):
         # -------------------------------------------------下面的效益函数没有考虑了VOP自身的能耗-----------------------------------------------
         rho_m = [2 * v_number * ((lamda_m[i] / Theta_m[i]) + (Theta_m[i] ** -1 - Theta_m[i + 1] ** -1) * sum([
@@ -785,11 +781,6 @@ if __name__ == '__main__':
         print("------------------------------------------")
         # print("整体社会效益为",sum(utility_for_user_device)+U_C+U_M1+U_M2+utility_for_Vop)
         print("------------------------------------------")
-        # if (np.abs(U_C - U_C_t) <= cst.Error_value).all() and (np.abs(U_M1 - U_M1_t) <= cst.Error_value).all() and (
-        #         np.abs(U_M2 - U_M2_t) <= cst.Error_value).all() and all(diff < 1 for diff in [np.abs(a - b) for a, b in
-        #                                                                                       zip(utility_for_user_device_t,
-        #                                                                                           utility_for_user_device)]) and (
-        #         np.abs(utility_for_Vop - utility_for_Vop_t) <= cst.Error_value).all():
         if all(diff <= cst.Error_value for diff in
                [np.abs(a - b) for a, b in zip(U_j_t, U_j)]) and all(
             diff <= cst.Error_value for diff in

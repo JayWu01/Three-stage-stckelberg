@@ -9,13 +9,13 @@ import random
 
 n_number = 10
 v_number = 10
-ecsp_number=5
+ecsp_number=3
 bg = []
 s_k =0.04# (0.8-1.4)
 # s_k =0.1# (0.8-1.4)
 # s_k = 1.5 # (0.8-1.4)
 
-Error_value = 0.00001
+Error_value = 0.0000001
 # Error_value = 0.000000000000001
 max_iteration = 2000
 epsilon=0.01   # 博弈停止的精度阈值
@@ -38,7 +38,7 @@ Q_total_m_range = [10, 20]
 k_m_range = [1, 5]
 e_m_range = [1, 5]
 # s_m=1.75
-s_m=0.5
+s_m=0.05
 
 ############################################################################################################################################
 # Userdevice 配置
@@ -301,10 +301,10 @@ if __name__ == '__main__':
     # UserDevice.build()
     # UserDevice.read(v_number)
     #
-    # Vechicle.build()
+    Vechicle.build()
     # Vechicle.read(v_number)
     #
     # LM.build()
     # LM.read(v_number)
 
-    ECSP.build()
+    # ECSP.build()
