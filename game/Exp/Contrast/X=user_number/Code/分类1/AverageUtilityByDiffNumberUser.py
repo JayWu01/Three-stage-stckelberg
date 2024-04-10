@@ -728,7 +728,7 @@ if __name__ == '__main__':
     average_UserResource_by_number_user, average_ECSPResource_by_number_user, average_ECSPPrice_by_number_user, average_VOPPrice_by_number_user = [], [], [], []
     vechicleUtility_by_number_user,p_m_by_number_user,f_m_by_number_user=[],[],[]
     socialWelfare = []
-    for n in range(10, 100):
+    for n in range(10, 100,5):
         print("----------------------------nuser={}------------------------------------：".format(
             n))
         nuser = n
