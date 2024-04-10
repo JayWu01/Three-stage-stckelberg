@@ -728,10 +728,10 @@ if __name__ == '__main__':
     average_UserResource_by_number_user, average_ECSPResource_by_number_user, average_ECSPPrice_by_number_user, average_VOPPrice_by_number_user = [], [], [], []
     vechicleUtility_by_number_user,p_m_by_number_user,f_m_by_number_user=[],[],[]
     socialWelfare = []
-    for n in range(22, 23):
-        print("----------------------------nuser={}------------------------------------：".format(
-            n))
-        ecsp_number = n
+    for necsp in range(2, 13):
+        print("----------------------------ecsp_number={}------------------------------------：".format(
+            necsp))
+        ecsp_number = necsp
         v_number=0
         create()
         cst.LM.read(v_number)
@@ -753,7 +753,7 @@ if __name__ == '__main__':
         P_v = []
         while True:
             print(
-                "--------------------------------------------------------------------------第{}次博弈--------------------------------------------------------------------------：".format(
+                "---------------------------ecsp_number={}----第{}次博弈-----------------------------------：".format(ecsp_number,
                     n))
             # Algorithm 1
             F = find_Optial_mulitUser(P)
