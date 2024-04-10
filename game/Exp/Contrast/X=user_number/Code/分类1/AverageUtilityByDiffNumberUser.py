@@ -691,7 +691,7 @@ def find_nash_equilibrium(p_j_vop, f_j_vop):
         else:
             p_init[j] = p_init[j]
 
-        p_t_v[j].append(p_init[j])
+        # p_t_v[j].append(p_init[j])
     return p_init
 
 
@@ -727,6 +727,7 @@ if __name__ == '__main__':
     average_Userutility_by_number_user, average_ECSPutility_by_number_user, average_VOPutility_by_number_user = [], [], []
     average_UserResource_by_number_user, average_ECSPResource_by_number_user, average_ECSPPrice_by_number_user, average_VOPPrice_by_number_user = [], [], [], []
     vechicleUtility_by_number_user,p_m_by_number_user,f_m_by_number_user=[],[],[]
+    socialWelfare = []
     for n in range(22, 24):
         print("----------------------------nuser={}------------------------------------：".format(
             n))
@@ -824,6 +825,7 @@ if __name__ == '__main__':
         f_m_by_number_user.append(f_m)
         # vechicleUtility_by_number_user.append(f_m)
 
+        socialWelfare.append(sum(utility_for_user_device) + sum(U_j) + utility_for_Vop)
         print("用户平均效益值", average_utility_for_user_v[-1])
         utilityTorTotalVechicle = sum([p_m[m] - (f_m[m] ** 2 / Theta_m[m]) for m in range(v_number)])
         print("车辆整体效益值", utilityTorTotalVechicle)
@@ -841,3 +843,5 @@ if __name__ == '__main__':
 
     print("p_m值变化", p_m_by_number_user)
     print("f_m变化", f_m_by_number_user)
+
+    print("整体社会福利", socialWelfare)
