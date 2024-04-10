@@ -650,8 +650,8 @@ def LagrangeDualStageIforVop(F):
         # Pi_new = 0
         Upsilon_j_new = [np.maximum(0, Upsilon_j[j] - cst.s_k * Upsilon_j_grad[j]) for j in range(ecsp_number)]
         Lambda_j_new = [np.maximum(0, Lambda_j[j] - cst.s_k * Lambda_j_grad[j]) for j in range(ecsp_number)]
-        print("第{}次迭代更新的乘子为：".format(n + 1), Phi_m_new, Omega_m_new, Pi_new, Upsilon_j_new, Lambda_j_new, Rho_m_new,
-              Rho_m_new, )
+        # print("第{}次迭代更新的乘子为：".format(n + 1), Phi_m_new, Omega_m_new, Pi_new, Upsilon_j_new, Lambda_j_new, Rho_m_new,
+        #       Rho_m_new, )
         utility_for_Vop = calculate_utility_for_Vop(f_m, p_j_vop, F)
         if np.allclose(Phi_m_new, Phi_m, atol=cst.Error_value) and np.allclose(Omega_m_new, Omega_m,
                                                                                atol=cst.Error_value) \
@@ -748,7 +748,7 @@ if __name__ == '__main__':
                 n))
         # Algorithm 1
         F = find_Optial_mulitUser(P)
-        print("stageIII的购买决策F_i0, F_i1, F_i2分别为:", F)
+        # print("stageIII的购买决策F_i0, F_i1, F_i2分别为:", F)
         # Algorithm 2
         P = find_nash_equilibrium(p_j_vop, f_j_vop)  # 这里加了一个p_j_vop, f_j_vop
 

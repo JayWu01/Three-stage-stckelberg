@@ -728,7 +728,7 @@ if __name__ == '__main__':
     average_UserResource_by_number_user, average_ECSPResource_by_number_user, average_ECSPPrice_by_number_user, average_VOPPrice_by_number_user = [], [], [], []
     vechicleUtility_by_number_user,p_m_by_number_user,f_m_by_number_user=[],[],[]
     socialWelfare = []
-    for n in range(22, 24):
+    for n in range(10, 100):
         print("----------------------------nuser={}------------------------------------：".format(
             n))
         nuser = n
@@ -748,12 +748,12 @@ if __name__ == '__main__':
         utility_for_user_device_t_v, utility_for_Vop_t_v = [], []
         utility_for_user_device_t, utility_for_Vop_t = [0 for i in range(nuser)], 0
         average_utility_for_user_v = []
-        n = 1
+        m = 1
         P_v = []
         while True:
             print(
-                "--------------------------------------------------------------------------第{}次博弈--------------------------------------------------------------------------：".format(
-                    n))
+                "------------------------------------------nuser={}---------------第{}次博弈----------------------------：".format(n,
+                    m))
             # Algorithm 1
             F = find_Optial_mulitUser(P)
             # print("stageIII的购买决策F_i0, F_i1, F_i2分别为:", F)
@@ -780,13 +780,13 @@ if __name__ == '__main__':
 
             utility_for_Vop = calculate_utility_for_Vop(f_m, p_j_vop, F)
 
-            # print("------------------------------------------")
-            # print("user的效益函数为：", utility_for_user_device)
-            # print("------------------------------------------")
-            # print("U_j效益函数为：", U_j)
-            # print("------------------------------------------")
-            # print("stageI阶段Vop的效益函数为", utility_for_Vop)
-            # print("------------------------------------------")
+            print("------------------------------------------")
+            print("user的效益函数为：", utility_for_user_device)
+            print("------------------------------------------")
+            print("U_j效益函数为：", U_j)
+            print("------------------------------------------")
+            print("stageI阶段Vop的效益函数为", utility_for_Vop)
+            print("------------------------------------------")
             # print("整体社会效益为",sum(utility_for_user_device)+U_C+U_M1+U_M2+utility_for_Vop)
             # print("------------------------------------------")
             if all(diff <= cst.Error_value for diff in
@@ -799,12 +799,12 @@ if __name__ == '__main__':
             utility_for_user_device_t = utility_for_user_device
             utility_for_Vop_t = utility_for_Vop
 
-            if n != 1:
+            if m != 1:
                 U_j_t_v.append(U_j)
                 utility_for_user_device_t_v.append(utility_for_user_device)
                 utility_for_Vop_t_v.append(utility_for_Vop)
                 average_utility_for_user_v.append(np.average(utility_for_user_device))
-            n += 1
+            m += 1
             P_v.append(P)
         print("已达到纳什均衡")
         # print("--------------------------P_0_v,P_1_v,P_2_v-------------------", P_v)
