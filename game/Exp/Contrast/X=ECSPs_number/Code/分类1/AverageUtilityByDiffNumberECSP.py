@@ -725,6 +725,7 @@ if __name__ == '__main__':
         print("----------------------------ecsp_number={}------------------------------------：".format(
             nv))
         ecsp_number = nv
+        # nuser=40
         create()
         cst.LM.read(v_number)
         cst.Vechicle.read(v_number)
@@ -808,7 +809,8 @@ if __name__ == '__main__':
         average_ECSPutility_by_number_user.append(np.average(U_j))
         average_VOPutility_by_number_user.append(np.average(utility_for_Vop))
         # aa=[sum(i) for i in F]
-        average_UserResource_by_number_user.append(np.average([sum(i) for i in F]))
+        # average_UserResource_by_number_user.append(np.average([sum(i) for i in F]))
+        average_UserResource_by_number_user.append((sum(F)/nuser))
         average_CloudResource_by_number_user.append(f_j_vop[0])
         average_ECSPResource_by_number_user.append(np.average(f_j_vop))
 
