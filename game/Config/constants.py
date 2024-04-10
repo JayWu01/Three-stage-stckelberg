@@ -15,7 +15,7 @@ s_k =0.04# (0.8-1.4)
 # s_k =0.1# (0.8-1.4)
 # s_k = 1.5 # (0.8-1.4)
 
-Error_value = 0.0000001
+Error_value = 0.000001
 # Error_value = 0.000000000000001
 max_iteration = 2000
 epsilon=0.01   # 博弈停止的精度阈值
