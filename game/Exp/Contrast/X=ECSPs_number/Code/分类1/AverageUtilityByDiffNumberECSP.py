@@ -805,15 +805,15 @@ if __name__ == '__main__':
         #       average_utility_for_user_v, ',', U_j_t_v, ',', utility_for_Vop_t_v)
         average_Userutility_by_number_user.append(np.average(utility_for_user_device))
         average_Cloudutility_by_number_user.append(U_j[0])
-        average_ECSPutility_by_number_user.append(np.average(U_j[0:]))
+        average_ECSPutility_by_number_user.append(np.average(U_j))
         average_VOPutility_by_number_user.append(np.average(utility_for_Vop))
         # aa=[sum(i) for i in F]
         average_UserResource_by_number_user.append(np.average([sum(i) for i in F]))
         average_CloudResource_by_number_user.append(f_j_vop[0])
-        average_ECSPResource_by_number_user.append(np.average(f_j_vop[0:]))
+        average_ECSPResource_by_number_user.append(np.average(f_j_vop))
 
         average_CloudPrice_by_number_user.append(P[0])
-        average_ECSPPrice_by_number_user.append(P[0:])
+        average_ECSPPrice_by_number_user.append(P)
         average_VOPPrice_by_number_user.append(np.average(p_j_vop))
 
         p_m_by_number_user.append(p_m)
