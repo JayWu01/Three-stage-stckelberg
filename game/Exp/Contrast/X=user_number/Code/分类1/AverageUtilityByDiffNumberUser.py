@@ -554,8 +554,9 @@ def find_Optial_mulitUser(P):
 def calculate_utility_for_user_device(F):
     U = [sum([bg[i] * np.log(1 + ecsp_beta[j] * F[i][j]) for j in range(ecsp_number)]) for i in
          range(nuser)]
-    # U = [sum([alpha[j] * np.log(1 + ecsp_beta[j] * F[i][j]) for j in range(ecsp_number)]) for i in
+    # U = [sum([bg[i] * np.log(1 + ecsp_beta[j] * F[i][j]) for j in range(ecsp_number)]) for i in
     #      range(nuser)]
+
     return U
 
 
@@ -714,6 +715,7 @@ def ODCA(B, P):
                     S_prime = {k for k in Snew if P[k] == 0}
                     Mnew = len(Snew) - len(S_prime)
                     f[i][j] = (B[i] + sum(P[k] / ecsp_beta[k] for k in Snew)) / (Mnew * P[j]) - ecsp_beta[j] ** -1
+                    # f[i][j] = (B[i] + sum(ecsp_beta[k]*P[k] for k in Snew)) / (Mnew * P[j]) - ecsp_beta[j]
                     if f[i][j] < 0:
                         f[i][j] = 0
                         Sz.add(j)
@@ -813,15 +815,15 @@ if __name__ == '__main__':
         #       average_utility_for_user_v, ',', U_j_t_v, ',', utility_for_Vop_t_v)
         average_Userutility_by_number_user.append(np.average(utility_for_user_device))
         average_Cloudutility_by_number_user.append(U_j[0])
-        average_ECSPutility_by_number_user.append(np.average(U_j[1:]))
+        average_ECSPutility_by_number_user.append(np.average(U_j))
         average_VOPutility_by_number_user.append(np.average(utility_for_Vop))
 
         average_UserResource_by_number_user.append(np.average([sum(i) for i in F]))
         average_CloudResource_by_number_user.append(f_j_vop[0])
-        average_ECSPResource_by_number_user.append(np.average(f_j_vop[1:]))
+        average_ECSPResource_by_number_user.append(np.average(f_j_vop))
 
         average_CloudPrice_by_number_user.append(P[0])
-        average_ECSPPrice_by_number_user.append(np.average(P[1:]))
+        average_ECSPPrice_by_number_user.append(np.average(P))
         average_VOPPrice_by_number_user.append(np.average(p_j_vop))
 
         p_m_by_number_user.append(p_m)
