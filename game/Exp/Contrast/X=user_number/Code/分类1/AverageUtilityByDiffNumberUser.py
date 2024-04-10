@@ -815,7 +815,7 @@ if __name__ == '__main__':
         average_ECSPutility_by_number_user.append(np.average(U_j))
         average_VOPutility_by_number_user.append(np.average(utility_for_Vop))
 
-        average_UserResource_by_number_user.append(np.average(F))
+        average_UserResource_by_number_user.append(np.average([sum(i) for i in F]))
         average_ECSPResource_by_number_user.append(np.average(f_j_vop))
 
         average_ECSPPrice_by_number_user.append(np.average(P))

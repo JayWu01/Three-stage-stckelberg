@@ -721,8 +721,8 @@ if __name__ == '__main__':
     average_UserResource_by_number_user, average_ECSPResource_by_number_user, average_ECSPPrice_by_number_user, average_VOPPrice_by_number_user = [], [], [], []
     vechicleUtility_by_number_user,p_m_by_number_user,f_m_by_number_user=[],[],[]
     socialWelfare=[]
-    for nv in range(3, 11):
-        print("----------------------------nuser={}------------------------------------：".format(
+    for nv in range(2, 13):
+        print("----------------------------ecsp_number={}------------------------------------：".format(
             nv))
         ecsp_number = nv
         create()
@@ -745,7 +745,7 @@ if __name__ == '__main__':
         P_v = []
         while True:
             print(
-                "--------------------nuser={}--------------第{}次博弈----------------------：".format(nv,n))
+                "--------------------ecsp_number={}--------------第{}次博弈----------------------：".format(nv,n))
             # Algorithm 1
             F = find_Optial_mulitUser(P)
             # print("stageIII的购买决策F_i0, F_i1, F_i2分别为:", F)
@@ -806,8 +806,8 @@ if __name__ == '__main__':
         average_Userutility_by_number_user.append(np.average(utility_for_user_device))
         average_ECSPutility_by_number_user.append(np.average(U_j))
         average_VOPutility_by_number_user.append(np.average(utility_for_Vop))
-
-        average_UserResource_by_number_user.append(np.average(F))
+        # aa=[sum(i) for i in F]
+        average_UserResource_by_number_user.append(np.average([sum(i) for i in F]))
         average_ECSPResource_by_number_user.append(np.average(f_j_vop))
 
         average_ECSPPrice_by_number_user.append(np.average(P))
