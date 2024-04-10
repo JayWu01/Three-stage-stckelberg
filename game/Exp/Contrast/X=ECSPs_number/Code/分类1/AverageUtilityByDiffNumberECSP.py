@@ -721,7 +721,7 @@ if __name__ == '__main__':
     average_UserResource_by_number_user, average_ECSPResource_by_number_user, average_ECSPPrice_by_number_user, average_VOPPrice_by_number_user = [], [], [], []
     vechicleUtility_by_number_user,p_m_by_number_user,f_m_by_number_user=[],[],[]
     socialWelfare=[]
-    for nv in range(10, 11):
+    for nv in range(3, 11):
         print("----------------------------nuser={}------------------------------------：".format(
             nv))
         ecsp_number = nv
@@ -745,8 +745,7 @@ if __name__ == '__main__':
         P_v = []
         while True:
             print(
-                "--------------------------------------------------------------------------第{}次博弈--------------------------------------------------------------------------：".format(
-                    n))
+                "--------------------nuser={}--------------第{}次博弈----------------------：".format(nv,n))
             # Algorithm 1
             F = find_Optial_mulitUser(P)
             # print("stageIII的购买决策F_i0, F_i1, F_i2分别为:", F)
