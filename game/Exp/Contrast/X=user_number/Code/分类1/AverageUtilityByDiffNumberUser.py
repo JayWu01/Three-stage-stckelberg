@@ -674,7 +674,7 @@ def LagrangeDualStageIforVop(F):
 
 # p_init = ecsp_cost
 # ecsp_cost_pro = [i for i in ecsp_cost]
-Delta = [0.01 for i in range(ecsp_number)]
+Delta = [0.1 for i in range(ecsp_number)]
 def find_nash_equilibrium(p_j_vop, f_j_vop):
     global p_init
     global p_t_v
