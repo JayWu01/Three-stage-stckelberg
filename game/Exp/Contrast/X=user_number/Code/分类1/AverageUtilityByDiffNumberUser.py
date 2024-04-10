@@ -693,11 +693,11 @@ def find_nash_equilibrium(p_j_vop, f_j_vop):
         else:
             p_temp = p_init[j]
 
-        if p_init[j]==p_temp or (
-                    np.abs(p_init[j]==p_temp) <= cst.Error_value).all():
-            Delta[j]=Delta[j]*0.5
-        else:
-            Delta[j] = Delta[j] *0.99
+        # if p_init[j]==p_temp or (
+        #             np.abs(p_init[j]==p_temp) <= cst.Error_value).all():
+        #     Delta[j]=Delta[j]*0.5
+        # else:
+        #     Delta[j] = Delta[j] *0.99
         # p_t_v[j].append(p_init[j])
         p_init[j]=p_temp
     return p_init
