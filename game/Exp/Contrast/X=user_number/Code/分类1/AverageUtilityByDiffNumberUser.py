@@ -724,8 +724,8 @@ def ODCA(B, P):
 
 
 if __name__ == '__main__':
-    average_Userutility_by_number_user, average_ECSPutility_by_number_user, average_VOPutility_by_number_user = [], [], []
-    average_UserResource_by_number_user, average_ECSPResource_by_number_user, average_ECSPPrice_by_number_user, average_VOPPrice_by_number_user = [], [], [], []
+    average_Userutility_by_number_user, average_Cloudutility_by_number_user, average_ECSPutility_by_number_user, average_VOPutility_by_number_user = [], [], [], []
+    average_UserResource_by_number_user, average_CloudResource_by_number_user, average_ECSPResource_by_number_user, average_CloudPrice_by_number_user,  average_ECSPPrice_by_number_user, average_VOPPrice_by_number_user = [], [], [], [], [], []
     vechicleUtility_by_number_user,p_m_by_number_user,f_m_by_number_user=[],[],[]
     socialWelfare = []
     for n in range(10, 105,5):
@@ -812,13 +812,16 @@ if __name__ == '__main__':
         # print("--------------------------U_user_v,U_j_t_v,U_vop_v-------------------",
         #       average_utility_for_user_v, ',', U_j_t_v, ',', utility_for_Vop_t_v)
         average_Userutility_by_number_user.append(np.average(utility_for_user_device))
-        average_ECSPutility_by_number_user.append(np.average(U_j))
+        average_Cloudutility_by_number_user.append(U_j[0])
+        average_ECSPutility_by_number_user.append(np.average(U_j[1:]))
         average_VOPutility_by_number_user.append(np.average(utility_for_Vop))
 
         average_UserResource_by_number_user.append(np.average([sum(i) for i in F]))
-        average_ECSPResource_by_number_user.append(np.average(f_j_vop))
+        average_CloudResource_by_number_user.append(f_j_vop[0])
+        average_ECSPResource_by_number_user.append(np.average(f_j_vop[1:]))
 
-        average_ECSPPrice_by_number_user.append(np.average(P))
+        average_CloudPrice_by_number_user.append(P[0])
+        average_ECSPPrice_by_number_user.append(np.average(P[1:]))
         average_VOPPrice_by_number_user.append(np.average(p_j_vop))
 
         p_m_by_number_user.append(p_m)
@@ -833,11 +836,14 @@ if __name__ == '__main__':
 
     print("用户平均效益值变化", average_Userutility_by_number_user)
     print("ECSPS平均效益值变化", average_ECSPutility_by_number_user)
+    print("Cloud平均效益值变化", average_Cloudutility_by_number_user)
     print("VOP平均效益值变化", average_VOPutility_by_number_user)
 
     print("用户平均资源购买情况", average_UserResource_by_number_user)
+    print("Cloud平均资源购买情况", average_CloudResource_by_number_user)
     print("ECSPS平均资源购买情况", average_ECSPResource_by_number_user)
 
+    print("Cloud平均定价值变化", average_CloudPrice_by_number_user)
     print("ECSPS平均定价值变化", average_ECSPPrice_by_number_user)
     print("VOP的平均定价值变化", average_VOPPrice_by_number_user)
 
