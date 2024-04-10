@@ -674,25 +674,32 @@ def LagrangeDualStageIforVop(F):
 
 # p_init = ecsp_cost
 # ecsp_cost_pro = [i for i in ecsp_cost]
+Delta = [0.01 for i in range(ecsp_number)]
 def find_nash_equilibrium(p_j_vop, f_j_vop):
     global p_init
     global p_t_v
+    global Delta
     # Parameter Setup
-    Delta = 0.1
     for j in range(ecsp_number):
         # Calculate utility for the cloud
         U_j = calculate_utility_for_server(p_init[j] + 0, p_init, p_j_vop, f_j_vop, j)
-        U_j_add_Delta = calculate_utility_for_server(p_init[j] + Delta, p_init, p_j_vop, f_j_vop, j)
-        U_j_minus_Delta = calculate_utility_for_server(p_init[j] - Delta, p_init, p_j_vop, f_j_vop, j)
+        U_j_add_Delta = calculate_utility_for_server(p_init[j] + Delta[j], p_init, p_j_vop, f_j_vop, j)
+        U_j_minus_Delta = calculate_utility_for_server(p_init[j] - Delta[j], p_init, p_j_vop, f_j_vop, j)
 
         if U_j_add_Delta >= U_j and U_j_add_Delta >= U_j_minus_Delta:
-            p_init[j] = p_init[j] + Delta
+            p_temp = p_init[j] + Delta[j]
         elif U_j_minus_Delta >= U_j and U_j_minus_Delta >= U_j_add_Delta:
-            p_init[j] = p_init[j] - Delta
+            p_temp = p_init[j] - Delta[j]
         else:
-            p_init[j] = p_init[j]
+            p_temp = p_init[j]
 
+        if p_init[j]==p_temp or (
+                    np.abs(p_init[j]==p_temp) <= cst.Error_value).all():
+            Delta[j]=Delta[j]*0.5
+        else:
+            Delta[j] = Delta[j] *0.99
         # p_t_v[j].append(p_init[j])
+        p_init[j]=p_temp
     return p_init
 
 
