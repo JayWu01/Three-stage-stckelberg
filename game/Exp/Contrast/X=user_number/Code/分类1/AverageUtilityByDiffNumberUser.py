@@ -596,7 +596,8 @@ def caculate_VopGradient(f_m, p_j_vop, F, f_j_vop, Rho_m):
     Rho_m_grad = [f_m[m] if m == 0 else f_m[m] - f_m[m - 1] for m in range(len(f_m))]
     Upsilon_j_grad = p_j_vop
     Q_ecsp[0] = sum(F[:, 0])
-    Lambda_j_grad = [2 * a * ecsp_enery[j] * K * Q_ecsp[j] - p_j_vop[j] for j in range(ecsp_number)]
+    # Lambda_j_grad = [2 * a * ecsp_enery[j] * K * Q_ecsp[j] - p_j_vop[j] for j in range(ecsp_number)]
+    Lambda_j_grad = [min(P[j], 2 * a * ecsp_enery[j] * K * Q_ecsp[j]) - p_j_vop[j] for j in range(ecsp_number)]
     return Phi_m_grad, Omega_m_grad, Rho_m_grad, Pi_grad, Upsilon_j_grad, Lambda_j_grad
 
 
@@ -675,6 +676,8 @@ def LagrangeDualStageIforVop(F):
 # p_init = ecsp_cost
 # ecsp_cost_pro = [i for i in ecsp_cost]
 Delta = [0.1 for i in range(ecsp_number)]
+
+
 def find_nash_equilibrium(p_j_vop, f_j_vop):
     global p_init
     global p_t_v
@@ -699,7 +702,7 @@ def find_nash_equilibrium(p_j_vop, f_j_vop):
         # else:
         #     Delta[j] = Delta[j] *0.99
         # p_t_v[j].append(p_init[j])
-        p_init[j]=p_temp
+        p_init[j] = p_temp
     return p_init
 
 
@@ -734,10 +737,10 @@ def ODCA(B, P):
 
 if __name__ == '__main__':
     average_Userutility_by_number_user, average_Cloudutility_by_number_user, average_ECSPutility_by_number_user, average_VOPutility_by_number_user = [], [], [], []
-    average_UserResource_by_number_user, average_CloudResource_by_number_user, average_ECSPResource_by_number_user, average_CloudPrice_by_number_user,  average_ECSPPrice_by_number_user, average_VOPPrice_by_number_user = [], [], [], [], [], []
-    vechicleUtility_by_number_user,p_m_by_number_user,f_m_by_number_user=[],[],[]
+    average_UserResource_by_number_user, average_CloudResource_by_number_user, average_ECSPResource_by_number_user, average_CloudPrice_by_number_user, average_ECSPPrice_by_number_user, average_VOPPrice_by_number_user = [], [], [], [], [], []
+    vechicleUtility_by_number_user, p_m_by_number_user, f_m_by_number_user = [], [], []
     socialWelfare = []
-    for n in range(10, 105,5):
+    for n in range(5, 55, 5):
         print("----------------------------nuser={}------------------------------------：".format(
             n))
         nuser = n
@@ -761,7 +764,8 @@ if __name__ == '__main__':
         P_v = []
         while True:
             print(
-                "------------------------------------------nuser={}---------------第{}次博弈----------------------------：".format(n,
+                "------------------------------------------nuser={}---------------第{}次博弈----------------------------：".format(
+                    n,
                     m))
             # Algorithm 1
             F = find_Optial_mulitUser(P)
@@ -781,9 +785,9 @@ if __name__ == '__main__':
             sumf_m = v_number * sum([lamda_m[i] * f_m[i] for i in range(v_number)]) - sum(f_j_vop)
             # print("多购买了{}的资源".format(sumf_m))
             # print("stageI阶段合同为f_m, p_m：", f_m, p_m)
-            # print("stageI阶段Vop对CEA的资源定价p_j_vop为", p_j_vop)
-            # print("stageII阶段CEA的价格P_0, P_1, P_2分别为：", P)
-            # print("stageII阶段CEA的资源购买决策f_j_vop：", f_j_vop)
+            print("stageI阶段Vop对CEA的资源定价p_j_vop为", p_j_vop)
+            print("stageII阶段CEA的价格P_0, P_1, P_2分别为：", P)
+            print("stageII阶段CEA的资源购买决策f_j_vop：", f_j_vop)
             utility_for_user_device = calculate_utility_for_user_device(F)
             U_j = [calculate_utility_for_server(P[j], P, p_j_vop, f_j_vop, j) for j in range(ecsp_number)]
 
@@ -802,7 +806,7 @@ if __name__ == '__main__':
                    [np.abs(a - b) for a, b in zip(U_j_t, U_j)]) and all(
                 diff <= cst.Error_value for diff in
                 [np.abs(a - b) for a, b in zip(utility_for_user_device_t, utility_for_user_device)]) and (
-                    np.abs(utility_for_Vop - utility_for_Vop_t) <= cst.Error_value).all():
+                    np.abs(utility_for_Vop - utility_for_Vop_t) <= cst.Error_value).all() or m>=100:
                 break
             U_j_t = U_j
             utility_for_user_device_t = utility_for_user_device

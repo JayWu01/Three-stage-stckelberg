@@ -588,7 +588,8 @@ def caculate_VopGradient(f_m, p_j_vop, F, f_j_vop, Rho_m):
     Rho_m_grad = [f_m[m] if m == 0 else f_m[m] - f_m[m - 1] for m in range(len(f_m))]
     Upsilon_j_grad = p_j_vop
     Q_ecsp[0] = sum(F[:, 0])
-    Lambda_j_grad = [2 * a * ecsp_enery[j] * K * Q_ecsp[j] - p_j_vop[j] for j in range(ecsp_number)]
+    # Lambda_j_grad = [2 * a * ecsp_enery[j] * K * Q_ecsp[j] - p_j_vop[j] for j in range(ecsp_number)]
+    Lambda_j_grad = [min(P[j], 2 * a * ecsp_enery[j] * K * Q_ecsp[j]) - p_j_vop[j] for j in range(ecsp_number)]
     return Phi_m_grad, Omega_m_grad, Rho_m_grad, Pi_grad, Upsilon_j_grad, Lambda_j_grad
 
 
@@ -721,7 +722,7 @@ if __name__ == '__main__':
     average_UserResource_by_number_user, average_CloudResource_by_number_user,average_ECSPResource_by_number_user, average_CloudPrice_by_number_user, average_ECSPPrice_by_number_user, average_VOPPrice_by_number_user = [], [], [], [], [], []
     vechicleUtility_by_number_user,p_m_by_number_user,f_m_by_number_user=[],[],[]
     socialWelfare=[]
-    for nv in range(2, 13):
+    for nv in range(1, 11):
         print("----------------------------ecsp_number={}------------------------------------：".format(
             nv))
         ecsp_number = nv
@@ -786,7 +787,7 @@ if __name__ == '__main__':
                    [np.abs(a - b) for a, b in zip(U_j_t, U_j)]) and all(
                 diff <= cst.Error_value for diff in
                 [np.abs(a - b) for a, b in zip(utility_for_user_device_t, utility_for_user_device)]) and (
-                    np.abs(utility_for_Vop - utility_for_Vop_t) <= cst.Error_value).all():
+                    np.abs(utility_for_Vop - utility_for_Vop_t) <= cst.Error_value).all() or n>=100:
                 break
             U_j_t = U_j
             utility_for_user_device_t = utility_for_user_device

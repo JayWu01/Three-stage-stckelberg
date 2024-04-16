@@ -6,10 +6,10 @@ import random
 # # 常量
 # n_number = 100
 # v_number = 30
-# 标准实验：n_number，v_number，ecsp_number 20，10，10
+# 标准实验：n_number，v_number，ecsp_number 20，10，3
 n_number = 20
 v_number = 10
-ecsp_number=10
+ecsp_number=3
 bg = []
 s_k =0.04# (0.8-1.4)
 # s_k =0.1# (0.8-1.4)
@@ -42,7 +42,7 @@ s_m=0.05
 
 ############################################################################################################################################
 # Userdevice 配置
-bi_size_range = [10, 30]
+bi_size_range = [3, 7]
 bi_range = [bi_size_range[0], bi_size_range[1]]
 
 
@@ -298,10 +298,10 @@ class LM:
 
 
 if __name__ == '__main__':
-    # UserDevice.build()
+    UserDevice.build()
     # UserDevice.read(v_number)
     #
-    Vechicle.build()
+    # Vechicle.build()
     # Vechicle.read(v_number)
     #
     # LM.build()
