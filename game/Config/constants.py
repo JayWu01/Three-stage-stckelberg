@@ -8,8 +8,8 @@ import random
 # v_number = 30
 # 标准实验：n_number，v_number，ecsp_number 20，10，3
 n_number = 20
-v_number = 10
 ecsp_number=3
+v_number = 10
 bg = []
 s_k =0.04# (0.8-1.4)
 # s_k =0.1# (0.8-1.4)

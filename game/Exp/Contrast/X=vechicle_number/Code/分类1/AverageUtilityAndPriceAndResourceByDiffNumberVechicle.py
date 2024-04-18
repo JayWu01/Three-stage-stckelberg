@@ -9,12 +9,6 @@ ecsp_number = cst.ecsp_number
 bg = cst.bg
 Theta_m = cst.Theta_m
 # 权重参数
-# alpha, beta, zeta = np.array([0.1, 0.3, 0.3]), np.array([0.1, 0.3, 0.3]), np.array([0.1, 0.3, 0.3])
-# e, a = [0.3, 0.2, 0.1], 0.25  # zuiyou
-# C = [0.2, 0.5, 0.35]  # 三台服务器成本
-# K = [1, 1, 1]  # 服务器功率
-# CEA的计算资源上限
-# Q_CEA = [float("inf"), 300, 400]
 a = 0.25
 K = 1.0
 ecsp_beta, ecsp_cost, Q_ecsp, ecsp_enery = cst.ecsp_beta, cst.ecsp_cost, cst.Q_ecsp, cst.ecsp_enery
@@ -29,10 +23,10 @@ print("=====>start<=====")
 
 
 def create():
-    lamda_m_t = [[1.0], [0.45, 0.55], [0.22, 0.39, 0.39], [0.55, 0.03, 0.29, 0.13], [0.17, 0.17, 0.14, 0.26, 0.26],
-                 [0.21, 0.19, 0.22, 0.18, 0.02, 0.18], [0.06, 0.25, 0.16, 0.13, 0.24, 0.05, 0.1],
-                 [0.06, 0.06, 0.1, 0.2, 0.29, 0.23, 0.05, 0.02], [0.13, 0.1, 0.07, 0.17, 0.1, 0.05, 0.15, 0.12, 0.12],
-                 [0.1, 0.05, 0.03, 0.13, 0.12, 0.11, 0.13, 0.13, 0.11, 0.1]]
+    # lamda_m_t = [[1.0], [0.45, 0.55], [0.22, 0.39, 0.39], [0.55, 0.03, 0.29, 0.13], [0.17, 0.17, 0.14, 0.26, 0.26],
+    #              [0.21, 0.19, 0.22, 0.18, 0.02, 0.18], [0.06, 0.25, 0.16, 0.13, 0.24, 0.05, 0.1],
+    #              [0.06, 0.06, 0.1, 0.2, 0.29, 0.23, 0.05, 0.02], [0.13, 0.1, 0.07, 0.17, 0.1, 0.05, 0.15, 0.12, 0.12],
+    #              [0.1, 0.05, 0.03, 0.13, 0.12, 0.11, 0.13, 0.13, 0.11, 0.1]]
 
     lamda_m_t = [[1.0], [0.27913, 0.72087], [0.34263, 0.29807, 0.35929], [0.2414, 0.2644, 0.33891, 0.15529],
                  [0.14178, 0.21772, 0.17464, 0.28404, 0.18181], [0.13026, 0.32711, 0.24151, 0.16565, 0.05853, 0.07694],
@@ -550,7 +544,6 @@ def find_Optial_mulitUser(P):
 
 
 # 计算用户的效益函数值
-# alpha = np.array([0.1, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3])
 def calculate_utility_for_user_device(F):
     U = [sum([bg[i] * np.log(1 + ecsp_beta[j] * F[i][j]) for j in range(ecsp_number)]) for i in
          range(nuser)]
@@ -595,7 +588,8 @@ def caculate_VopGradient(f_m, p_j_vop, F, f_j_vop, Rho_m):
     Rho_m_grad = [f_m[m] if m == 0 else f_m[m] - f_m[m - 1] for m in range(len(f_m))]
     Upsilon_j_grad = p_j_vop
     Q_ecsp[0] = sum(F[:, 0])
-    Lambda_j_grad = [2 * a * ecsp_enery[j] * K * Q_ecsp[j] - p_j_vop[j] for j in range(ecsp_number)]
+    # Lambda_j_grad = [2 * a * ecsp_enery[j] * K * Q_ecsp[j] - p_j_vop[j] for j in range(ecsp_number)]
+    Lambda_j_grad = [min(P[j], 2 * a * ecsp_enery[j] * K * Q_ecsp[j]) - p_j_vop[j] for j in range(ecsp_number)]
     return Phi_m_grad, Omega_m_grad, Rho_m_grad, Pi_grad, Upsilon_j_grad, Lambda_j_grad
 
 
@@ -720,19 +714,19 @@ def ODCA(B, P):
                         break
                     else:
                         j = j + 1
+
     return f
 
 
 if __name__ == '__main__':
-    average_Userutility_by_number_user, average_ECSPutility_by_number_user, average_VOPutility_by_number_user = [], [], []
-    average_UserResource_by_number_user, average_ECSPResource_by_number_user, average_ECSPPrice_by_number_user, average_VOPPrice_by_number_user = [], [], [], []
+    average_Userutility_by_number_user, average_Cloudutility_by_number_user, average_ECSPutility_by_number_user, average_VOPutility_by_number_user = [], [],  [], []
+    average_UserResource_by_number_user, average_CloudResource_by_number_user, average_ECSPResource_by_number_user, average_CloudPrice_by_number_user, average_ECSPPrice_by_number_user, average_VOPPrice_by_number_user = [], [], [],  [], [], []
     vechicleUtility_by_number_user,p_m_by_number_user,f_m_by_number_user=[],[],[]
     socialWelfare = []
-    for n in range(22, 23):
-        print("----------------------------nuser={}------------------------------------：".format(
-            n))
-        nuser = n
-        v_number=0
+    for nv in range(0, 13):
+        print("----------------------------v_number={}------------------------------------：".format(
+            nv))
+        v_number = nv
         create()
         cst.LM.read(v_number)
         cst.Vechicle.read(v_number)
@@ -743,7 +737,7 @@ if __name__ == '__main__':
         p_init = [i for i in ecsp_cost]
 
         f_m, p_m = [], []  # 合同（f_m,p_m）
-        f_j_vop = p_j_vop = [0 for i in range(ecsp_number)]  # CEA的资源购 买决策、vop的定价 初始值
+        f_j_vop = p_j_vop = [0.6 for i in range(ecsp_number)]  # CEA的资源购 买决策、vop的定价 初始值
         # f_j_vop, p_j_vop = [0.6, 0.3, 0.3], [0.6, 0.3, 0.3]  # CEA的资源购买决策、vop的定价
         U_j_t, U_j_t_v = [], []
         utility_for_user_device_t_v, utility_for_Vop_t_v = [], []
@@ -753,8 +747,7 @@ if __name__ == '__main__':
         P_v = []
         while True:
             print(
-                "--------------------------------------------------------------------------第{}次博弈--------------------------------------------------------------------------：".format(
-                    n))
+                "--------------------------------------v_number={}----------第{}次博弈---------------------------------------：".format(nv,n))
             # Algorithm 1
             F = find_Optial_mulitUser(P)
             # print("stageIII的购买决策F_i0, F_i1, F_i2分别为:", F)
@@ -766,7 +759,7 @@ if __name__ == '__main__':
             abs = [a - b for a, b in zip(bg, Budgt)]
             # Algorithm 3
             f_m, p_m, f_j_vop, p_j_vop, utility_for_Vop = LagrangeDualStageIforVop(F)
-            f_j_vop = [0 for i in range(ecsp_number)]
+
             if ([0 <= p_j_vop[j] <= sum(F[:, j]) * 2 * a * ecsp_enery[j] * K for j in range(ecsp_number)]) is False:
                 print("不满足条件")
 
@@ -775,7 +768,7 @@ if __name__ == '__main__':
             # print("stageI阶段合同为f_m, p_m：", f_m, p_m)
             # print("stageI阶段Vop对CEA的资源定价p_j_vop为", p_j_vop)
             # print("stageII阶段CEA的价格P_0, P_1, P_2分别为：", P)
-            print("stageII阶段CEA的资源购买决策f_j_vop：", f_j_vop)
+            # print("stageII阶段CEA的资源购买决策f_j_vop：", f_j_vop)
             utility_for_user_device = calculate_utility_for_user_device(F)
             U_j = [calculate_utility_for_server(P[j], P, p_j_vop, f_j_vop, j) for j in range(ecsp_number)]
 
@@ -794,7 +787,7 @@ if __name__ == '__main__':
                    [np.abs(a - b) for a, b in zip(U_j_t, U_j)]) and all(
                 diff <= cst.Error_value for diff in
                 [np.abs(a - b) for a, b in zip(utility_for_user_device_t, utility_for_user_device)]) and (
-                    np.abs(utility_for_Vop - utility_for_Vop_t) <= cst.Error_value).all():
+                    np.abs(utility_for_Vop - utility_for_Vop_t) <= cst.Error_value).all() or n>=100:
                 break
             U_j_t = U_j
             utility_for_user_device_t = utility_for_user_device
@@ -813,13 +806,16 @@ if __name__ == '__main__':
         # print("--------------------------U_user_v,U_j_t_v,U_vop_v-------------------",
         #       average_utility_for_user_v, ',', U_j_t_v, ',', utility_for_Vop_t_v)
         average_Userutility_by_number_user.append(np.average(utility_for_user_device))
-        average_ECSPutility_by_number_user.append(np.average(U_j))
+        average_Cloudutility_by_number_user.append(U_j[0])
+        average_ECSPutility_by_number_user.append(np.average(U_j[1:]))
         average_VOPutility_by_number_user.append(np.average(utility_for_Vop))
 
         average_UserResource_by_number_user.append(np.average([sum(i) for i in F]))
-        average_ECSPResource_by_number_user.append(np.average(f_j_vop))
+        average_CloudResource_by_number_user.append(f_j_vop[0])
+        average_ECSPResource_by_number_user.append(np.average(f_j_vop[1:]))
 
-        average_ECSPPrice_by_number_user.append(np.average(P))
+        average_CloudPrice_by_number_user.append(P[0])
+        average_ECSPPrice_by_number_user.append(np.average(P[1:]))
         average_VOPPrice_by_number_user.append(np.average(p_j_vop))
 
         p_m_by_number_user.append(p_m)
@@ -834,11 +830,14 @@ if __name__ == '__main__':
 
     print("用户平均效益值变化", average_Userutility_by_number_user)
     print("ECSPS平均效益值变化", average_ECSPutility_by_number_user)
+    print("Cloud效益值变化", average_Cloudutility_by_number_user)
     print("VOP平均效益值变化", average_VOPutility_by_number_user)
 
     print("用户平均资源购买情况", average_UserResource_by_number_user)
+    print("Cloud平均资源购买情况", average_CloudResource_by_number_user)
     print("ECSPS平均资源购买情况", average_ECSPResource_by_number_user)
 
+    print("Cloud平均定价值变化", average_CloudPrice_by_number_user)
     print("ECSPS平均定价值变化", average_ECSPPrice_by_number_user)
     print("VOP的平均定价值变化", average_VOPPrice_by_number_user)
 
