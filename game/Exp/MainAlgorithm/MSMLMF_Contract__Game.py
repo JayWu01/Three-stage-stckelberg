@@ -712,14 +712,15 @@ def ODCA(B, P):
                 else:
                     Snew = set(range(num_MECs)) - Sz
                     S_prime = {k for k in Snew if P[k] == 0}
-                    Mnew = len(Snew) - len(S_prime)
+                    # Mnew = len(Snew) - len(S_prime)
+                    Mnew = num_MECs - len(S_prime)
                     f[i][j] = (B[i] + sum(P[k] / ecsp_beta[k] for k in Snew)) / (Mnew * P[j]) - ecsp_beta[j] ** -1
                     if f[i][j] < 0:
                         f[i][j] = 0
                         Sz.add(j)
                         break
-                    else:
-                        j = j + 1
+                    # else:
+            j = j + 1
     return f
 
 

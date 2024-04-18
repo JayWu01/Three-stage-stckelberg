@@ -720,12 +720,12 @@ def ODCA(B, P):
 if __name__ == '__main__':
     average_Userutility_by_number_user, average_ECSPutility_by_number_user, average_VOPutility_by_number_user = [], [], []
     average_UserResource_by_number_user, average_ECSPResource_by_number_user, average_ECSPPrice_by_number_user, average_VOPPrice_by_number_user = [], [], [], []
-    vechicleUtility_by_number_user,p_m_by_number_user,f_m_by_number_user=[],[],[]
-    socialWelfare,socialWelfare2 = [],[]
-    vset=[0,5,10]
+    vechicleUtility_by_number_user, p_m_by_number_user, f_m_by_number_user = [], [], []
+    socialWelfare, socialWelfare2 = [], []
+    vset = [0, 5, 10]
     for v_num in (vset):
-        v_number=v_num
-        for necsp in range(1, 11):
+        v_number = v_num
+        for necsp in range(11, 12, 2):
             print("----------------------------ecsp_number={}------------------------------------：".format(
                 necsp))
             ecsp_number = necsp
@@ -749,7 +749,8 @@ if __name__ == '__main__':
             P_v = []
             while True:
                 print(
-                    "----------v_num={}-------ecsp_number={}----第{}次博弈-----------------------------------：".format(v_number,ecsp_number,                                                                                        n))
+                    "----------v_num={}-------ecsp_number={}----第{}次博弈-----------------------------------：".format(
+                        v_number, ecsp_number, n))
                 # Algorithm 1
                 F = find_Optial_mulitUser(P)
                 # Algorithm 2
@@ -773,7 +774,7 @@ if __name__ == '__main__':
                        [np.abs(a - b) for a, b in zip(U_j_t, U_j)]) and all(
                     diff <= cst.Error_value for diff in
                     [np.abs(a - b) for a, b in zip(utility_for_user_device_t, utility_for_user_device)]) and (
-                        np.abs(utility_for_Vop - utility_for_Vop_t) <= cst.Error_value).all() or n>=100:
+                        np.abs(utility_for_Vop - utility_for_Vop_t) <= cst.Error_value).all() or n >= 100:
                     break
                 U_j_t = U_j
                 utility_for_user_device_t = utility_for_user_device
