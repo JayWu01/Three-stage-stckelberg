@@ -19,9 +19,9 @@ socialWelfare = [[100.12796887802119, 104.66186426440885, 110.86269554887856, 95
 # plt.plot(range(len(U_vop_v)), U_vop_v, label='vop的效益值', marker='x')
 
 # 绘制折线图
-plt.plot(range(3, 12, 2),socialWelfare[0], label='v=0', marker='.')
-plt.plot(range(3, 12, 2),socialWelfare[1], label='v=1', marker='o')
-plt.plot(range(3, 12, 2),socialWelfare[2], label='v=2', marker='^')
+plt.plot(range(3, 12, 2),socialWelfare[0], label='Without Vechicle', marker='.')
+plt.plot(range(3, 12, 2),socialWelfare[1], label='The number of Vechicle is =5', marker='o')
+plt.plot(range(3, 12, 2),socialWelfare[2], label='The number of Vechicle is =10', marker='^')
 # 添加图例
 plt.legend()
 
