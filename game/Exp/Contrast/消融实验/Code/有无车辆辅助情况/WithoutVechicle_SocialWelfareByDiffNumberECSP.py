@@ -725,7 +725,7 @@ if __name__ == '__main__':
     vset = [0, 5, 10]
     for v_num in (vset):
         v_number = v_num
-        for necsp in range(11, 12, 2):
+        for necsp in range(1, 11):
             print("----------------------------ecsp_number={}------------------------------------：".format(
                 necsp))
             ecsp_number = necsp

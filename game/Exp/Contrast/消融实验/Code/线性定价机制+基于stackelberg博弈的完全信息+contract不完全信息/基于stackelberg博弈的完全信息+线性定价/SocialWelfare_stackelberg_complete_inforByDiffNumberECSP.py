@@ -572,7 +572,8 @@ def calculate_utility_for_Vop(f_m, p_j_vop, F,p_m):
     # 奖励回报
     Reward = sum([p_j_vop[j] * (sum(F[:, j]) - (p_j_vop[j] / (2 * a * ecsp_enery[j] * K))) for j in range(ecsp_number)])
     # 付给车辆的成本
-    payment_cost = sum([f_m[m] * p_m[m] for m in range(v_number)])
+    # payment_cost = sum([f_m[m] * p_m[m] for m in range(v_number)])
+    payment_cost = sum([p_m[m] for m in range(v_number)])
     # 计算整体表达式
     U_vop = Reward - payment_cost
     return U_vop
@@ -613,7 +614,7 @@ def LagrangeDualStageIforVop(F):
     f_j_vop = [1.0 for i in range(ecsp_number)]
     for n in range(cst.max_iteration):
         p_m = [f_m[m] ** 2 / Theta_m[m] for m in range(v_number)]
-        f_m = [Theta_m[m]*(Phi_m[m]- Omega_m[m]+Pi)/3 for m in range(v_number)]
+        f_m = [Theta_m[m]*(Phi_m[m]- Omega_m[m]+Pi)/2 for m in range(v_number)]
 
         p_j_vop = [a * ecsp_enery[j] * K * (sum(F[:, j]) + Upsilon_j[j] - Lambda_j[j]) + Pi / 2 for j in
                    range(ecsp_number)]

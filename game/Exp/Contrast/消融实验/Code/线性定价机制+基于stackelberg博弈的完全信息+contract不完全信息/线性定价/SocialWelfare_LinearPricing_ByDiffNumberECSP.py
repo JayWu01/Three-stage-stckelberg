@@ -709,7 +709,6 @@ if __name__ == '__main__':
     vechicleUtility_by_number_user, p_m_by_number_user, f_m_by_number_user = [], [], []
     socialWelfare = []
     for nv in range(1, 11):
-    # for nv in range(3, 4):
         print("----------------------------ecsp_number={}------------------------------------：".format(
             nv))
         ecsp_number = nv
