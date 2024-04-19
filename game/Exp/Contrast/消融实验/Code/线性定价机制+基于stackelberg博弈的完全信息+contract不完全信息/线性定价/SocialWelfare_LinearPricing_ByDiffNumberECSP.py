@@ -708,8 +708,8 @@ if __name__ == '__main__':
     average_UserResource_by_number_user, average_CloudResource_by_number_user, average_ECSPResource_by_number_user, average_CloudPrice_by_number_user, average_ECSPPrice_by_number_user, average_VOPPrice_by_number_user = [], [], [], [], [], []
     vechicleUtility_by_number_user, p_m_by_number_user, f_m_by_number_user = [], [], []
     socialWelfare = []
-    # for nv in range(1, 11):
-    for nv in range(3, 4):
+    for nv in range(1, 11):
+    # for nv in range(3, 4):
         print("----------------------------ecsp_number={}------------------------------------：".format(
             nv))
         ecsp_number = nv
