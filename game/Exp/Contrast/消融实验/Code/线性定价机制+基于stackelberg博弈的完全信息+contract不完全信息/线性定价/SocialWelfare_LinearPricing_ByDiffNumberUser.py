@@ -1,6 +1,4 @@
-import copy
 import game.Config.constants as cst
-from decimal import Decimal
 
 import numpy as np
 
@@ -568,13 +566,11 @@ def calculate_utility_for_server(p_j_t, p_t, p_vop_j, f_vop_j, j):
 
 
 # stage I 计算Vop的效益
-def calculate_utility_for_Vop(f_m, p_j_vop, F):
+def calculate_utility_for_Vop(f_m, p_j_vop, F,p_m):
     # 奖励回报
     Reward = sum([p_j_vop[j] * (sum(F[:, j]) - (p_j_vop[j] / (2 * a * ecsp_enery[j] * K))) for j in range(ecsp_number)])
     # 付给车辆的成本
-    payment_cost = v_number * sum([lamda_m[i] * ((f_m[i] ** 2 / Theta_m[i]) + sum(
-        [((Theta_m[j - 1] ** -1) - (Theta_m[j] ** -1)) * f_m[j - 1] ** 2 for j in range(1, v_number)])) for i in
-                                   range(v_number)])
+    payment_cost = sum([f_m[m] * p_m[m] for m in range(v_number)])
     # 计算整体表达式
     U_vop = Reward - payment_cost
     return U_vop
@@ -584,7 +580,7 @@ def calculate_utility_for_Vop(f_m, p_j_vop, F):
 def caculate_VopGradient(f_m, p_j_vop, F, f_j_vop, Rho_m):
     Phi_m_grad = f_m
     Omega_m_grad = [Q_total_m[i] - f_m[i] for i in range(v_number)]
-    Pi_grad = v_number * sum([lamda_m[i] * f_m[i] for i in range(v_number)]) - sum(f_j_vop)
+    Pi_grad = sum(f_m) - sum(f_j_vop)
     Rho_m_grad = [f_m[m] if m == 0 else f_m[m] - f_m[m - 1] for m in range(len(f_m))]
     Upsilon_j_grad = p_j_vop
     Q_ecsp[0] = sum(F[:, 0])
@@ -614,20 +610,10 @@ def LagrangeDualStageIforVop(F):
     f_m = [1.0 for i in range(v_number)]
     f_j_vop = [1.0 for i in range(ecsp_number)]
     for n in range(cst.max_iteration):
-        # -------------------------------------------------下面的效益函数没有考虑了VOP自身的能耗-----------------------------------------------
-        rho_m = [2 * v_number * ((lamda_m[i] / Theta_m[i]) + (Theta_m[i] ** -1 - Theta_m[i + 1] ** -1) * sum([
-            lamda_m[j] for j in range(i + 1, v_number)])) for i in range(v_number - 1)]
-        con = [Phi_m[i] - Omega_m[i] + (Rho_m[i] - Rho_m[i + 1]) + Pi * lamda_m[i] * v_number if i != v_number - 1 else
-               Phi_m[i] - Omega_m[i] + Rho_m[i] + Pi * lamda_m[i] * v_number for i in range(v_number)]
-        f_m = [
-            con[m] / rho_m[m] if (m != v_number - 1 and con[m] > 0 and rho_m[m] != 0)
-            else Theta_m[m] * con[m] / (2 * v_number * lamda_m[m]) if (m == v_number - 1 and con[m] > 0)
-            else 0
-            for m in range(v_number)
-        ]
-        p_m = [((f_m[i] ** 2 / Theta_m[i]) + sum(
-            [((Theta_m[j - 1] ** -1) - (Theta_m[j] ** -1)) * (f_m[j - 1] ** 2) for j in range(1, i + 1)])) for i in
-               range(v_number)]
+        # p_m = [f_m[m] ** 2 / Theta_m[m] for m in range(v_number)]
+        # p_m = [1.2 for m in range(v_number)] # 定值【1.2，1.5】
+        p_m = [1.5 for m in range(v_number)] # 定值【1.2，1.5】
+        f_m = [Theta_m[m]*(Phi_m[m]- Omega_m[m]+Pi)/3 for m in range(v_number)]
 
         p_j_vop = [a * ecsp_enery[j] * K * (sum(F[:, j]) + Upsilon_j[j] - Lambda_j[j]) + Pi / 2 for j in
                    range(ecsp_number)]
@@ -646,17 +632,17 @@ def LagrangeDualStageIforVop(F):
         Lambda_j_new = [np.maximum(0, Lambda_j[j] - cst.s_k * Lambda_j_grad[j]) for j in range(ecsp_number)]
         # print("第{}次迭代更新的乘子为：".format(n + 1), Phi_m_new, Omega_m_new, Pi_new, Upsilon_j_new, Lambda_j_new, Rho_m_new,
         #       Rho_m_new, )
-        utility_for_Vop = calculate_utility_for_Vop(f_m, p_j_vop, F)
+        utility_for_Vop = calculate_utility_for_Vop(f_m, p_j_vop, F,p_m)
         if np.allclose(Phi_m_new, Phi_m, atol=cst.Error_value) and np.allclose(Omega_m_new, Omega_m,
                                                                                atol=cst.Error_value) \
-                and np.allclose(Rho_m_new, Rho_m, atol=cst.Error_value) and np.allclose(Pi_new, Pi,
+                and np.allclose(Pi_new, Pi,
                                                                                         atol=cst.Error_value) \
                 and np.allclose(Upsilon_j_new, Upsilon_j, atol=cst.Error_value) and np.allclose(Lambda_j_new, Lambda_j,
                                                                                                 atol=cst.Error_value):
             break
         Phi_m = Phi_m_new
         Omega_m = Omega_m_new
-        Rho_m = Rho_m_new
+        # Rho_m = Rho_m_new
         Pi = Pi_new
         Upsilon_j = Upsilon_j_new
         Lambda_j = Lambda_j_new
@@ -712,113 +698,137 @@ def ODCA(B, P):
                         f[i][j] = 0
                         Sz.add(j)
                         break
-                    else:
-                        j = j + 1
+
+            j = j + 1
     return f
 
 
 if __name__ == '__main__':
-    average_Userutility_by_number_user, average_ECSPutility_by_number_user, average_VOPutility_by_number_user = [], [], []
-    average_UserResource_by_number_user, average_ECSPResource_by_number_user, average_ECSPPrice_by_number_user, average_VOPPrice_by_number_user = [], [], [], []
+    average_Userutility_by_number_user, average_Cloudutility_by_number_user, average_ECSPutility_by_number_user, average_VOPutility_by_number_user = [], [], [], []
+    average_UserResource_by_number_user, average_CloudResource_by_number_user, average_ECSPResource_by_number_user, average_CloudPrice_by_number_user, average_ECSPPrice_by_number_user, average_VOPPrice_by_number_user = [], [], [], [], [], []
     vechicleUtility_by_number_user, p_m_by_number_user, f_m_by_number_user = [], [], []
-    socialWelfare, socialWelfare2 = [], []
-    vset = [0, 5, 10]
-    for v_num in (vset):
-        v_number = v_num
-        for necsp in range(11, 12, 2):
-            print("----------------------------ecsp_number={}------------------------------------：".format(
-                necsp))
-            ecsp_number = necsp
-            create()
-            cst.LM.read(v_number)
-            cst.Vechicle.read(v_number)
-            cst.UserDevice.read(nuser)
-            cst.ECSP.read(ecsp_number)
-            P = [i for i in ecsp_cost]
-            # P = ecsp_cost
-            p_init = [i for i in ecsp_cost]
+    socialWelfare = []
+    for n in range(5, 55, 5):
+        print("----------------------------nuser={}------------------------------------：".format(
+            n))
+        nuser = n
+        create()
+        cst.LM.read(v_number)
+        cst.Vechicle.read(v_number)
+        cst.UserDevice.read(nuser)
+        cst.ECSP.read(ecsp_number)
+        P = [i for i in ecsp_cost]
+        # P = ecsp_cost
+        p_init = [i for i in ecsp_cost]
 
-            f_m, p_m = [], []  # 合同（f_m,p_m）
-            f_j_vop = p_j_vop = [0 for i in range(ecsp_number)]  # CEA的资源购 买决策、vop的定价 初始值
-            # f_j_vop, p_j_vop = [0.6, 0.3, 0.3], [0.6, 0.3, 0.3]  # CEA的资源购买决策、vop的定价
-            U_j_t, U_j_t_v = [], []
-            utility_for_user_device_t_v, utility_for_Vop_t_v = [], []
-            utility_for_user_device_t, utility_for_Vop_t = [0 for i in range(nuser)], 0
-            average_utility_for_user_v = []
-            n = 1
-            P_v = []
-            while True:
-                print(
-                    "----------v_num={}-------ecsp_number={}----第{}次博弈-----------------------------------：".format(
-                        v_number, ecsp_number, n))
-                # Algorithm 1
-                F = find_Optial_mulitUser(P)
-                # Algorithm 2
-                P = find_nash_equilibrium(p_j_vop, f_j_vop)  # 这里加了一个p_j_vop, f_j_vop
+        f_m, p_m = [], []  # 合同（f_m,p_m）
+        f_j_vop = p_j_vop = [0.6 for i in range(ecsp_number)]  # CEA的资源购 买决策、vop的定价 初始值
+        # f_j_vop, p_j_vop = [0.6, 0.3, 0.3], [0.6, 0.3, 0.3]  # CEA的资源购买决策、vop的定价
+        U_j_t, U_j_t_v = [], []
+        utility_for_user_device_t_v, utility_for_Vop_t_v = [], []
+        utility_for_user_device_t, utility_for_Vop_t = [0 for i in range(nuser)], 0
+        average_utility_for_user_v = []
+        m = 1
+        P_v = []
+        while True:
+            print(
+                "------------------------------------------nuser={}---------------第{}次博弈----------------------------：".format(
+                    n,
+                    m))
+            # Algorithm 1
+            F = find_Optial_mulitUser(P)
+            # print("stageIII的购买决策F_i0, F_i1, F_i2分别为:", F)
+            # Algorithm 2
+            P = find_nash_equilibrium(p_j_vop, f_j_vop)  # 这里加了一个p_j_vop, f_j_vop
 
-                # 判断是否满足预算约束
-                Budgt = [sum([F[i][j] * P[j] for j in range(ecsp_number)]) for i in range(nuser)]
-                abs = [a - b for a, b in zip(bg, Budgt)]
-                # Algorithm 3
-                f_m, p_m, f_j_vop, p_j_vop, utility_for_Vop = LagrangeDualStageIforVop(F)
-                f_j_vop = [0 for i in range(ecsp_number)]
-                if ([0 <= p_j_vop[j] <= sum(F[:, j]) * 2 * a * ecsp_enery[j] * K for j in range(ecsp_number)]) is False:
-                    print("不满足条件")
+            # 判断是否满足预算约束
+            Budgt = [sum([F[i][j] * P[j] for j in range(ecsp_number)]) for i in range(nuser)]
+            abs = [a - b for a, b in zip(bg, Budgt)]
+            # Algorithm 3
+            f_m, p_m, f_j_vop, p_j_vop, utility_for_Vop = LagrangeDualStageIforVop(F)
 
-                sumf_m = v_number * sum([lamda_m[i] * f_m[i] for i in range(v_number)]) - sum(f_j_vop)
-                # print("stageII阶段CEA的资源购买决策f_j_vop：", f_j_vop)
-                utility_for_user_device = calculate_utility_for_user_device(F)
-                U_j = [calculate_utility_for_server(P[j], P, p_j_vop, f_j_vop, j) for j in range(ecsp_number)]
-                utility_for_Vop = calculate_utility_for_Vop(f_m, p_j_vop, F)
-                if all(diff <= cst.Error_value for diff in
-                       [np.abs(a - b) for a, b in zip(U_j_t, U_j)]) and all(
-                    diff <= cst.Error_value for diff in
-                    [np.abs(a - b) for a, b in zip(utility_for_user_device_t, utility_for_user_device)]) and (
-                        np.abs(utility_for_Vop - utility_for_Vop_t) <= cst.Error_value).all() or n >= 100:
-                    break
-                U_j_t = U_j
-                utility_for_user_device_t = utility_for_user_device
-                utility_for_Vop_t = utility_for_Vop
+            if ([0 <= p_j_vop[j] <= sum(F[:, j]) * 2 * a * ecsp_enery[j] * K for j in range(ecsp_number)]) is False:
+                print("不满足条件")
 
-                if n != 1:
-                    U_j_t_v.append(U_j)
-                    utility_for_user_device_t_v.append(utility_for_user_device)
-                    utility_for_Vop_t_v.append(utility_for_Vop)
-                    average_utility_for_user_v.append(np.average(utility_for_user_device))
-                n += 1
-                P_v.append(P)
-            print("已达到纳什均衡")
-            average_Userutility_by_number_user.append(np.average(utility_for_user_device))
-            average_ECSPutility_by_number_user.append(np.average(U_j))
-            average_VOPutility_by_number_user.append(np.average(utility_for_Vop))
+            sumf_m = v_number * sum([lamda_m[i] * f_m[i] for i in range(v_number)]) - sum(f_j_vop)
+            # print("多购买了{}的资源".format(sumf_m))
+            # print("stageI阶段合同为f_m, p_m：", f_m, p_m)
+            print("stageI阶段Vop对CEA的资源定价p_j_vop为", p_j_vop)
+            print("stageII阶段CEA的价格P_0, P_1, P_2分别为：", P)
+            print("stageII阶段CEA的资源购买决策f_j_vop：", f_j_vop)
+            utility_for_user_device = calculate_utility_for_user_device(F)
+            U_j = [calculate_utility_for_server(P[j], P, p_j_vop, f_j_vop, j) for j in range(ecsp_number)]
 
-            average_UserResource_by_number_user.append(np.average([sum(i) for i in F]))
-            average_ECSPResource_by_number_user.append(np.average(f_j_vop))
+            utility_for_Vop = calculate_utility_for_Vop(f_m, p_j_vop, F)
 
-            average_ECSPPrice_by_number_user.append(np.average(P))
-            average_VOPPrice_by_number_user.append(np.average(p_j_vop))
+            print("------------------------------------------")
+            print("user的效益函数为：", utility_for_user_device)
+            print("------------------------------------------")
+            print("U_j效益函数为：", U_j)
+            print("------------------------------------------")
+            print("stageI阶段Vop的效益函数为", utility_for_Vop)
+            print("------------------------------------------")
+            # print("整体社会效益为",sum(utility_for_user_device)+U_C+U_M1+U_M2+utility_for_Vop)
+            # print("------------------------------------------")
+            if all(diff <= cst.Error_value for diff in
+                   [np.abs(a - b) for a, b in zip(U_j_t, U_j)]) and all(
+                diff <= cst.Error_value for diff in
+                [np.abs(a - b) for a, b in zip(utility_for_user_device_t, utility_for_user_device)]) and (
+                    np.abs(utility_for_Vop - utility_for_Vop_t) <= cst.Error_value).all() or m>=100:
+                break
+            U_j_t = U_j
+            utility_for_user_device_t = utility_for_user_device
+            utility_for_Vop_t = utility_for_Vop
 
-            p_m_by_number_user.append(p_m)
-            f_m_by_number_user.append(f_m)
-            # vechicleUtility_by_number_user.append(f_m)
+            if m != 1:
+                U_j_t_v.append(U_j)
+                utility_for_user_device_t_v.append(utility_for_user_device)
+                utility_for_Vop_t_v.append(utility_for_Vop)
+                average_utility_for_user_v.append(np.average(utility_for_user_device))
+            m += 1
+            P_v.append(P)
+        print("已达到纳什均衡")
+        # print("--------------------------P_0_v,P_1_v,P_2_v-------------------", P_v)
+        # print("--------------------------f_m, p_m, p_j_vop-------------------", f_m, ',', p_m, ',', p_j_vop)
+        # print("--------------------------U_user_v,U_j_t_v,U_vop_v-------------------",
+        #       average_utility_for_user_v, ',', U_j_t_v, ',', utility_for_Vop_t_v)
+        average_Userutility_by_number_user.append(np.average(utility_for_user_device))
+        average_Cloudutility_by_number_user.append(U_j[0])
+        average_ECSPutility_by_number_user.append(np.average(U_j))
+        average_VOPutility_by_number_user.append(np.average(utility_for_Vop))
 
-            print("用户平均效益值", average_utility_for_user_v[-1])
-            utilityTorTotalVechicle = sum([p_m[m] - (f_m[m] ** 2 / Theta_m[m]) for m in range(v_number)])
-            socialWelfare.append(sum(utility_for_user_device) + sum(U_j) + utility_for_Vop + utilityTorTotalVechicle)
-            print("车辆整体效益值", utilityTorTotalVechicle)
-            print("整体社会效益为", sum(utility_for_user_device) + sum(U_j) + utility_for_Vop + utilityTorTotalVechicle)
-        socialWelfare2.append(socialWelfare)
+        average_UserResource_by_number_user.append(np.average([sum(i) for i in F]))
+        average_CloudResource_by_number_user.append(f_j_vop[0])
+        average_ECSPResource_by_number_user.append(np.average(f_j_vop))
+
+        average_CloudPrice_by_number_user.append(P[0])
+        average_ECSPPrice_by_number_user.append(np.average(P))
+        average_VOPPrice_by_number_user.append(np.average(p_j_vop))
+
+        p_m_by_number_user.append(p_m)
+        f_m_by_number_user.append(f_m)
+        # vechicleUtility_by_number_user.append(f_m)
+
+        # print("用户平均效益值", average_utility_for_user_v[-1])
+        utilityTorTotalVechicle = sum([p_m[m] - (f_m[m] ** 2 / Theta_m[m]) for m in range(v_number)])
+        socialWelfare.append(sum(utility_for_user_device) + sum(U_j) + utility_for_Vop + utilityTorTotalVechicle)
+        print("车辆整体效益值", utilityTorTotalVechicle)
+        print("整体社会效益为", sum(utility_for_user_device) + sum(U_j) + utility_for_Vop + utilityTorTotalVechicle)
+
     print("用户平均效益值变化", average_Userutility_by_number_user)
     print("ECSPS平均效益值变化", average_ECSPutility_by_number_user)
+    print("Cloud平均效益值变化", average_Cloudutility_by_number_user)
     print("VOP平均效益值变化", average_VOPutility_by_number_user)
 
     print("用户平均资源购买情况", average_UserResource_by_number_user)
+    print("Cloud平均资源购买情况", average_CloudResource_by_number_user)
     print("ECSPS平均资源购买情况", average_ECSPResource_by_number_user)
 
+    print("Cloud平均定价值变化", average_CloudPrice_by_number_user)
     print("ECSPS平均定价值变化", average_ECSPPrice_by_number_user)
     print("VOP的平均定价值变化", average_VOPPrice_by_number_user)
 
     print("p_m值变化", p_m_by_number_user)
     print("f_m变化", f_m_by_number_user)
 
-    print("整体社会福利变化", socialWelfare2)
+    print("整体社会福利", socialWelfare)

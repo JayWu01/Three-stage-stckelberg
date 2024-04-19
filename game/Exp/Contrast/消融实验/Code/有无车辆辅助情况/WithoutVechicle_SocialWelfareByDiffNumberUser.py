@@ -801,9 +801,9 @@ if __name__ == '__main__':
             f_m_by_number_user.append(f_m)
             # vechicleUtility_by_number_user.append(f_m)
 
-            socialWelfare.append(sum(utility_for_user_device) + sum(U_j) + utility_for_Vop)
             print("用户平均效益值", average_utility_for_user_v[-1])
             utilityTorTotalVechicle = sum([p_m[m] - (f_m[m] ** 2 / Theta_m[m]) for m in range(v_number)])
+            socialWelfare.append(sum(utility_for_user_device) + sum(U_j) + utility_for_Vop + utilityTorTotalVechicle)
             print("车辆整体效益值", utilityTorTotalVechicle)
             print("整体社会效益为", sum(utility_for_user_device) + sum(U_j) + utility_for_Vop + utilityTorTotalVechicle)
         socialWelfare2.append(socialWelfare)

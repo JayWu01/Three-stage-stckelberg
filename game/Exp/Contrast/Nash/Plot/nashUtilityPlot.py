@@ -66,7 +66,7 @@ plt.legend()
 # 添加标题和轴标签
 plt.xlabel('Iteration', fontsize=16)
 plt.ylabel('Utility', fontsize=16)
-plt.xticks(fontsize=13.5)  # 修改x轴刻度字体大小
+plt.xticks(range(len(U_user_v)),fontsize=13.5)  # 修改x轴刻度字体大小
 plt.yticks(fontsize=13.5)  # 修改y轴刻度字体大小
 # 添加图例并设置字体大小
 plt.legend(fontsize='16')
