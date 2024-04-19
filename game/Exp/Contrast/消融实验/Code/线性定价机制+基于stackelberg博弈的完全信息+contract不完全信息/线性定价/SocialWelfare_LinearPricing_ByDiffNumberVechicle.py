@@ -612,8 +612,8 @@ def LagrangeDualStageIforVop(F):
     for n in range(cst.max_iteration):
         # p_m = [f_m[m] ** 2 / Theta_m[m] for m in range(v_number)]
         # p_m = [1.2 for m in range(v_number)] # 定值【1.2，1.5】
-        p_m = [1.5 for m in range(v_number)] # 定值【1.2，1.5】
-        f_m = [Theta_m[m]*(Phi_m[m]- Omega_m[m]+Pi)/3 for m in range(v_number)]
+        p_m = [f_m[m]**2/Theta_m[m] for m in range(v_number)] # 定值【1.2，1.5】
+        f_m = [(Theta_m[m]*(Phi_m[m]- Omega_m[m]+Pi)/3)**-2 for m in range(v_number)]
 
         p_j_vop = [a * ecsp_enery[j] * K * (sum(F[:, j]) + Upsilon_j[j] - Lambda_j[j]) + Pi / 2 for j in
                    range(ecsp_number)]
@@ -701,6 +701,7 @@ def ODCA(B, P):
 
             j = j + 1
     return f
+
 
 
 
