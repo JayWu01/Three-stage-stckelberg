@@ -758,7 +758,7 @@ if __name__ == '__main__':
             utility_for_user_device = calculate_utility_for_user_device(F)
             U_j = [calculate_utility_for_server(P[j], P, p_j_vop, f_j_vop, j) for j in range(ecsp_number)]
 
-            utility_for_Vop = calculate_utility_for_Vop(f_m, p_j_vop, F)
+            utility_for_Vop = calculate_utility_for_Vop(f_m, p_j_vop, F,p_m)
 
             # print("------------------------------------------")
             # print("user的效益函数为：", utility_for_user_device)
