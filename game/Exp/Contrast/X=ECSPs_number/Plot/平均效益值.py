@@ -1,11 +1,6 @@
 import matplotlib.pyplot as plt
-import matplotlib
-
-# 预设字体格式，并传给rc方法
 import numpy as np
 
-font = {'family': 'SimHei', "size": 16}
-matplotlib.rc('font', **font)  # 一次定义终身使用
 # 四组数据
 np.set_printoptions(precision=16)
 # 用户平均效益值变化 [0.4888001174418751, 2.4482136701850408, 3.1266285981296327, 3.4109760201461206, 3.9160599359477515, 4.2067485751883344, 4.391656129232662, 4.722647674378195, 5.096477728891999, 5.453841410282022]
@@ -25,7 +20,7 @@ U_user_v, U_S_t_v, U_vop_v = [0.4888001174418751, 2.4482136701850408, 3.12662859
                                  5.542302025734919, 8.208625121026163, 4.001863095714995, 10.485841975218069,
                                  7.331192867046289, 4.8932351225131665]
 
-U_S_t_v = [U_S_t_v[i] * (i + 1) for i in range(len(U_S_t_v))]
+# U_S_t_v = [U_S_t_v[i] * (i + 1) for i in range(len(U_S_t_v))]
 # 绘制折线图
 # plt.plot(range(len(U_user_v)), U_user_v, label='用户的平均效益值', marker='.')
 # plt.plot(range(len(U_S_t_v[:,0])), U_S_t_v[:,0], label='云服务器的效益值', marker='o')
@@ -34,17 +29,17 @@ U_S_t_v = [U_S_t_v[i] * (i + 1) for i in range(len(U_S_t_v))]
 # plt.plot(range(len(U_vop_v)), U_vop_v, label='vop的效益值', marker='x')
 
 # 绘制折线图
-plt.plot(range(len(U_user_v)), U_user_v, label='用户的平均效益值', marker='.')
-plt.plot(range(len(U_S_t_v)), U_S_t_v, label='ECSP服务器的效益值', marker='o')
-plt.plot(range(len(U_vop_v)), U_vop_v, label='vop的效益值', marker='^')
+plt.plot(range(len(U_user_v)), U_user_v, label='$U_i$', marker='*', color='#d95319')
+plt.plot(range(len(U_S_t_v)), U_S_t_v, label='$U_j$', marker='o')
+plt.plot(range(len(U_vop_v)), U_vop_v, label='$U_{vop}$', marker='^', color='green')
 # 添加图例
 plt.legend()
-
+plt.xlim(0, 9)
 # 添加标题和轴标签
-plt.xlabel('ECSP数量', fontsize=16)
-plt.ylabel('效益值', fontsize=16)
-plt.xticks(fontsize=13.5)  # 修改x轴刻度字体大小
-plt.yticks(fontsize=13.5)  # 修改y轴刻度字体大小
+plt.xlabel('ECSP Number', fontweight='bold', fontsize=15.5)
+plt.ylabel('Average Utility', fontweight='bold', fontsize=15.5)
+plt.xticks(range(len(U_user_v)), range(1, 11), fontsize=15.5)  # 修改x轴刻度字体大小
+plt.yticks(fontsize=15.5)  # 修改y轴刻度字体大小
 # 添加图例并设置字体大小
 plt.legend(fontsize='16')
 # 显示图形

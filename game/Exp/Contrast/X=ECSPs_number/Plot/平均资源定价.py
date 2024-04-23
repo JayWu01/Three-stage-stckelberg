@@ -1,12 +1,6 @@
 import matplotlib.pyplot as plt
-import matplotlib
-
-# 预设字体格式，并传给rc方法
 import numpy as np
-from numpy import array
 
-font = {'family': 'SimHei', "size": 16}
-matplotlib.rc('font', **font)  # 一次定义终身使用
 # 四组数据
 np.set_printoptions(precision=16)
 # ECSPS平均定价值变化 [[10.29999999999998], [6.099999999999994, 8.799999999999985], [4.699999999999999, 6.699999999999992, 4.75], [4.000000000000002, 5.799999999999995, 4.0500000000000025, 6.299999999999994], [3.600000000000002, 5.099999999999998, 3.650000000000002, 5.599999999999996, 5.4999999999999964], [3.3000000000000016, 4.699999999999999, 3.350000000000002, 5.099999999999998, 4.999999999999998, 5.099999999999998], [3.0000000000000013, 4.300000000000001, 3.0500000000000016, 4.699999999999999, 4.6, 4.6, 4.6], [2.9000000000000012, 4.100000000000001, 2.8500000000000014, 4.5, 4.4, 4.4, 4.300000000000001, 4.4], [2.700000000000001, 3.900000000000002, 2.7500000000000013, 4.200000000000001, 4.100000000000001, 4.200000000000001, 4.100000000000001, 4.100000000000001, 4.300000000000001], [2.600000000000001, 3.700000000000002, 2.550000000000001, 4.000000000000002, 3.900000000000002, 4.000000000000002, 3.900000000000002, 3.900000000000002, 4.100000000000001, 3.900000000000002]]
@@ -31,7 +25,7 @@ U_user_v, U_S_t_v = [[10.29999999999998], [1.9000000000000006, 2.800000000000001
                                              0.8518611412576224, 0.7135208230261492, 0.8539969023754364,
                                              0.8772475975024643]
 
-U_user_v = [np.mean(arr) for arr in U_user_v]
+U_user_v = [np.mean(arr) for arr in U_user_v]  # 因为输出的是所有ECSP的定价，所以需要求平均
 # 绘制折线图
 # plt.plot(range(len(U_user_v)), U_user_v, label='用户的平均效益值', marker='.')
 # plt.plot(range(len(U_S_t_v[:,0])), U_S_t_v[:,0], label='云服务器的效益值', marker='o')
@@ -40,17 +34,18 @@ U_user_v = [np.mean(arr) for arr in U_user_v]
 # plt.plot(range(len(U_vop_v)), U_vop_v, label='vop的效益值', marker='x')
 
 # 绘制折线图
-plt.plot(range(len(U_user_v)), U_user_v, label='ECSP的资源定价', marker='.')
-plt.plot(range(len(U_S_t_v)), U_S_t_v, label='VOP的资源定价', marker='o')
+plt.plot(range(len(U_user_v)), U_user_v, label='$p_{j}$', marker='*', color='#d95319')
+plt.plot(range(len(U_S_t_v)), U_S_t_v, label='$p^{j}_{vop}$', marker='o')
 
 # 添加图例
 plt.legend()
-
+plt.xlim(0, 9)
+# plt.xlim(1, 10)
 # 添加标题和轴标签
-plt.xlabel('ECSP数量', fontsize=16)
-plt.ylabel('资源定价', fontsize=16)
-plt.xticks(fontsize=13.5)  # 修改x轴刻度字体大小
-plt.yticks(fontsize=13.5)  # 修改y轴刻度字体大小
+plt.xlabel('ECSP Number', fontweight='bold', fontsize=15.5)
+plt.ylabel('Price', fontweight='bold', fontsize=15.5)
+plt.xticks(range(len(U_S_t_v)), range(1, 11), fontsize=15.5)  # 修改x轴刻度字体大小
+plt.yticks(fontsize=15.5)  # 修改y轴刻度字体大小
 # 添加图例并设置字体大小
 plt.legend(fontsize='16')
 # 显示图形
