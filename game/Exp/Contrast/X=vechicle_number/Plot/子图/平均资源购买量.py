@@ -58,8 +58,8 @@ ax_inset = fig.add_axes([left, bottom, width, height])  # left, bottom, width, h
 
 # 绘制子图中的三条曲线
 ax_inset.plot(range(len(Resouce_ECSP[:, 0])), Resouce_ECSP[:, 0], label='$f^{1}_{vop}$', marker='.', color='#990066')
-ax_inset.plot(range(len(Resouce_ECSP[:, 0])), Resouce_ECSP[:, 1], label='$f^{2}_{vop}$', marker='o', color='green')
-ax_inset.plot(range(len(Resouce_ECSP[:, 0])), Resouce_ECSP[:, 2], label='$f^{3}_{vop}$', marker='*', color='y')
+ax_inset.plot(range(len(Resouce_ECSP[:, 0])), Resouce_ECSP[:, 1], label='$f^{2}_{vop}$', marker='+', color='green')
+ax_inset.plot(range(len(Resouce_ECSP[:, 0])), Resouce_ECSP[:, 2], label='$f^{3}_{vop}$', marker='x', color='y')
 
 ax_inset.set_xlim(0, 9)
 ax_inset.set_ylim(-0.2, 8)
@@ -79,4 +79,4 @@ ax_inset.legend(loc='upper center', ncol=3, fontsize=8)
 # 显示图形
 plt.show()
 # 保存图像时设置dpi参数
-# fig.savefig("output.png", dpi=300)
+# fig.savefig("Fig_6c.png", dpi=300)

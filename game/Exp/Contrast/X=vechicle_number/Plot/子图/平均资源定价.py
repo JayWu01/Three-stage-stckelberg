@@ -50,9 +50,12 @@ P_VOP = np.array([[1.1161263854644843, 1.4668085673739537, 1.1922252340406212],
                   [0.8760608151654563, 1.1571651922698332, 0.7771994053685631]])
 
 U_user_v = [np.mean(arr) for arr in U_user_v]  # 因为输出的是所有ECSP的定价，所以需要求平均
+
+
 # 自定义刻度标签格式函数
 def format_func(value, tick_number):
     return f"{value:.1f}"
+
 
 # 绘制折线图
 # plt.plot(range(len(U_user_v)), U_user_v, label='用户的平均效益值', marker='.')
@@ -90,9 +93,9 @@ left, bottom, width, height = 0.205, 0.35, 0.3, 0.3
 ax_inset = fig.add_axes([left, bottom, width, height])  # left, bottom, width, height
 
 # 绘制子图中的三条曲线
-ax_inset.plot(range(len(P_ECSP[:, 0])), P_ECSP[:, 0], label='$p_{1}$', marker='.')
-ax_inset.plot(range(len(P_ECSP[:, 1])), P_ECSP[:, 1], label='$p_{2}$', marker='o')
-ax_inset.plot(range(len(P_ECSP[:, 2])), P_ECSP[:, 2], label='$p_{3}$', marker='s', color='#d95319')
+ax_inset.plot(range(len(P_ECSP[:, 0])), P_ECSP[:, 0], label='$p_{1}$', marker='.', color='#990066')
+ax_inset.plot(range(len(P_ECSP[:, 1])), P_ECSP[:, 1], label='$p_{2}$', marker='+', color='green')
+ax_inset.plot(range(len(P_ECSP[:, 2])), P_ECSP[:, 2], label='$p_{3}$', marker='x', color='y')
 
 ax_inset.set_xlim(0, 9)
 # 添加标题和轴标签
@@ -111,9 +114,9 @@ left, bottom, width, height = 0.59, 0.35, 0.3, 0.3
 ax_inset2 = fig.add_axes([left, bottom, width, height])  # left, bottom, width, height
 
 # 绘制子图中的三条曲线
-ax_inset2.plot(range(len(P_VOP[:, 0])), P_VOP[:, 0], label='$p^{1}_{vop}$', marker='^')
-ax_inset2.plot(range(len(P_VOP[:, 1])), P_VOP[:, 1], label='$p^{2}_{vop}$', marker='x')
-ax_inset2.plot(range(len(P_VOP[:, 2])), P_VOP[:, 2], label='$p^{3}_{vop}$', marker='*', color='#d95319')
+ax_inset2.plot(range(len(P_VOP[:, 0])), P_VOP[:, 0], label='$p^{1}_{vop}$', marker='.', color='#990066')
+ax_inset2.plot(range(len(P_VOP[:, 1])), P_VOP[:, 1], label='$p^{2}_{vop}$', marker='+', color='green')
+ax_inset2.plot(range(len(P_VOP[:, 2])), P_VOP[:, 2], label='$p^{3}_{vop}$', marker='D', color='y')
 
 ax_inset2.set_xlim(0, 9)
 # 设置y轴刻度标签格式
@@ -132,4 +135,4 @@ ax_inset2.legend(loc='upper center', ncol=3, fontsize=7)
 # 显示图形
 plt.show()
 # 保存图像时设置dpi参数
-# fig.savefig("output.png", dpi=300)
+# fig.savefig("Fig_6b.png", dpi=300)
