@@ -43,9 +43,9 @@ plt.xlim(0, 9)
 # plt.xlim(1, 10)
 # 添加标题和轴标签
 plt.xlabel('ECSP Number', fontweight='bold', fontsize=15.5)
-plt.ylabel('Price', fontweight='bold', fontsize=15.5)
-plt.xticks(range(len(U_S_t_v)), range(1, 11), fontsize=15.5)  # 修改x轴刻度字体大小
-plt.yticks(fontsize=15.5)  # 修改y轴刻度字体大小
+plt.ylabel('Average Price', fontweight='bold', fontsize=15.5)
+plt.xticks(range(len(U_S_t_v)), range(1, 11), fontsize=13.5)  # 修改x轴刻度字体大小
+plt.yticks(fontsize=13.5)  # 修改y轴刻度字体大小
 # 添加图例并设置字体大小
 plt.legend(fontsize='16')
 # 显示图形

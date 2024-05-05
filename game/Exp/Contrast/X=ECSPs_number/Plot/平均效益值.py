@@ -30,7 +30,7 @@ U_user_v, U_S_t_v, U_vop_v = [0.4888001174418751, 2.4482136701850408, 3.12662859
 
 # 绘制折线图
 plt.plot(range(len(U_user_v)), U_user_v, label='$U_i$', marker='*', color='#d95319')
-plt.plot(range(len(U_S_t_v)), U_S_t_v, label='$U_j$', marker='o')
+plt.plot(range(len(U_S_t_v)), U_S_t_v, label='$U^{ecsp}_j$', marker='o')
 plt.plot(range(len(U_vop_v)), U_vop_v, label='$U_{vop}$', marker='^', color='green')
 # 添加图例
 plt.legend()
