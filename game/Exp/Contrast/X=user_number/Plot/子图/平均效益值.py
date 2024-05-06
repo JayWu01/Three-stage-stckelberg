@@ -32,27 +32,28 @@ def format_func(value, tick_number):
     return f"{value:.0f}"
 x_major_locator = MultipleLocator(3)
 # 绘制主图中的三条曲线
-ax.plot(range(len(U_user_v)), U_user_v, label='$U_{i}$', marker='*', color='#d95319')
-ax.plot(range(len(U_S_t_v)), U_S_t_v, label='$U^{ecsp}_{j}$', marker='o')
-ax.plot(range(len(U_vop_v)), U_vop_v, label='$U_{vop}$', marker='^', color='green')
+ax.plot(range(len(U_user_v)), U_user_v, label='$U_{i}$', marker='*', color='#d95319',linewidth=4,markersize=10)
+ax.plot(range(len(U_S_t_v)), U_S_t_v, label='$U^{ecsp}_{j}$', marker='o',linewidth=4,markersize=10)
+ax.plot(range(len(U_vop_v)), U_vop_v, label='$U_{vop}$', marker='^', color='green',linewidth=4,markersize=10)
 ax.set_xlim(0, 9)
-ax.set_ylim(0, 55)
+ax.set_ylim(0, 60)
 # 添加标题和轴标签
-ax.set_xlabel('User Number', fontweight='bold', fontsize=15.5)
-ax.set_ylabel('Average Utility', fontweight='bold', fontsize=15.5)
-ax.set_xticks(range(len(U_user_v)), range(5, 55, 5), fontsize=13.5)  # 修改x轴刻度字体大小
+ax.set_xlabel('User Number', fontweight='bold', fontsize=20)
+ax.set_ylabel('Average Utility', fontweight='bold', fontsize=20)
+ax.set_xticks(range(len(U_user_v)), range(5, 55, 5), fontsize=20)  # 修改x轴刻度字体大小
+ax.tick_params(axis='y', labelsize=20)  # 修改y轴刻度字体大小
 # 添加主图的标签和图例
-ax.legend()
-
+ax.legend(loc='upper right',fontsize=17.5)
+ax.figure.subplots_adjust(bottom=0.14, left=0.12, right=0.965, top=0.97)
 
 # -----------------------------------子图 创建子图并调整位置
 left, bottom, width, height = 0.22, 0.5, 0.35, 0.35
 ax_inset = fig.add_axes([left, bottom, width, height])  # left, bottom, width, height
 
 # 绘制子图中的三条曲线
-ax_inset.plot(range(len(U_ECSP[:, 0])), U_ECSP[:, 0], label='$U_{j}(j=1)$', marker='.', color='#990066')
-ax_inset.plot(range(len(U_ECSP[:, 0])), U_ECSP[:, 1], label='$U_{j}(j=2)$', marker='+', color='green')
-ax_inset.plot(range(len(U_ECSP[:, 0])), U_ECSP[:, 2], label='$U_{j}(j=3)$', marker='x', color='y')
+ax_inset.plot(range(len(U_ECSP[:, 0])), U_ECSP[:, 0], label='$U_{j}(j=1)$', marker='.', color='#990066',linewidth=2,markersize=10)
+ax_inset.plot(range(len(U_ECSP[:, 0])), U_ECSP[:, 1], label='$U_{j}(j=2)$', marker='*', color='green',linewidth=2,markersize=10)
+ax_inset.plot(range(len(U_ECSP[:, 0])), U_ECSP[:, 2], label='$U_{j}(j=3)$', marker='x', color='y',linewidth=2,markersize=10)
 
 ax_inset.set_xlim(0, 9)
 # 添加标题和轴标签

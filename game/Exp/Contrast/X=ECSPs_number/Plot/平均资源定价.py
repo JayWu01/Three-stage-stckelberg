@@ -35,20 +35,21 @@ U_user_v = [np.mean(arr) for arr in U_user_v]  # 因为输出的是所有ECSP的
 # plt.plot(range(len(U_vop_v)), U_vop_v, label='vop的效益值', marker='x')
 
 # 绘制折线图
-plt.plot(range(len(U_user_v)), U_user_v, label='$p_{j}$', marker='*', color='#d95319')
-plt.plot(range(len(U_S_t_v)), U_S_t_v, label='$p^{j}_{vop}$', marker='o')
+plt.plot(range(len(U_user_v)), U_user_v, label='$p_{j}$', marker='*', color='#d95319',linewidth=4,markersize=10)
+plt.plot(range(len(U_S_t_v)), U_S_t_v, label='$p^{j}_{vop}$', marker='o',linewidth=4,markersize=10)
 
 # 添加图例
 plt.legend()
 plt.xlim(0, 9)
 # plt.xlim(1, 10)
 # 添加标题和轴标签
-plt.xlabel('ECSP Number', fontweight='bold', fontsize=15.5)
-plt.ylabel('Average Price', fontweight='bold', fontsize=15.5)
-plt.xticks(range(len(U_S_t_v)), range(1, 11), fontsize=13.5)  # 修改x轴刻度字体大小
-plt.yticks(fontsize=13.5)  # 修改y轴刻度字体大小
+plt.xlabel('ECSP Number', fontweight='bold', fontsize=20)
+plt.ylabel('Average Price', fontweight='bold', fontsize=20)
+plt.xticks(range(len(U_S_t_v)), range(1, 11), fontsize=20)  # 修改x轴刻度字体大小
+plt.yticks(fontsize=20)  # 修改y轴刻度字体大小
 # 添加图例并设置字体大小
-plt.legend(fontsize='16')
+plt.legend(fontsize=17.5)
+plt.subplots_adjust(bottom=0.14, left=0.12, right=0.965, top=0.97)
 # 显示图形
 
 # 保存图像时设置dpi参数

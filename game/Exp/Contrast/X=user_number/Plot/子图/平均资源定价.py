@@ -56,25 +56,27 @@ x_major_locator = MultipleLocator(3)
 # 创建一个大的图形和主图
 fig, ax = plt.subplots()
 # 绘制主图中的曲线 绘制折线图
-ax.plot(range(len(U_user_v)), U_user_v, label='$p_{j}$', marker='*', color='#d95319')
-ax.plot(range(len(U_S_t_v)), U_S_t_v, label='$p^{j}_{vop}$', marker='o')
+ax.plot(range(len(U_user_v)), U_user_v, label='$p_{j}$', marker='*', color='#d95319',linewidth=4,markersize=10)
+ax.plot(range(len(U_S_t_v)), U_S_t_v, label='$p^{j}_{vop}$', marker='o',linewidth=4,markersize=10)
 ax.set_xlim(0, 9)
 ax.set_ylim(0, 5)
 # 添加标题和轴标签
-ax.set_xlabel('User Number', fontweight='bold', fontsize=15.5)
-ax.set_ylabel('Average Utility', fontweight='bold', fontsize=15.5)
-ax.set_xticks(range(len(U_user_v)), range(5, 55, 5), fontsize=13.5)  # 修改x轴刻度字体大小
+ax.set_xlabel('User Number', fontweight='bold', fontsize=20)
+ax.set_ylabel('Average Price', fontweight='bold', fontsize=20)
+ax.set_xticks(range(len(U_user_v)), range(5, 55, 5), fontsize=20)  # 修改x轴刻度字体大小
+ax.tick_params(axis='y', labelsize=20)  # 修改y轴刻度字体大小
+ax.figure.subplots_adjust(bottom=0.14, left=0.12, right=0.965, top=0.97)
 # 添加主图的标签和图例
-ax.legend(loc='lower right')
+ax.legend(loc='lower right',ncol=2,fontsize=17.5)
 
 # -----------------------------------子图1 创建子图并调整位置
-left, bottom, width, height = 0.2, 0.56, 0.3, 0.3
+left, bottom, width, height = 0.2, 0.62, 0.3, 0.3
 ax_inset = fig.add_axes([left, bottom, width, height])  # left, bottom, width, height
 
 # 绘制子图中的三条曲线
-ax_inset.plot(range(len(P_ECSP[:, 0])), P_ECSP[:, 0], label='$p_{1}$', marker='.', color='#990066')
-ax_inset.plot(range(len(P_ECSP[:, 1])), P_ECSP[:, 1], label='$p_{2}$', marker='+', color='green')
-ax_inset.plot(range(len(P_ECSP[:, 2])), P_ECSP[:, 2], label='$p_{3}$', marker='x', color='y')
+ax_inset.plot(range(len(P_ECSP[:, 0])), P_ECSP[:, 0], label='$p_{1}$', marker='.', color='#990066',linewidth=2,markersize=10)
+ax_inset.plot(range(len(P_ECSP[:, 1])), P_ECSP[:, 1], label='$p_{2}$', marker='*', color='green',linewidth=2,markersize=10)
+ax_inset.plot(range(len(P_ECSP[:, 2])), P_ECSP[:, 2], label='$p_{3}$', marker='x', color='y',linewidth=2,markersize=10)
 
 ax_inset.set_xlim(0, 9)
 # 添加标题和轴标签
@@ -89,13 +91,13 @@ ax_inset.xaxis.set_major_locator(x_major_locator)
 ax_inset.set_ylim(0.7, 4)
 ax_inset.legend(loc='upper center', ncol=3, fontsize=8)
 # -----------------------------------子图2 创建子图并调整位置
-left, bottom, width, height = 0.58, 0.56, 0.3, 0.3
+left, bottom, width, height = 0.58, 0.62, 0.3, 0.3
 ax_inset2 = fig.add_axes([left, bottom, width, height])  # left, bottom, width, height
 
 # 绘制子图中的三条曲线
-ax_inset2.plot(range(len(P_VOP[:, 0])), P_VOP[:, 0], label='$p^{1}_{vop}$', marker='.', color='#990066')
-ax_inset2.plot(range(len(P_VOP[:, 1])), P_VOP[:, 1], label='$p^{2}_{vop}$', marker='+', color='green')
-ax_inset2.plot(range(len(P_VOP[:, 2])), P_VOP[:, 2], label='$p^{3}_{vop}$', marker='x', color='y')
+ax_inset2.plot(range(len(P_VOP[:, 0])), P_VOP[:, 0], label='$p^{1}_{vop}$', marker='.', color='#990066',linewidth=2,markersize=10)
+ax_inset2.plot(range(len(P_VOP[:, 1])), P_VOP[:, 1], label='$p^{2}_{vop}$', marker='*', color='green',linewidth=2,markersize=10)
+ax_inset2.plot(range(len(P_VOP[:, 2])), P_VOP[:, 2], label='$p^{3}_{vop}$', marker='x', color='y',linewidth=2,markersize=10)
 
 ax_inset2.set_xlim(0, 9)
 # 添加标题和轴标签

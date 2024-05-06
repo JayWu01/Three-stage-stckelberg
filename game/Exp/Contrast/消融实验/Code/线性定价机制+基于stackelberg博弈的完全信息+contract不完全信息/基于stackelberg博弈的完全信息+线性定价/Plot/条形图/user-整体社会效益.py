@@ -42,16 +42,17 @@ plt.bar(index + 2 * bar_width, socialWelfare[2], bar_width, label='LP', color='#
         zorder=2, edgecolor='black',
         linewidth=0.5)
 # 添加标题和轴标签
-plt.xlabel('User Number', fontweight='bold', fontsize=15.5)
-plt.ylabel('Social Welfare', fontweight='bold', fontsize=15.5)
+plt.xlabel('User Number', fontweight='bold', fontsize=20)
+plt.ylabel('Social Welfare', fontweight='bold', fontsize=20)
 # 旋转刻度标签并间隔显示
 plt.gca().xaxis.set_major_locator(plt.MultipleLocator(1))  # 每隔2个类别显示一个刻度标签
 plt.xticks(index + 1.5 * bar_width, range(5, 55, 5))
 # 设置 y 轴的上下限
 plt.ylim(0, 280)  # 这里将 y 轴范围设置为 0 到 3.5
 # 旋转 x 轴刻度标签为垂直显示
-plt.xticks( fontsize=13.5)
-plt.yticks( fontsize=13.5)  # 修改y轴刻度字体大小
+plt.xticks( fontsize=20)
+plt.yticks( fontsize=20)  # 修改y轴刻度字体大小
+plt.subplots_adjust(bottom=0.14, left=0.155, right=0.965, top=0.97)
 # 添加图例并设置字体大小
 plt.legend(fontsize=13, loc='upper center', bbox_to_anchor=(0.5, 1.0), ncol=4)
 # 保存图像时设置dpi参数

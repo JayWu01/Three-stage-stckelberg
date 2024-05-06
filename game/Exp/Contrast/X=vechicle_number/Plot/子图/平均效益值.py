@@ -40,33 +40,36 @@ x_major_locator = MultipleLocator(3)
 # 创建一个大的图形和主图
 fig, ax = plt.subplots()
 # 绘制主图中的三条曲线
-ax.plot(range(len(U_user_v)), U_user_v, label='$U_{i}$', marker='*', color='#d95319')
-ax.plot(range(len(U_S_t_v)), U_S_t_v, label='$U^{ecsp}_{j}$', marker='o')
-ax.plot(range(len(U_vop_v)), U_vop_v, label='$U_{vop}$', marker='x', color='green')
+ax.plot(range(len(U_user_v)), U_user_v, label='$U_{i}$', marker='*', color='#d95319',linewidth=4,markersize=10)
+ax.plot(range(len(U_S_t_v)), U_S_t_v, label='$U^{ecsp}_{j}$', marker='o',linewidth=4,markersize=10)
+ax.plot(range(len(U_vop_v)), U_vop_v, label='$U_{vop}$', marker='x', color='green',linewidth=4,markersize=10)
 
 ax.set_xlim(0, 9)
 ax.set_ylim(-18, 17)
 # 添加标题和轴标签
-ax.set_xlabel('Vechicle Number', fontweight='bold', fontsize=15.5)
-ax.set_ylabel('Average Utility', fontweight='bold', fontsize=15.5)
-ax.set_xticks(range(len(U_user_v)), range(0, 13), fontsize=13.5)  # 修改x轴刻度字体大小
+ax.set_xlabel('Vechicle Number', fontweight='bold', fontsize=20)
+ax.set_ylabel('Average Utility', fontweight='bold', fontsize=20)
+ax.set_xticks(range(len(U_user_v)), range(0, 13), fontsize=20)  # 修改x轴刻度字体大小
+ax.tick_params(axis='y', labelsize=20)  # 修改y轴刻度字体大小
 # 添加主图的标签和图例
-ax.legend()
+ax.figure.subplots_adjust(bottom=0.14, left=0.16, right=0.965, top=0.97)
+# 添加主图的标签和图例
+ax.legend(loc='lower right',fontsize=17.5)
 
 # -----------------------------------子图 创建子图并调整位置
-left, bottom, width, height = 0.5, 0.2, 0.35, 0.35
+left, bottom, width, height = 0.32, 0.23, 0.35, 0.35
 ax_inset = fig.add_axes([left, bottom, width, height])  # left, bottom, width, height
 
 # 绘制子图中的三条曲线
-ax_inset.plot(range(len(U_ECSP[:, 0])), U_ECSP[:, 0], label='$U_{j}(j=1)$', marker='.', color='#990066')
-ax_inset.plot(range(len(U_ECSP[:, 0])), U_ECSP[:, 1], label='$U_{j}(j=2)$', marker='+', color='green')
-ax_inset.plot(range(len(U_ECSP[:, 0])), U_ECSP[:, 2], label='$U_{j}(j=3)$', marker='x', color='y')
+ax_inset.plot(range(len(U_ECSP[:, 0])), U_ECSP[:, 0], label='$U_{j}(j=1)$', marker='.', color='#990066',linewidth=2,markersize=10)
+ax_inset.plot(range(len(U_ECSP[:, 0])), U_ECSP[:, 1], label='$U_{j}(j=2)$', marker='*', color='green',linewidth=2,markersize=10)
+ax_inset.plot(range(len(U_ECSP[:, 0])), U_ECSP[:, 2], label='$U_{j}(j=3)$', marker='x', color='y',linewidth=2,markersize=10)
 
 
 ax_inset.set_xlim(0, 9)
 ax_inset.set_ylim(13, 19)
 # 添加标题和轴标签
-ax_inset.set_xlabel('User Number', fontweight='bold', fontsize=8)
+ax_inset.set_xlabel('Vechicle Number', fontweight='bold', fontsize=8)
 ax_inset.set_ylabel('ECSP Utility', fontweight='bold', fontsize=8)
 ax_inset.set_xticks(range(len(U_user_v)), range(0, 13), fontsize=8)  # 修改x轴刻度字体大小
 # 设置y轴刻度字体大小

@@ -77,29 +77,33 @@ def format_func(value, tick_number):
 fig, ax = plt.subplots()
 x_major_locator = MultipleLocator(3)
 # 绘制主图中的曲线 绘制折线图
-ax.plot(range(len(U_user_v)), U_user_v, label='$p_{j}$', marker='*', color='#d95319')
-ax.plot(range(len(U_S_t_v)), U_S_t_v, label='$p^{j}_{vop}$', marker='o')
+ax.plot(range(len(U_user_v)), U_user_v, label='$p_{j}$', marker='*', color='#d95319',linewidth=4,markersize=10)
+ax.plot(range(len(U_S_t_v)), U_S_t_v, label='$p^{j}_{vop}$', marker='o',linewidth=4,markersize=10)
 ax.set_xlim(0, 9)
-# ax.set_ylim(0, 8)
+ax.set_ylim(0.8, 2.25)
 # 添加标题和轴标签
-ax.set_xlabel('User Number', fontweight='bold', fontsize=15.5)
-ax.set_ylabel('Average Utility', fontweight='bold', fontsize=15.5)
-ax.set_xticks(range(len(U_user_v)), range(0, 13), fontsize=13.5)  # 修改x轴刻度字体大小
+ax.set_xlabel('Vechicle Number', fontweight='bold', fontsize=20)
+ax.set_ylabel('Average Price', fontweight='bold', fontsize=20)
+ax.set_xticks(range(len(U_user_v)), range(0, 13), fontsize=20)  # 修改x轴刻度字体大小
 # 添加主图的标签和图例
-ax.legend(loc='upper right', ncol=2)
-
+ax.legend(loc='upper right', ncol=2,fontsize=17.5)
+ax.tick_params(axis='y', labelsize=20)  # 修改y轴刻度字体大小
+# 添加主图的标签和图例
+ax.figure.subplots_adjust(bottom=0.14, left=0.16, right=0.965, top=0.97)
+# 添加主图的标签和图例
+# ax.legend(loc='lower right',fontsize=17.5)
 # -----------------------------------子图1 创建子图并调整位置
-left, bottom, width, height = 0.205, 0.35, 0.3, 0.3
+left, bottom, width, height = 0.235, 0.4, 0.3, 0.3
 ax_inset = fig.add_axes([left, bottom, width, height])  # left, bottom, width, height
 
 # 绘制子图中的三条曲线
-ax_inset.plot(range(len(P_ECSP[:, 0])), P_ECSP[:, 0], label='$p_{1}$', marker='.', color='#990066')
-ax_inset.plot(range(len(P_ECSP[:, 1])), P_ECSP[:, 1], label='$p_{2}$', marker='+', color='green')
-ax_inset.plot(range(len(P_ECSP[:, 2])), P_ECSP[:, 2], label='$p_{3}$', marker='x', color='y')
+ax_inset.plot(range(len(P_ECSP[:, 0])), P_ECSP[:, 0], label='$p_{1}$', marker='.', color='#990066',linewidth=2,markersize=10)
+ax_inset.plot(range(len(P_ECSP[:, 1])), P_ECSP[:, 1], label='$p_{2}$', marker='*', color='green',linewidth=2,markersize=10)
+ax_inset.plot(range(len(P_ECSP[:, 2])), P_ECSP[:, 2], label='$p_{3}$', marker='x', color='y',linewidth=2,markersize=10)
 
 ax_inset.set_xlim(0, 9)
 # 添加标题和轴标签
-ax_inset.set_xlabel('User Number', fontweight='bold', fontsize=8)
+ax_inset.set_xlabel('Vechicle Number', fontweight='bold', fontsize=8)
 ax_inset.set_ylabel('ECSP Price', fontweight='bold', fontsize=8)
 ax_inset.set_xticks(range(len(U_user_v)), range(0, 13), fontsize=8)  # 修改x轴刻度字体大小
 # 设置y轴刻度字体大小
@@ -110,19 +114,19 @@ ax_inset.yaxis.set_major_formatter(FuncFormatter(format_func))
 ax_inset.xaxis.set_major_locator(x_major_locator)
 ax_inset.legend(loc='upper center', ncol=3, fontsize=8)
 # -----------------------------------子图2 创建子图并调整位置
-left, bottom, width, height = 0.59, 0.35, 0.3, 0.3
+left, bottom, width, height = 0.62, 0.4, 0.3, 0.3
 ax_inset2 = fig.add_axes([left, bottom, width, height])  # left, bottom, width, height
 
 # 绘制子图中的三条曲线
-ax_inset2.plot(range(len(P_VOP[:, 0])), P_VOP[:, 0], label='$p^{1}_{vop}$', marker='.', color='#990066')
-ax_inset2.plot(range(len(P_VOP[:, 1])), P_VOP[:, 1], label='$p^{2}_{vop}$', marker='+', color='green')
-ax_inset2.plot(range(len(P_VOP[:, 2])), P_VOP[:, 2], label='$p^{3}_{vop}$', marker='x', color='y')
+ax_inset2.plot(range(len(P_VOP[:, 0])), P_VOP[:, 0], label='$p^{1}_{vop}$', marker='.', color='#990066',linewidth=2,markersize=10)
+ax_inset2.plot(range(len(P_VOP[:, 1])), P_VOP[:, 1], label='$p^{2}_{vop}$', marker='*', color='green',linewidth=2,markersize=10)
+ax_inset2.plot(range(len(P_VOP[:, 2])), P_VOP[:, 2], label='$p^{3}_{vop}$', marker='x', color='y',linewidth=2,markersize=10)
 
 ax_inset2.set_xlim(0, 9)
 # 设置y轴刻度标签格式
 ax_inset2.yaxis.set_major_formatter(FuncFormatter(format_func))
 # 添加标题和轴标签
-ax_inset2.set_xlabel('User Number', fontweight='bold', fontsize=8)
+ax_inset2.set_xlabel('Vechicle Number', fontweight='bold', fontsize=8)
 ax_inset2.set_ylabel('VOP Price', fontweight='bold', fontsize=8)
 ax_inset2.set_xticks(range(len(U_user_v)), range(0, 13), fontsize=8)  # 修改x轴刻度字体大小
 # 设置y轴刻度字体大小

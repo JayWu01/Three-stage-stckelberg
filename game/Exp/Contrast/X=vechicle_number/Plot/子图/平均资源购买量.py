@@ -41,25 +41,28 @@ def format_func(value, tick_number):
 fig, ax = plt.subplots()
 x_major_locator = MultipleLocator(3)
 # 绘制折线图
-ax.plot(range(len(U_user_v)), U_user_v, label='$f_i$', marker='*', color='#d95319')
-ax.plot(range(len(U_S_t_v)), U_S_t_v, label='$f^{j}_{vop}$', marker='o')
+ax.plot(range(len(U_user_v)), U_user_v, label='$f_i$', marker='*', color='#d95319',linewidth=4,markersize=10)
+ax.plot(range(len(U_S_t_v)), U_S_t_v, label='$f^{j}_{vop}$', marker='o',linewidth=4,markersize=10)
 ax.set_xlim(0, 12)
 ax.set_ylim(-2, 4.5)
 # 添加标题和轴标签
-ax.set_xlabel('Vechicle Number', fontweight='bold', fontsize=15.5)
-ax.set_ylabel('Average Resource Purchase', fontweight='bold', fontsize=15.5)
-ax.set_xticks(range(len(U_user_v)), range(0, 13), fontsize=13.5)  # 修改x轴刻度字体大小
+ax.set_xlabel('Vechicle Number', fontweight='bold', fontsize=20)
+ax.set_ylabel('Average Resource Purchase', fontweight='bold', fontsize=20)
+ax.set_xticks(range(len(U_user_v)), range(0, 13), fontsize=20)  # 修改x轴刻度字体大小
 # 添加主图的标签和图例
-ax.legend()
+ax.legend(loc='upper left', ncol=2,fontsize=17.5)
+ax.tick_params(axis='y', labelsize=20)  # 修改y轴刻度字体大小
+# 添加主图的标签和图例
+ax.figure.subplots_adjust(bottom=0.14, left=0.16, right=0.965, top=0.97)
 
 # -----------------------------------子图 创建子图并调整位置
-left, bottom, width, height = 0.51, 0.19, 0.35, 0.35
+left, bottom, width, height = 0.51, 0.22, 0.35, 0.35
 ax_inset = fig.add_axes([left, bottom, width, height])  # left, bottom, width, height
 
 # 绘制子图中的三条曲线
-ax_inset.plot(range(len(Resouce_ECSP[:, 0])), Resouce_ECSP[:, 0], label='$f^{1}_{vop}$', marker='.', color='#990066')
-ax_inset.plot(range(len(Resouce_ECSP[:, 0])), Resouce_ECSP[:, 1], label='$f^{2}_{vop}$', marker='+', color='green')
-ax_inset.plot(range(len(Resouce_ECSP[:, 0])), Resouce_ECSP[:, 2], label='$f^{3}_{vop}$', marker='x', color='y')
+ax_inset.plot(range(len(Resouce_ECSP[:, 0])), Resouce_ECSP[:, 0], label='$f^{1}_{vop}$', marker='.', color='#990066',linewidth=2,markersize=10)
+ax_inset.plot(range(len(Resouce_ECSP[:, 0])), Resouce_ECSP[:, 1], label='$f^{2}_{vop}$', marker='*', color='green',linewidth=2,markersize=10)
+ax_inset.plot(range(len(Resouce_ECSP[:, 0])), Resouce_ECSP[:, 2], label='$f^{3}_{vop}$', marker='x', color='y',linewidth=2,markersize=10)
 
 ax_inset.set_xlim(0, 9)
 ax_inset.set_ylim(-0.2, 8)

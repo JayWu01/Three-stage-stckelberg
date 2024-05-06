@@ -33,30 +33,31 @@ V2, V4, V6, V8, V10 = [p_m[i] - (f_m[i] ** 2 / Theta_m[1]) for i in range(len(Th
 # plt.plot(range(1, len(V10) + 1), V10, label=r'$\theta_{10}$',  marker='^')
 # plt.axvline(x=10, ymin=0, ymax=0.77, linestyle='--')
 #
-plt.plot(range(1, len(V2) + 1), V2, label=r'$\theta_{2}$', c='#0066cc', marker='o')
-plt.axvline(x=2, ymin=0, ymax=0.55, color='#0066cc', linestyle='--')
+plt.plot(range(1, len(V2) + 1), V2, label=r'$\theta_{2}$', c='#0066cc', marker='o',linewidth=3,markersize=10)
+plt.axvline(x=2, ymin=0, ymax=0.55, color='#0066cc', linestyle='--',linewidth=3,markersize=10)
 
-plt.plot(range(1, len(V4) + 1), V4, label=r'$\theta_{4}$', c='#990066', marker='*')
-plt.axvline(x=4, ymin=0, ymax=0.57, color='#990066', linestyle='--')
+plt.plot(range(1, len(V4) + 1), V4, label=r'$\theta_{4}$', c='#990066', marker='*',linewidth=3,markersize=10)
+plt.axvline(x=4, ymin=0, ymax=0.57, color='#990066', linestyle='--',linewidth=3,markersize=10)
 
-plt.plot(range(1, len(V6) + 1), V6, label=r'$\theta_{6}$', c='#d95319', marker='<')
-plt.axvline(x=6, ymin=0, ymax=0.60, color='#d95319', linestyle='--')
+plt.plot(range(1, len(V6) + 1), V6, label=r'$\theta_{6}$', c='#d95319', marker='<',linewidth=3,markersize=10)
+plt.axvline(x=6, ymin=0, ymax=0.60, color='#d95319', linestyle='--',linewidth=3,markersize=10)
 
-plt.plot(range(1, len(V8) + 1), V8, label=r'$\theta_8$', c='y', marker='.')
-plt.axvline(x=8, ymin=0, ymax=0.65, color='y', linestyle='--')
+plt.plot(range(1, len(V8) + 1), V8, label=r'$\theta_8$', c='y', marker='.',linewidth=3,markersize=10)
+plt.axvline(x=8, ymin=0, ymax=0.65, color='y', linestyle='--',linewidth=3,markersize=10)
 
-plt.plot(range(1, len(V10) + 1), V10, label=r'$\theta_{10}$', c='#336600', marker='s')
-plt.axvline(x=10, ymin=0, ymax=0.77, color='#336600', linestyle='--')
+plt.plot(range(1, len(V10) + 1), V10, label=r'$\theta_{10}$', c='#336600', marker='s',linewidth=3,markersize=10)
+plt.axvline(x=10, ymin=0, ymax=0.77, color='#336600', linestyle='--',linewidth=3,markersize=10)
 
 # 调整部分刻度的间隔
 # 添加标题和轴标签
-plt.xlabel(r'Type of Vechicle $(\mathbf{\theta_m})$', fontweight='bold', fontsize=15.5)
-plt.ylabel(r'Utility of Vechicle $(\mathbf{U_{m}})$', fontweight='bold', fontsize=15.5)
-plt.xticks(range(1, len(V8) + 1, 1), fontsize=13.5)  # 修改x轴刻度字体大小
-plt.yticks(fontsize=13.5)  # 修改y轴刻度字体大小
+plt.xlabel(r'Type of Vechicle $(\mathbf{\theta_m})$', fontweight='bold', fontsize=20)
+plt.ylabel(r'Utility of Vechicle $(\mathbf{U_{m}})$', fontweight='bold', fontsize=20)
+plt.xticks(range(1, len(V8) + 1, 1), fontsize=20)  # 修改x轴刻度字体大小
+plt.yticks(fontsize=20)  # 修改y轴刻度字体大小
 plt.subplots_adjust(bottom=0.13, left=0.14)
 # 添加图例并设置字体大小
-plt.legend(fontsize='16')
+plt.legend(fontsize='17.5')
+plt.subplots_adjust(bottom=0.145, left=0.18, right=0.965, top=0.97)
 # 设置图例并显示
 plt.ylim(-0.45, 0.4)
 plt.legend(loc='upper center', ncol=5, fontsize=12)

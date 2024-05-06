@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 # 预设字体格式，并传给rc方法
 import numpy as np
+from matplotlib.ticker import MultipleLocator
 
 # 四组数据
 np.set_printoptions(precision=16)
@@ -50,20 +51,24 @@ U_user_v, U_S_t_v, U_vop_v = [9.098345528870142, 7.868087828956858, 6.9464953597
 
 U_S_t_v = np.array(U_S_t_v)
 # 绘制折线图
-plt.plot(range(len(U_user_v)), U_user_v, label=r'$\frac{U_{i}}{|N|}$', c='#0066cc', marker='o')
-plt.plot(range(len(U_S_t_v[:, 0])), U_S_t_v[:, 0], label='$U_{j=1}$', c='#990066', marker='*')
-plt.plot(range(len(U_S_t_v[:, 1])), U_S_t_v[:, 1], label='$U_{j=2}$', c='#d95319', marker='<')
-plt.plot(range(len(U_S_t_v[:, 2])), U_S_t_v[:, 2], label='$U_{j=3}$', c='y', marker='.')
-plt.plot(range(len(U_vop_v)), U_vop_v, label='$U_{vop}$', c='#336600', marker='s')
+plt.plot(range(len(U_user_v)), U_user_v, label=r'$\bar{U}_{i}$', c='#0066cc', marker='o', linewidth=3, markersize=10)
+plt.plot(range(len(U_S_t_v[:, 0])), U_S_t_v[:, 0], label='$U_{j}(j=1)$', c='#990066', marker='*', linewidth=3,
+         markersize=10)
+plt.plot(range(len(U_S_t_v[:, 1])), U_S_t_v[:, 1], label='$U_{j}(j=2)$', c='#d95319', marker='<', linewidth=3,
+         markersize=10)
+plt.plot(range(len(U_S_t_v[:, 2])), U_S_t_v[:, 2], label='$U_{j}(j=3)$', c='y', marker='.', linewidth=3, markersize=10)
+plt.plot(range(len(U_vop_v)), U_vop_v, label='$U_{vop}$', c='#336600', marker='s', linewidth=3, markersize=10)
 plt.subplots_adjust(left=0.135)
 
 # 添加标题和轴标签
-plt.xlabel('The Number Of Game Rounds', fontweight='bold', fontsize=15.5)
-plt.ylabel('Utility', fontweight='bold', fontsize=15.5)
-plt.xticks(range(len(U_user_v)), fontsize=13.5)  # 修改x轴刻度字体大小
-plt.yticks(fontsize=13.5)  # 修改y轴刻度字体大小
+plt.xlabel('The Number Of Game Rounds', fontweight='bold', fontsize=20)
+plt.ylabel('Utility', fontweight='bold', fontsize=20)
+plt.xticks(range(len(U_user_v)), fontsize=20)  # 修改x轴刻度字体大小
+plt.yticks(fontsize=20)  # 修改y轴刻度字体大小
+plt.gca().xaxis.set_major_locator(MultipleLocator(2)) #让x轴的显示刻度的间隔为3
+plt.subplots_adjust(bottom=0.14, left=0.185, right=0.965, top=0.97)
 # 添加图例并设置字体大小
-plt.legend(fontsize='16')
+plt.legend(fontsize='16.5')
 # 显示图形
 
 # 保存图像时设置dpi参数
