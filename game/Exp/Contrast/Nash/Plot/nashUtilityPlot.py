@@ -1,6 +1,4 @@
 import matplotlib.pyplot as plt
-import matplotlib
-
 # 预设字体格式，并传给rc方法
 import numpy as np
 
@@ -34,28 +32,40 @@ U_user_v, U_S_t_v, U_vop_v = [9.098345528870142, 7.868087828956858, 6.9464953597
                                  6.066094540991868]
 
 # 绘制折线图
-# plt.plot(range(len(U_user_v)), U_user_v, label='用户的平均效益值', marker='.')
-# plt.plot(range(len(U_S_t_v[:,0])), U_S_t_v[:,0], label='云服务器的效益值', marker='o')
-# plt.plot(range(len(U_S_t_v[:,1])), U_S_t_v[:,1], label='M1服务器的效益值', marker='s')
-# plt.plot(range(len(U_S_t_v[:,2])), U_S_t_v[:,2], label='M2服务器的效益值', marker='^')
-# plt.plot(range(len(U_vop_v)), U_vop_v, label='vop的效益值', marker='x')
+# plt.plot(range(1, len(V2) + 1), V2, label=r'$\theta_{2}$', c='#0066cc', marker='o')
+# plt.axvline(x=2, ymin=0, ymax=0.55, color='#0066cc', linestyle='--')
+#
+# plt.plot(range(1, len(V4) + 1), V4, label=r'$\theta_{4}$', c='#990066', marker='*')
+# plt.axvline(x=4, ymin=0, ymax=0.57, color='#990066', linestyle='--')
+#
+# plt.plot(range(1, len(V6) + 1), V6, label=r'$\theta_{6}$', c='#d95319', marker='<')
+# plt.axvline(x=6, ymin=0, ymax=0.60, color='#d95319', linestyle='--')
+#
+# plt.plot(range(1, len(V8) + 1), V8, label=r'$\theta_8$', c='y', marker='.')
+# plt.axvline(x=8, ymin=0, ymax=0.65, color='y', linestyle='--')
+#
+# plt.plot(range(1, len(V10) + 1), V10, label=r'$\theta_{10}$', c='#336600', marker='s')
+# plt.axvline(x=10, ymin=0, ymax=0.77, color='#336600', linestyle='--')
+
+
 U_S_t_v = np.array(U_S_t_v)
 # 绘制折线图
-plt.plot(range(len(U_user_v)), U_user_v, label='The average utility value of users', marker='.')
-plt.plot(range(len(U_S_t_v[:, 0])), U_S_t_v[:, 0], label='The utility value of $s_{1}$', marker='o')
-plt.plot(range(len(U_S_t_v[:, 1])), U_S_t_v[:, 1], label='The utility value of $s_{2}$', marker='s')
-plt.plot(range(len(U_S_t_v[:, 2])), U_S_t_v[:, 2], label='The utility value of $s_{3}$', marker='^')
-plt.plot(range(len(U_vop_v)), U_vop_v, label='The utility value of VOP', marker='x')
-# 添加图例
-plt.legend()
+plt.plot(range(len(U_user_v)), U_user_v, label=r'$\frac{U_{i}}{|N|}$', c='#0066cc', marker='o')
+plt.plot(range(len(U_S_t_v[:, 0])), U_S_t_v[:, 0], label='$U_{j=1}$', c='#990066', marker='*')
+plt.plot(range(len(U_S_t_v[:, 1])), U_S_t_v[:, 1], label='$U_{j=2}$', c='#d95319', marker='<')
+plt.plot(range(len(U_S_t_v[:, 2])), U_S_t_v[:, 2], label='$U_{j=3}$', c='y', marker='.')
+plt.plot(range(len(U_vop_v)), U_vop_v, label='$U_{vop}$', c='#336600', marker='s')
+plt.subplots_adjust(left=0.135)
 
 # 添加标题和轴标签
-plt.xlabel('Iteration', fontsize=16)
-plt.ylabel('Utility', fontsize=16)
+plt.xlabel('The Number Of Game Rounds', fontweight='bold', fontsize=15.5)
+plt.ylabel('Utility', fontweight='bold', fontsize=15.5)
 plt.xticks(range(len(U_user_v)), fontsize=13.5)  # 修改x轴刻度字体大小
 plt.yticks(fontsize=13.5)  # 修改y轴刻度字体大小
 # 添加图例并设置字体大小
 plt.legend(fontsize='16')
 # 显示图形
 
+# 保存图像时设置dpi参数
+plt.savefig("Fig_3.png", dpi=300)
 plt.show()

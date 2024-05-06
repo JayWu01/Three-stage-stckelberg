@@ -26,7 +26,7 @@ socialWelfare = [[100.12796887802119, 106.19076668010068, 108.53256967558933, 10
 # plt.plot(range(1, 10), socialWelfare[3], label='基于合同的不完全信息', marker='^')
 
 # 绘制折线图
-# plt.plot(range(0, 13), socialWelfare[0], label='IA-C', marker='^')
+# plt.plot(range(0, 13), socialWelfare[0], label='IA-C(Our scheme)', marker='^')
 # plt.plot(range(0, 13), socialWelfare[1], label='NIA-S', marker='.')
 # plt.plot(range(0, 13), socialWelfare[2], label='LP', marker='o')
 # # 添加图例
@@ -36,7 +36,7 @@ socialWelfare = [[100.12796887802119, 106.19076668010068, 108.53256967558933, 10
 bar_width = 0.2
 index = np.arange(0, 13)
 # 创建条形图 #332c83 0899c7 a4bb6a efef6d
-plt.bar(index, socialWelfare[0], bar_width, label='IA-C', color='#4dbeee', zorder=2, edgecolor='black',
+plt.bar(index, socialWelfare[0], bar_width, label='IA-C(Our scheme)', color='#4dbeee', zorder=2, edgecolor='black',
         linewidth=0.5)
 plt.bar(index + bar_width, socialWelfare[1], bar_width, label='NIA-S', color='#77ac30', zorder=2,
         edgecolor='black',
@@ -46,7 +46,7 @@ plt.bar(index + 2 * bar_width, socialWelfare[2], bar_width, label='LP', color='#
         linewidth=0.5)
 # 添加标题和轴标签
 plt.xlabel('Vechicle Number', fontweight='bold', fontsize=15.5)
-plt.ylabel('SocialWelfare',fontweight='bold', fontsize=15.5)
+plt.ylabel('Social Welfare',fontweight='bold', fontsize=15.5)
 # 旋转刻度标签并间隔显示
 plt.gca().xaxis.set_major_locator(plt.MultipleLocator(1))  # 每隔2个类别显示一个刻度标签
 plt.xticks(index + 1.5 * bar_width, range(0, 13))
@@ -56,7 +56,8 @@ plt.ylim(0, 135)  # 这里将 y 轴范围设置为 0 到 3.5
 plt.xticks(fontsize=13.5)
 plt.yticks(fontsize=13.5)  # 修改y轴刻度字体大小
 # 添加图例并设置字体大小
-plt.legend(fontsize=14, loc='upper center', bbox_to_anchor=(0.5, 1.0), ncol=3)
+plt.legend(fontsize=13, loc='upper center', bbox_to_anchor=(0.5, 1.0), ncol=3)
+# 保存图像时设置dpi参数
+plt.savefig("Fig_7c.png", dpi=300)
 # 显示图形
-
 plt.show()

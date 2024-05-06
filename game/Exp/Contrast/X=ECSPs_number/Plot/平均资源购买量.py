@@ -4,7 +4,7 @@ import numpy as np
 from numpy import array
 # 四组数据
 np.set_printoptions(precision=16)
-
+fig = plt.subplots()
 U_user_v, U_S_t_v = [array([0.4900980392156867]), array([1.271666666666666, 0.9224404761904752]),
                      array([1.1294074074074067, 0.8458080808080801, 0.9316845878136201]),
                      array([0.9373214285714286, 0.822791666666666, 0.7325862068965516,
@@ -52,4 +52,6 @@ plt.yticks(fontsize=13.5)  # 修改y轴刻度字体大小
 plt.legend(fontsize='16')
 # 显示图形
 
+# 保存图像时设置dpi参数
+plt.savefig("Fig_5c.png", dpi=300)
 plt.show()

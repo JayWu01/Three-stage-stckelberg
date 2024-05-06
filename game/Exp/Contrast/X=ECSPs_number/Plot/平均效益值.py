@@ -27,7 +27,7 @@ U_user_v, U_S_t_v, U_vop_v = [0.4888001174418751, 2.4482136701850408, 3.12662859
 # plt.plot(range(len(U_S_t_v[:,1])), U_S_t_v[:,1], label='M1服务器的效益值', marker='s')
 # plt.plot(range(len(U_S_t_v[:,2])), U_S_t_v[:,2], label='M2服务器的效益值', marker='^')
 # plt.plot(range(len(U_vop_v)), U_vop_v, label='vop的效益值', marker='x')
-
+fig = plt.subplots()
 # 绘制折线图
 plt.plot(range(len(U_user_v)), U_user_v, label='$U_i$', marker='*', color='#d95319')
 plt.plot(range(len(U_S_t_v)), U_S_t_v, label='$U^{ecsp}_j$', marker='o')
@@ -44,4 +44,6 @@ plt.yticks(fontsize=15.5)  # 修改y轴刻度字体大小
 plt.legend(fontsize='16')
 # 显示图形
 
+# 保存图像时设置dpi参数
+plt.savefig("Fig_5a.png", dpi=300)
 plt.show()

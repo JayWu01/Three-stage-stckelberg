@@ -1,9 +1,5 @@
 import matplotlib.pyplot as plt
 import game.Config.constants as cst
-
-# 预设字体格式，并传给rc方法
-# font = {'family': 'SimHei', "size": 16}
-# matplotlib.rc('font', **font)  # 一次定义终身使用
 # 四组数据
 v_number = cst.v_number
 cst.Vechicle.read(v_number)
@@ -22,30 +18,49 @@ V2, V4, V6, V8, V10 = [p_m[i] - (f_m[i] ** 2 / Theta_m[1]) for i in range(len(Th
                           for i in range(len(Theta_m))], [
                           p_m[i] - (f_m[i] ** 2 / Theta_m[9]) for i in range(len(Theta_m))]
 
-plt.plot(range(1, len(V2) + 1), V2, label=r'$\theta_{2}$', c='r', marker='.')
-plt.axvline(x=2, ymin=0, ymax=0.65, color='r', linestyle='--')
+# plt.plot(range(1, len(V2) + 1), V2, label=r'$\theta_{2}$', marker='.')
+# plt.axvline(x=2, ymin=0, ymax=0.55, linestyle='--')
+#
+# plt.plot(range(1, len(V4) + 1), V4, label=r'$\theta_{4}$',  marker='*')
+# plt.axvline(x=4, ymin=0, ymax=0.56,  linestyle='--')
+#
+# plt.plot(range(1, len(V6) + 1), V6, label=r'$\theta_{6}$',  marker='<')
+# plt.axvline(x=6, ymin=0, ymax=0.60,  linestyle='--')
+#
+# plt.plot(range(1, len(V8) + 1), V8, label=r'$\theta_8$', marker='.')
+# plt.axvline(x=8, ymin=0, ymax=0.65,  linestyle='--')
+#
+# plt.plot(range(1, len(V10) + 1), V10, label=r'$\theta_{10}$',  marker='^')
+# plt.axvline(x=10, ymin=0, ymax=0.77, linestyle='--')
+#
+plt.plot(range(1, len(V2) + 1), V2, label=r'$\theta_{2}$', c='#0066cc', marker='o')
+plt.axvline(x=2, ymin=0, ymax=0.55, color='#0066cc', linestyle='--')
 
-plt.plot(range(1, len(V4) + 1), V4, label=r'$\theta_{4}$', c='black', marker='*')
-plt.axvline(x=4, ymin=0, ymax=0.66, color='black', linestyle='--')
+plt.plot(range(1, len(V4) + 1), V4, label=r'$\theta_{4}$', c='#990066', marker='*')
+plt.axvline(x=4, ymin=0, ymax=0.57, color='#990066', linestyle='--')
 
-plt.plot(range(1, len(V6) + 1), V6, label=r'$\theta_{6}$', c='blue', marker='<')
-plt.axvline(x=6, ymin=0, ymax=0.72, color='blue', linestyle='--')
+plt.plot(range(1, len(V6) + 1), V6, label=r'$\theta_{6}$', c='#d95319', marker='<')
+plt.axvline(x=6, ymin=0, ymax=0.60, color='#d95319', linestyle='--')
 
 plt.plot(range(1, len(V8) + 1), V8, label=r'$\theta_8$', c='y', marker='.')
-plt.axvline(x=8, ymin=0, ymax=0.81, color='y', linestyle='--')
+plt.axvline(x=8, ymin=0, ymax=0.65, color='y', linestyle='--')
 
-plt.plot(range(1, len(V10) + 1), V10, label=r'$\theta_{10}$', c='g', marker='^')
-plt.axvline(x=10, ymin=0, ymax=0.95, color='g', linestyle='--')
+plt.plot(range(1, len(V10) + 1), V10, label=r'$\theta_{10}$', c='#336600', marker='s')
+plt.axvline(x=10, ymin=0, ymax=0.77, color='#336600', linestyle='--')
 
 # 调整部分刻度的间隔
-plt.legend()
 # 添加标题和轴标签
-plt.xlabel(r'$\theta_m$', fontsize=16)
-plt.ylabel('$U_{m}$', fontsize=16)
+plt.xlabel(r'Type of Vechicle $(\mathbf{\theta_m})$', fontweight='bold', fontsize=15.5)
+plt.ylabel(r'Utility of Vechicle $(\mathbf{U_{m}})$', fontweight='bold', fontsize=15.5)
 plt.xticks(range(1, len(V8) + 1, 1), fontsize=13.5)  # 修改x轴刻度字体大小
 plt.yticks(fontsize=13.5)  # 修改y轴刻度字体大小
+plt.subplots_adjust(bottom=0.13, left=0.14)
 # 添加图例并设置字体大小
 plt.legend(fontsize='16')
+# 设置图例并显示
+plt.ylim(-0.45, 0.4)
+plt.legend(loc='upper center', ncol=5, fontsize=12)
 # 显示图形
-
+# 保存图像时设置dpi参数
+plt.savefig("ContractFeasibility.png", dpi=300)
 plt.show()

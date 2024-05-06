@@ -16,17 +16,18 @@ socialWelfare = [[104.16466780433962, 101.63910423705691, 100.12796887802119, 98
 # 绘制折线图
 plt.plot(range(len(socialWelfare[0])),  socialWelfare[0], label='V=0', marker='*', color='#d95319')
 plt.plot(range(len(socialWelfare[1])),  socialWelfare[1], label='V=5', marker='o', color='green')
-plt.plot(range(len(socialWelfare[2])),  socialWelfare[2], label='V=10', marker='^')
+plt.plot(range(len(socialWelfare[2])),  socialWelfare[2], label='V=10(Our scheme)', marker='^')
 
 plt.xlim(0, 8)
 
 # 添加标题和轴标签
 plt.xlabel('ECSP Number', fontweight='bold', fontsize=15.5)
-plt.ylabel('SocialWelfare', fontweight='bold', fontsize=15.5)
+plt.ylabel('Social Welfare', fontweight='bold', fontsize=15.5)
 plt.xticks(range(len(socialWelfare[0])), range(1, 10), fontsize=13.5)  # 修改x轴刻度字体大小
 plt.yticks(fontsize=13.5)  # 修改y轴刻度字体大小
 # 添加图例并设置字体大小
 plt.legend(fontsize='16')
+# 保存图像时设置dpi参数
+plt.savefig("Fig_8b.png", dpi=300)
 # 显示图形
-
 plt.show()

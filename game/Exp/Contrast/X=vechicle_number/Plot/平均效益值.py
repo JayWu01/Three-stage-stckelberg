@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 
 # 预设字体格式，并传给rc方法
 import numpy as np
+
 # 四组数据
 np.set_printoptions(precision=16)
 
@@ -20,18 +21,32 @@ U_user_v, U_S_t_v, U_vop_v = [2.929951276545613, 2.929951276545613, 2.9299512765
                                                                          6.066094557230833, 5.888465754416272,
                                                                          7.325860622702053]
 
+ECSP_Utility =np.array([[16.473749565972227, 17.07342554012346, 15.370320987654328],
+                [16.473749565972227, 17.188996695458776, 15.370320987654328],
+                [16.48418688384084, 17.303613623983892, 15.370320987654328],
+                [16.14209355490321, 16.82429418388407, 14.798225169767258],
+                [16.166349664014277, 16.954849582858287, 14.798225169767258],
+                [16.211811691519145, 17.091356824409864, 14.798225169767258],
+                [16.24875108284069, 17.17684175661076, 14.800073282832026],
+                [14.579757704131932, 15.385478866301408, 13.707800357516218],
+                [14.670963362375002, 15.508625391463664, 13.744463434882993],
+                [14.722101589351928, 15.572841197992084, 13.768418402763965],
+                [14.790094100961976, 15.654311293663495, 13.803018828587168],
+                [14.833494117938347, 15.704410223887189, 13.826443650097682],
+                [14.992011816716657, 15.87783774944592, 13.91872511178336]])
+
 # U_S_t_v = [U_S_t_v[i] * (i + 1) for i in range(len(U_S_t_v))]
 # 绘制折线图
 # plt.plot(range(len(U_user_v)), U_user_v, label='用户的平均效益值', marker='.')
-# plt.plot(range(len(U_S_t_v[:,0])), U_S_t_v[:,0], label='云服务器的效益值', marker='o')
-# plt.plot(range(len(U_S_t_v[:,1])), U_S_t_v[:,1], label='M1服务器的效益值', marker='s')
-# plt.plot(range(len(U_S_t_v[:,2])), U_S_t_v[:,2], label='M2服务器的效益值', marker='^')
+# plt.plot(range(len(ECSP_Utility[:,0])), ECSP_Utility[:,0], label='$U^{ecsp}_{0}$', marker='o')
+# plt.plot(range(len(ECSP_Utility[:,1])), ECSP_Utility[:,1], label='$U^{ecsp}_{1}$', marker='s')
+# plt.plot(range(len(ECSP_Utility[:,2])), ECSP_Utility[:,2], label='$U^{ecsp}_{2}$', marker='^')
 # plt.plot(range(len(U_vop_v)), U_vop_v, label='vop的效益值', marker='x')
 
 # 绘制折线图
 plt.plot(range(len(U_user_v)), U_user_v, label='$U_{i}$', marker='*', color='#d95319')
 plt.plot(range(len(U_S_t_v)), U_S_t_v, label='$U^{ecsp}_{j}$', marker='o')
-plt.plot(range(len(U_vop_v)), U_vop_v, label='$U_{vop}$', marker='^', color='green')
+plt.plot(range(len(U_vop_v)), U_vop_v, label='$U_{vop}$', marker='x', color='green')
 
 plt.xlim(0, 12)
 

@@ -67,4 +67,4 @@ ax_inset.legend(loc='upper center', ncol=3,fontsize=8)
 # 显示图形
 plt.show()
 # 保存图像时设置dpi参数
-fig.savefig("Fig_4c.png", dpi=300)
+plt.savefig("Fig_4c.png", dpi=300)

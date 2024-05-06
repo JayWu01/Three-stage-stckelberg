@@ -14,13 +14,23 @@ U_user_v, U_S_t_v = [4.597423187598625, 3.5678074074074067, 3.0976765188834134, 
                         4.3356131977736645, 4.922895641492554, 5.101074360136173, 5.620053917744894, 6.174495722051909,
                         6.745880417143311]
 
+Resouce_ECSP = np.array([[1.9992341482024836, 1.3885941464116458, 1.088382946123212],
+                [2.815600666991946, 2.6031707038663354, 1.5287117781030535],
+                [3.0583202535547045, 4.5255886982059135, 1.4641084308946013],
+                [4.1948885193836, 4.908488030735567, 2.2176603234457346],
+                [5.230141140358704, 4.846146959068232, 2.9305514938940576],
+                [5.472198579314881, 6.3880992896574345, 2.9083890555053458],
+                [5.668288675215482, 6.601635983388853, 3.033298421804183],
+                [5.722900697929706, 8.250837322144925, 2.8864237331600506],
+                [6.8343085948944164, 7.900218813576224, 3.788959757685088],
+                [7.476594265965723, 8.66043401641004, 4.100612969054168]])
 # U_user_v=[np.sum(arr) for arr in U_user_v]
 # 绘制折线图
-# plt.plot(range(len(U_user_v)), U_user_v, label='用户的平均效益值', marker='.')
-# plt.plot(range(len(U_S_t_v[:,0])), U_S_t_v[:,0], label='云服务器的效益值', marker='o')
-# plt.plot(range(len(U_S_t_v[:,1])), U_S_t_v[:,1], label='M1服务器的效益值', marker='s')
-# plt.plot(range(len(U_S_t_v[:,2])), U_S_t_v[:,2], label='M2服务器的效益值', marker='^')
-# plt.plot(range(len(U_vop_v)), U_vop_v, label='vop的效益值', marker='x')
+# # plt.plot(range(len(U_user_v)), U_user_v, label='用户的平均效益值', marker='.')
+# plt.plot(range(len(Resouce_ECSP[:, 0])), Resouce_ECSP[:, 0], label='$f^{1}_{vop}$', marker='o')
+# plt.plot(range(len(Resouce_ECSP[:, 1])), Resouce_ECSP[:, 1], label='$f^{2}_{vop}$', marker='s')
+# plt.plot(range(len(Resouce_ECSP[:, 2])), Resouce_ECSP[:, 2], label='$f^{3}_{vop}$', marker='^')
+# # plt.plot(range(len(U_vop_v)), U_vop_v, label='vop的效益值', marker='x')
 
 # 绘制折线图
 plt.plot(range(len(U_user_v)), U_user_v, label='$f_i$', marker='*', color='#d95319')

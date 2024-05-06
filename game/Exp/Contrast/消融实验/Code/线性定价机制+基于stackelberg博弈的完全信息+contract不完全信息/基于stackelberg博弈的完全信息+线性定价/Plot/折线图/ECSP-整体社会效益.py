@@ -15,7 +15,7 @@ socialWelfare = [[105.37979814022239, 109.28704913561442, 113.49689457861072, 11
                   117.00368069657723, 118.60429540740748, 123.91936404967883, 126.39027136852386, 126.27658051214108]]
 
 # 绘制折线
-plt.plot(range(len(socialWelfare[0])), socialWelfare[0], label='IA-C', marker='*', color='#d95319')
+plt.plot(range(len(socialWelfare[0])), socialWelfare[0], label='IA-C(Our scheme)', marker='*', color='#d95319')
 plt.plot(range(len(socialWelfare[1])), socialWelfare[1], label='NIA-S', marker='o')
 plt.plot(range(len(socialWelfare[2])), socialWelfare[2], label='LP', marker='^', color='green')
 # 添加图例
@@ -24,8 +24,8 @@ plt.xlim(0, 9)
 # 添加标题和轴标签
 plt.xlabel('ECSP Number', fontweight='bold', fontsize=15.5)
 plt.ylabel('SocialWelfare', fontweight='bold', fontsize=15.5)
-plt.xticks(range(len(socialWelfare[0])), range(1, 11), fontsize=15.5)  # 修改x轴刻度字体大小
-plt.yticks(fontsize=15.5)  # 修改y轴刻度字体大小
+plt.xticks(range(len(socialWelfare[0])), range(1, 11), fontsize=13.5)  # 修改x轴刻度字体大小
+plt.yticks(fontsize=13.5)  # 修改y轴刻度字体大小
 # 添加图例并设置字体大小
 plt.legend(fontsize='16')
 # 显示图形

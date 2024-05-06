@@ -567,6 +567,14 @@ def calculate_utility_for_server(p_j_t, p_t, p_vop_j, f_vop_j, j):
     return U_j
 
 
+# 计算能耗
+def calculate_Energy_for_server(F_i, f_vop_j):
+    # F_i = find_Optial_mulitUser(p_v)
+    # 计算 能耗、成本
+    E = [a * ecsp_enery[j] * K * ((sum(F_i[:, j]) - f_vop_j[j]) ** 2) for j in range(ecsp_number)]
+    return E
+
+
 # stage I 计算Vop的效益
 def calculate_utility_for_Vop(f_m, p_j_vop, F):
     # 奖励回报
@@ -722,8 +730,10 @@ if __name__ == '__main__':
     average_UserResource_by_number_user, average_ECSPResource_by_number_user, average_ECSPPrice_by_number_user, average_VOPPrice_by_number_user = [], [], [], []
     vechicleUtility_by_number_user, p_m_by_number_user, f_m_by_number_user = [], [], []
     socialWelfare, socialWelfare2 = [], []
+    E_v = []
     vset = [0, 5, 10]
     for v_num in (vset):
+        E_v1=[]
         v_number = v_num
         for necsp in range(1, 11):
             print("----------------------------ecsp_number={}------------------------------------：".format(
@@ -807,7 +817,10 @@ if __name__ == '__main__':
             socialWelfare.append(sum(utility_for_user_device) + sum(U_j) + utility_for_Vop + utilityTorTotalVechicle)
             print("车辆整体效益值", utilityTorTotalVechicle)
             print("整体社会效益为", sum(utility_for_user_device) + sum(U_j) + utility_for_Vop + utilityTorTotalVechicle)
+            E = calculate_Energy_for_server(F, f_j_vop)
+            E_v1.append(E)
         socialWelfare2.append(socialWelfare)
+        E_v.append(E_v1)
     print("用户平均效益值变化", average_Userutility_by_number_user)
     print("ECSPS平均效益值变化", average_ECSPutility_by_number_user)
     print("VOP平均效益值变化", average_VOPutility_by_number_user)
@@ -822,3 +835,4 @@ if __name__ == '__main__':
     print("f_m变化", f_m_by_number_user)
 
     print("整体社会福利变化", socialWelfare2)
+    print("能耗变化", E_v)

@@ -14,7 +14,7 @@ socialWelfare = [[100.12796887802119, 106.19076668010068, 108.53256967558933, 10
                   106.04595464692619, 111.03448936778115, 105.2394387630879]]
 
 # 绘制折线图
-plt.plot(range(len(socialWelfare[0])), socialWelfare[0], label='IA-C', marker='*', color='#d95319')
+plt.plot(range(len(socialWelfare[0])), socialWelfare[0], label='IA-C(Our scheme)', marker='*', color='#d95319')
 plt.plot(range(len(socialWelfare[1])), socialWelfare[1], label='NIA-S', marker='o')
 plt.plot(range(len(socialWelfare[2])), socialWelfare[2], label='LP', marker='^', color='green')
 # 添加图例
