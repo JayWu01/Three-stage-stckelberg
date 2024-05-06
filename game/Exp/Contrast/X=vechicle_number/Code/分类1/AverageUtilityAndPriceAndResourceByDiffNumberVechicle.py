@@ -723,6 +723,7 @@ if __name__ == '__main__':
     average_UserResource_by_number_user, average_CloudResource_by_number_user, average_ECSPResource_by_number_user, average_CloudPrice_by_number_user, average_ECSPPrice_by_number_user, average_VOPPrice_by_number_user = [], [], [],  [], [], []
     vechicleUtility_by_number_user,p_m_by_number_user,f_m_by_number_user=[],[],[]
     socialWelfare = []
+    Userutility, ECSPUtility, VOPUtility, UserResource, ECSPResource, ECSPPrice, VOPPrice = [], [], [], [], [], [], []
     for nv in range(0, 13):
         print("----------------------------v_number={}------------------------------------：".format(
             nv))
@@ -828,6 +829,14 @@ if __name__ == '__main__':
         print("车辆整体效益值", utilityTorTotalVechicle)
         print("整体社会效益为", sum(utility_for_user_device) + sum(U_j) + utility_for_Vop + utilityTorTotalVechicle)
 
+        Userutility.append(utility_for_user_device)
+        ECSPUtility.append(U_j)
+        VOPUtility.append(utility_for_Vop)
+        UserResource.append([sum(i) for i in F])
+        ECSPResource.append(f_j_vop)
+        ECSPPrice.append(P)
+        VOPPrice.append(p_j_vop)
+
     print("用户平均效益值变化", average_Userutility_by_number_user)
     print("ECSPS平均效益值变化", average_ECSPutility_by_number_user)
     print("Cloud效益值变化", average_Cloudutility_by_number_user)
@@ -845,3 +854,12 @@ if __name__ == '__main__':
     print("f_m变化", f_m_by_number_user)
 
     print("整体社会福利", socialWelfare)
+
+    # Userutility, ECSPUtility, VOPUtility, UserResource, ECSPResource, ECSPPrice, VOPPrice
+    print("Userutility", Userutility)
+    print("ECSPUtility", ECSPUtility)
+    print("VOPUtility", VOPUtility)
+    print("UserResource", UserResource)
+    print("ECSPResource", ECSPResource)
+    print("ECSPPrice", ECSPPrice)
+    print("VOPPrice", VOPPrice)

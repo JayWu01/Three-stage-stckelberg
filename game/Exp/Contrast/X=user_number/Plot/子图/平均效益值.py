@@ -30,7 +30,7 @@ fig, ax = plt.subplots()
 # 自定义刻度标签格式函数
 def format_func(value, tick_number):
     return f"{value:.0f}"
-x_major_locator = MultipleLocator(2)
+x_major_locator = MultipleLocator(3)
 # 绘制主图中的三条曲线
 ax.plot(range(len(U_user_v)), U_user_v, label='$U_{i}$', marker='*', color='#d95319')
 ax.plot(range(len(U_S_t_v)), U_S_t_v, label='$U^{ecsp}_{j}$', marker='o')
@@ -68,4 +68,4 @@ ax_inset.legend(fontsize=8)
 # 显示图形
 plt.show()
 # 保存图像时设置dpi参数
-# fig.savefig("Fig_4a.png", dpi=300)
+fig.savefig("Fig_4a.png", dpi=300)

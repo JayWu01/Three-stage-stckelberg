@@ -116,7 +116,7 @@ ax_inset2 = fig.add_axes([left, bottom, width, height])  # left, bottom, width, 
 # 绘制子图中的三条曲线
 ax_inset2.plot(range(len(P_VOP[:, 0])), P_VOP[:, 0], label='$p^{1}_{vop}$', marker='.', color='#990066')
 ax_inset2.plot(range(len(P_VOP[:, 1])), P_VOP[:, 1], label='$p^{2}_{vop}$', marker='+', color='green')
-ax_inset2.plot(range(len(P_VOP[:, 2])), P_VOP[:, 2], label='$p^{3}_{vop}$', marker='D', color='y')
+ax_inset2.plot(range(len(P_VOP[:, 2])), P_VOP[:, 2], label='$p^{3}_{vop}$', marker='x', color='y')
 
 ax_inset2.set_xlim(0, 9)
 # 设置y轴刻度标签格式
@@ -135,4 +135,4 @@ ax_inset2.legend(loc='upper center', ncol=3, fontsize=7)
 # 显示图形
 plt.show()
 # 保存图像时设置dpi参数
-# fig.savefig("Fig_6b.png", dpi=300)
+fig.savefig("Fig_6b.png", dpi=300)

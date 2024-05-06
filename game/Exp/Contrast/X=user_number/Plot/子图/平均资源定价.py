@@ -72,9 +72,9 @@ left, bottom, width, height = 0.2, 0.56, 0.3, 0.3
 ax_inset = fig.add_axes([left, bottom, width, height])  # left, bottom, width, height
 
 # 绘制子图中的三条曲线
-ax_inset.plot(range(len(P_ECSP[:, 0])), P_ECSP[:, 0], label='$p_{1}$', marker='.')
-ax_inset.plot(range(len(P_ECSP[:, 1])), P_ECSP[:, 1], label='$p_{2}$', marker='o')
-ax_inset.plot(range(len(P_ECSP[:, 2])), P_ECSP[:, 2], label='$p_{3}$', marker='s', color='#d95319')
+ax_inset.plot(range(len(P_ECSP[:, 0])), P_ECSP[:, 0], label='$p_{1}$', marker='.', color='#990066')
+ax_inset.plot(range(len(P_ECSP[:, 1])), P_ECSP[:, 1], label='$p_{2}$', marker='+', color='green')
+ax_inset.plot(range(len(P_ECSP[:, 2])), P_ECSP[:, 2], label='$p_{3}$', marker='x', color='y')
 
 ax_inset.set_xlim(0, 9)
 # 添加标题和轴标签
@@ -113,4 +113,4 @@ ax_inset2.legend(loc='upper center', ncol=3, fontsize=7)
 # 显示图形
 plt.show()
 # 保存图像时设置dpi参数
-# fig.savefig("Fig_4b.png", dpi=300)
+fig.savefig("Fig_4b.png", dpi=300)
